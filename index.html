@@ -7,481 +7,63 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Scent Selector</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --card-bg: #f5f5f7;
-            --accent: #007AFF;
-            --accent-hover: #0051D5;
-            --border: #d1d1d6;
-            --shadow: rgba(0, 0, 0, 0.1);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #000000;
-                --text-color: #ffffff;
-                --card-bg: #1c1c1e;
-                --accent: #0A84FF;
-                --accent-hover: #409CFF;
-                --border: #38383a;
-                --shadow: rgba(255, 255, 255, 0.1);
-            }
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-            padding: 15px;
-            padding-bottom: 30px;
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .subtitle {
-            text-align: center;
-            opacity: 0.7;
-            margin-bottom: 25px;
-            font-size: 14px;
-        }
-
-        .section {
-            margin-bottom: 25px;
-        }
-
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        button {
-            background: var(--card-bg);
-            border: 2px solid var(--border);
-            color: var(--text-color);
-            padding: 0;
-            border-radius: 16px;
-            font-size: 18px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-            aspect-ratio: 1 / 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 140px;
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        button.selected {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        button.primary {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            font-size: 18px;
-            padding: 20px;
-            margin-top: 20px;
-            width: 100%;
-            aspect-ratio: auto;
-            min-height: auto;
-        }
-
-        button.secondary {
-            background: transparent;
-            border: 2px solid var(--accent);
-            color: var(--accent);
-            width: 100%;
-            margin-top: 10px;
-            padding: 18px;
-            aspect-ratio: auto;
-            min-height: auto;
-        }
-
-        .weather-temp {
-            font-size: 13px;
-            opacity: 0.8;
-            display: block;
-            margin-top: 6px;
-        }
-
-        .recommendation-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border);
-        }
-
-        .combo-card {
-            background: linear-gradient(135deg, var(--accent) 0%, #0051D5 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .combo-card:active {
-            transform: scale(0.98);
-        }
-
-        .combo-badge {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.3);
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .rec-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .rec-name {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .stars {
-            color: #FFD700;
-            font-size: 16px;
-        }
-
-        .rec-reason {
-            font-size: 14px;
-            line-height: 1.5;
-            opacity: 0.9;
-            margin-bottom: 12px;
-        }
-
-        .spray-guide {
-            background: rgba(0, 122, 255, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 13px;
-        }
-
-        .spray-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: var(--accent);
-        }
-
-        .pairs-with {
-            background: rgba(255, 215, 0, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            font-size: 13px;
-        }
-
-        .pairs-title {
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #FFD700;
-        }
-
-        .pair-link {
-            display: inline-block;
-            background: rgba(255, 215, 0, 0.2);
-            padding: 6px 12px;
-            border-radius: 8px;
-            margin: 4px 4px 4px 0;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-color);
-        }
-
-        .pair-link:active {
-            transform: scale(0.95);
-            background: rgba(255, 215, 0, 0.3);
-        }
-
-        .rec-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .rec-actions button {
-            flex: 1;
-            padding: 10px;
-            font-size: 14px;
-            aspect-ratio: auto;
-            min-height: auto;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .back-button {
-            background: transparent;
-            border: none;
-            color: var(--accent);
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            aspect-ratio: auto;
-            min-height: auto;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .nav-tab {
-            padding: 10px 20px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            white-space: nowrap;
-            font-size: 14px;
-            aspect-ratio: auto;
-            min-height: auto;
-        }
-
-        .nav-tab.active {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-        }
-
-        .history-item {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .history-item:active {
-            transform: scale(0.98);
-            background: var(--border);
-        }
-
-        .history-date {
-            opacity: 0.6;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .favorite-item {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .favorite-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-
-        .favorite-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .favorite-actions button {
-            flex: 1;
-            padding: 10px;
-            font-size: 14px;
-            aspect-ratio: auto;
-            min-height: auto;
-        }
-
-        .delete-btn {
-            background: #FF3B30;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            aspect-ratio: auto;
-            min-height: auto;
-        }
-
-        .edit-note-btn {
-            background: #FF9500;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            aspect-ratio: auto;
-            min-height: auto;
-        }
-
-        .favorite-note {
-            background: rgba(255, 149, 0, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-size: 13px;
-            font-style: italic;
-        }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-color);
-            font-size: 16px;
-            margin-bottom: 10px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            opacity: 0.6;
-        }
-
-        .rating-prompt {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #000;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .rating-prompt h3 {
-            margin-bottom: 10px;
-        }
-
-        .rating-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .rating-buttons button {
-            flex: 1;
-            aspect-ratio: auto;
-            min-height: auto;
-            padding: 12px;
-            font-size: 16px;
-        }
-
-        .combo-detail-content {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-        }
-
-        .combo-fragrances {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 20px 0;
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .reset-rating-btn {
-            background: #FF9500;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 12px;
-            aspect-ratio: auto;
-            min-height: auto;
-            margin-left: 10px;
-        }
-
-        .wear-dates-list {
-            background: rgba(0, 122, 255, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .wear-date-item {
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
-            font-size: 14px;
-        }
-
-        .wear-date-item:last-child {
-            border-bottom: none;
-        }
-
-        .combo-type-badge {
-            display: inline-block;
-            background: rgba(0, 122, 255, 0.2);
-            color: var(--accent);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
+        * {margin:0;padding:0;box-sizing:border-box;}
+        :root{--bg-color:#ffffff;--text-color:#000000;--card-bg:#f5f5f7;--accent:#007AFF;--accent-hover:#0051D5;--border:#d1d1d6;--shadow:rgba(0,0,0,0.1);}
+        @media (prefers-color-scheme: dark) {:root{--bg-color:#000000;--text-color:#ffffff;--card-bg:#1c1c1e;--accent:#0A84FF;--accent-hover:#409CFF;--border:#38383a;--shadow:rgba(255,255,255,0.1);}}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-color);color:var(--text-color);padding:15px;padding-bottom:30px;line-height:1.6;min-height:100vh;}
+        .container{max-width:600px;margin:0 auto;}
+        h1{font-size:32px;font-weight:700;margin-bottom:10px;text-align:center;}
+        .subtitle{text-align:center;opacity:0.7;margin-bottom:25px;font-size:14px;}
+        .section{margin-bottom:25px;}
+        .section-title{font-size:20px;font-weight:600;margin-bottom:15px;}
+        .button-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-bottom:20px;}
+        button{background:var(--card-bg);border:2px solid var(--border);color:var(--text-color);padding:0;border-radius:16px;font-size:18px;font-weight:500;cursor:pointer;transition:all 0.2s;-webkit-tap-highlight-color:transparent;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:140px;}
+        button:active{transform:scale(0.95);}
+        button.selected{background:var(--accent);color:white;border-color:var(--accent);}
+        button.primary{background:var(--accent);color:white;border-color:var(--accent);font-size:18px;padding:20px;margin-top:20px;width:100%;aspect-ratio:auto;min-height:auto;}
+        button.secondary{background:transparent;border:2px solid var(--accent);color:var(--accent);width:100%;margin-top:10px;padding:18px;aspect-ratio:auto;min-height:auto;}
+        .weather-temp{font-size:13px;opacity:0.8;display:block;margin-top:6px;}
+        .recommendation-card{background:var(--card-bg);border-radius:12px;padding:20px;margin-bottom:15px;border:1px solid var(--border);}
+        .combo-card{background:linear-gradient(135deg,var(--accent) 0%,#0051D5 100%);color:white;border-radius:12px;padding:20px;margin-bottom:15px;border:none;cursor:pointer;transition:transform 0.2s;}
+        .combo-card:active{transform:scale(0.98);}
+        .combo-badge{display:inline-block;background:rgba(255,255,255,0.3);padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;margin-bottom:10px;}
+        .rec-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+        .rec-name{font-size:18px;font-weight:600;}
+        .stars{color:#FFD700;font-size:16px;}
+        .rec-reason{font-size:14px;line-height:1.5;opacity:0.9;margin-bottom:12px;}
+        .spray-guide{background:rgba(0,122,255,0.1);padding:12px;border-radius:8px;margin-bottom:12px;font-size:13px;}
+        .spray-title{font-weight:600;margin-bottom:4px;color:var(--accent);}
+        .pairs-with{background:rgba(255,215,0,0.1);padding:10px;border-radius:8px;margin-bottom:12px;font-size:13px;}
+        .pairs-title{font-weight:600;margin-bottom:6px;color:#FFD700;}
+        .pair-link{display:inline-block;background:rgba(255,215,0,0.2);padding:6px 12px;border-radius:8px;margin:4px 4px 4px 0;cursor:pointer;transition:all 0.2s;color:var(--text-color);}
+        .pair-link:active{transform:scale(0.95);background:rgba(255,215,0,0.3);}
+        .rec-actions{display:flex;gap:10px;}
+        .rec-actions button{flex:1;padding:10px;font-size:14px;aspect-ratio:auto;min-height:auto;}
+        .hidden{display:none;}
+        .back-button{background:transparent;border:none;color:var(--accent);padding:10px;font-size:16px;cursor:pointer;margin-bottom:20px;aspect-ratio:auto;min-height:auto;}
+        .nav-tabs{display:flex;gap:10px;margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+        .nav-tab{padding:10px 20px;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;white-space:nowrap;font-size:14px;aspect-ratio:auto;min-height:auto;}
+        .nav-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
+        .history-item{background:var(--card-bg);padding:15px;border-radius:10px;margin-bottom:10px;font-size:14px;cursor:pointer;transition:all 0.2s;}
+        .history-item:active{transform:scale(0.98);background:var(--border);}
+        .history-date{opacity:0.6;font-size:12px;margin-top:5px;}
+        .favorite-item{background:var(--card-bg);padding:15px;border-radius:10px;margin-bottom:10px;}
+        .favorite-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+        .favorite-actions{display:flex;gap:8px;margin-top:10px;}
+        .favorite-actions button{flex:1;padding:10px;font-size:14px;aspect-ratio:auto;min-height:auto;}
+        .delete-btn{background:#FF3B30;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:14px;aspect-ratio:auto;min-height:auto;}
+        .edit-note-btn{background:#FF9500;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:14px;aspect-ratio:auto;min-height:auto;}
+        .favorite-note{background:rgba(255,149,0,0.1);padding:10px;border-radius:8px;margin-top:10px;font-size:13px;font-style:italic;}
+        input,select,textarea{width:100%;padding:12px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;color:var(--text-color);font-size:16px;margin-bottom:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
+        textarea{min-height:120px;resize:vertical;}
+        .empty-state{text-align:center;padding:40px 20px;opacity:0.6;}
+        .rating-prompt{background:linear-gradient(135deg,#FFD700 0%,#FFA500 100%);color:#000;border-radius:12px;padding:20px;margin-bottom:20px;text-align:center;}
+        .rating-prompt h3{margin-bottom:10px;}
+        .rating-buttons{display:flex;gap:10px;margin-top:15px;}
+        .rating-buttons button{flex:1;aspect-ratio:auto;min-height:auto;padding:12px;font-size:16px;}
+        .modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;}
+        .modal-content{background:var(--bg-color);border-radius:12px;padding:20px;max-width:500px;width:100%;}
+        .combo-type-badge{display:inline-block;background:rgba(0,122,255,0.2);color:var(--accent);padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;margin-left:8px;}
     </style>
 </head>
 <body>
@@ -491,10 +73,10 @@
 
         <!-- Navigation -->
         <div id="nav" class="nav-tabs hidden">
-            <button class="nav-tab active" onclick="showTab('selector')">Selector</button>
-            <button class="nav-tab" onclick="showTab('history')">History</button>
-            <button class="nav-tab" onclick="showTab('favorites')">Favorites</button>
-            <button class="nav-tab" onclick="showTab('notes')">Notes</button>
+            <button class="nav-tab active" onclick="showTab('selector', this)">Selector</button>
+            <button class="nav-tab" onclick="showTab('history', this)">History</button>
+            <button class="nav-tab" onclick="showTab('favorites', this)">Favorites</button>
+            <button class="nav-tab" onclick="showTab('notes', this)">Notes</button>
         </div>
 
         <!-- Main Selector Screen -->
@@ -536,9 +118,7 @@
             <div id="suspenseSection" class="section hidden">
                 <button class="back-button" onclick="goBack('situation')">← Back</button>
                 <h2 class="section-title">Build Suspense?</h2>
-                <p style="text-align: center; opacity: 0.7; margin-bottom: 20px; font-size: 14px;">
-                    Are you planning a date that might lead somewhere special?
-                </p>
+                <p style="text-align:center;opacity:0.7;margin-bottom:20px;font-size:14px;">Are you planning a date that might lead somewhere special?</p>
                 <div class="button-grid">
                     <button onclick="selectSuspense(true)">😏<br>Yes</button>
                     <button onclick="selectSuspense(false)">🍽️<br>No</button>
@@ -554,14 +134,12 @@
             <button class="secondary" onclick="surpriseMe()">🎲 Surprise Me!</button>
             <button class="secondary" onclick="showWhatAmIWearing()">What Am I Wearing?</button>
         </div>
-
-        <!-- Combo Detail Screen -->
+        <!-- Detail Screens -->
         <div id="comboDetailScreen" class="hidden">
             <button class="back-button" onclick="closeComboDetail()">← Back</button>
             <div id="comboDetailContent"></div>
         </div>
 
-        <!-- Fragrance Detail Screen -->
         <div id="fragranceDetailScreen" class="hidden">
             <button class="back-button" onclick="closeFragranceDetail()">← Back</button>
             <div id="fragranceDetailContent"></div>
@@ -595,1144 +173,87 @@
         </div>
 
         <!-- Edit Note Modal -->
-        <div id="editNoteModal" class="hidden" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-            <div style="background: var(--bg-color); border-radius: 12px; padding: 20px; max-width: 500px; width: 100%;">
-                <h3 style="margin-bottom: 15px;">Edit Note</h3>
-                <textarea id="editNoteText" placeholder="Add your note..." style="min-height: 100px;"></textarea>
-                <div style="display: flex; gap: 10px;">
-                    <button class="primary" onclick="saveNote()" style="flex: 1;">Save</button>
-                    <button class="secondary" onclick="closeNoteModal()" style="flex: 1; margin-top: 0;">Cancel</button>
+        <div id="editNoteModal" class="modal hidden">
+            <div class="modal-content">
+                <h3>Edit Note</h3>
+                <textarea id="editNoteText" placeholder="Add your note..."></textarea>
+                <div style="display:flex;gap:10px;margin-top:15px;">
+                    <button class="primary" onclick="saveNote()">Save</button>
+                    <button class="secondary" onclick="closeNoteModal()">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Fragrance Database
-        const fragranceData = {
-            "Phantom Noir": {
-                notes: "Coffee, rum, vanilla, caramel",
-                seasons: ["winter", "fall"],
-                pairsWith: ["Brooklyn Jazz", "1 Million"]
-            },
-            "Brooklyn Jazz": {
-                notes: "Rum, tobacco, vanilla, tonka",
-                seasons: ["winter", "fall", "spring"],
-                pairsWith: ["Phantom Noir", "Vanille Absolute"]
-            },
-            "Vanille Absolute": {
-                notes: "Vanilla, ginger, pink pepper",
-                seasons: ["fall", "winter"],
-                pairsWith: ["Aventus", "Brooklyn Jazz"]
-            },
-            "Lost Cherry": {
-                notes: "Cherry, almond, tonka bean",
-                seasons: ["winter", "fall"],
-                pairsWith: ["1 Million", "Ambery Saffron"]
-            },
-            "Aventus": {
-                notes: "Pineapple, birch, oakmoss",
-                seasons: ["spring", "summer", "fall"],
-                pairsWith: ["Ambery Saffron", "Gentle Silver"]
-            },
-            "Gentle Silver": {
-                notes: "Juniper, nutmeg, vanilla",
-                seasons: ["spring", "summer", "fall", "winter"],
-                pairsWith: ["Aventus", "Cubicle for Men"]
-            },
-            "Maison du Soir": {
-                notes: "Chestnut, cloves, vanilla",
-                seasons: ["winter", "fall"],
-                pairsWith: ["BLOMB No. 27"]
-            },
-            "BLOMB No. 27": {
-                notes: "Tobacco, coconut, sandalwood",
-                seasons: ["winter", "fall"],
-                pairsWith: ["Maison du Soir"]
-            },
-            "Cubicle for Men": {
-                notes: "Fresh, woody, ambroxan",
-                seasons: ["spring", "summer", "fall", "winter"],
-                pairsWith: ["Gentle Silver"]
-            },
-            "Victory Man": {
-                notes: "Bergamot, cedarwood",
-                seasons: ["spring", "summer"],
-                pairsWith: ["Aventus"]
-            },
-            "Eau Noir": {
-                notes: "Tea, tobacco, fig, cedarwood",
-                seasons: ["fall", "winter"],
-                pairsWith: ["Brooklyn Jazz"]
-            },
-            "1 Million": {
-                notes: "Cinnamon, leather, amber",
-                seasons: ["winter", "fall"],
-                pairsWith: ["Lost Cherry", "Phantom Noir"]
-            },
-            "Ambery Saffron": {
-                notes: "Amber, saffron, woody",
-                seasons: ["winter", "fall", "spring"],
-                pairsWith: ["Aventus", "Lost Cherry"]
-            }
+        // Data
+        const fragranceData={
+            "Phantom Noir":{notes:"Coffee, rum, vanilla, caramel",seasons:["winter","fall"],pairsWith:["Brooklyn Jazz","1 Million"]},
+            "Brooklyn Jazz":{notes:"Rum, tobacco, vanilla, tonka",seasons:["winter","fall","spring"],pairsWith:["Phantom Noir","Vanille Absolute"]},
+            "Vanille Absolute":{notes:"Vanilla, ginger, pink pepper",seasons:["fall","winter"],pairsWith:["Aventus","Brooklyn Jazz"]},
+            "Lost Cherry":{notes:"Cherry, almond, tonka bean",seasons:["winter","fall"],pairsWith:["1 Million","Ambery Saffron"]},
+            "Aventus":{notes:"Pineapple, birch, oakmoss",seasons:["spring","summer","fall"],pairsWith:["Ambery Saffron","Gentle Silver"]},
+            "Gentle Silver":{notes:"Juniper, nutmeg, vanilla",seasons:["spring","summer","fall","winter"],pairsWith:["Aventus","Cubicle for Men"]},
+            "Maison du Soir":{notes:"Chestnut, cloves, vanilla",seasons:["winter","fall"],pairsWith:["BLOMB No. 27"]},
+            "BLOMB No. 27":{notes:"Tobacco, coconut, sandalwood",seasons:["winter","fall"],pairsWith:["Maison du Soir"]},
+            "Cubicle for Men":{notes:"Fresh, woody, ambroxan",seasons:["spring","summer","fall","winter"],pairsWith:["Gentle Silver"]},
+            "1 Million":{notes:"Cinnamon, leather, amber",seasons:["winter","fall"],pairsWith:["Lost Cherry","Phantom Noir"]},
+            "Ambery Saffron":{notes:"Amber, saffron, woody",seasons:["winter","fall","spring"],pairsWith:["Aventus","Lost Cherry"]}
         };
 
-        // Detailed combo information
-        const comboDetails = {
-            "1 Million + Lost Cherry": {
-                name: "Winter Date Power",
-                why: "Sweet cherry-almond from Lost Cherry meets bold cinnamon-leather from 1 Million creating an irresistible sweet-spicy seduction bomb. The cherry softens 1 Million's aggressive opening while 1 Million adds projection power to Lost Cherry's intimate sweetness. Together they create maximum impact for winter dates.",
-                application: {
-                    first: {name: "Lost Cherry", sprays: 2, placement: "1 on neck, 1 on chest"},
-                    wait: "Wait 5 minutes to let Lost Cherry settle",
-                    second: {name: "1 Million", sprays: 1, placement: "1 on left wrist"}
-                },
-                bestFor: "Winter date-suspense, winter date-public, winter intimate (use less of both)",
-                seasons: ["winter"]
-            },
-            "Aventus + Vanille Absolute": {
-                name: "Fall Romance",
-                why: "Spicy vanilla-ginger meets fruity-smoky Aventus creating a unique depth that stands out from typical fall scents. The pink pepper in Vanille Absolute amplifies Aventus's birch smoke, while Aventus's pineapple brightens the vanilla. This combo is sophisticated and memorable—perfect for fall date nights.",
-                application: {
-                    first: {name: "Aventus", sprays: 1, placement: "1 on chest"},
-                    wait: "Wait 2-3 minutes",
-                    second: {name: "Vanille Absolute", sprays: 2, placement: "1 on neck, 1 on right wrist"}
-                },
-                bestFor: "Fall date-suspense, fall date-public",
-                seasons: ["fall"]
-            },
-            "Brooklyn Jazz + Phantom Noir": {
-                name: "Boozy Brothers",
-                why: "Coffee-rum from Phantom Noir meets rum-tobacco from Brooklyn Jazz for ULTIMATE boozy projection. This is for clubs and parties only—way too strong for intimate settings. The double rum creates an intoxicating cloud that fills a room. Maximum attention-grabbing power.",
-                application: {
-                    first: {name: "Phantom Noir", sprays: 2, placement: "1 on neck, 1 on chest"},
-                    wait: "Wait 5 minutes",
-                    second: {name: "Brooklyn Jazz", sprays: 1, placement: "1 on left wrist"}
-                },
-                bestFor: "Winter date-public (clubs/parties only), fall date-public (high-energy venues)",
-                seasons: ["winter", "fall"]
-            },
-            "Ambery Saffron + Aventus": {
-                name: "Spring Sophistication",
-                why: "Fruity freshness meets amber warmth for spring evening elegance. Aventus's pineapple-birch cuts through Ambery Saffron's heaviness making it wearable in warmer weather, while Ambery Saffron adds depth and luxury to Aventus. Perfect for upscale spring date nights.",
-                application: {
-                    first: {name: "Aventus", sprays: 2, placement: "1 on neck, 1 on chest"},
-                    wait: "Wait 3 minutes",
-                    second: {name: "Ambery Saffron", sprays: 1, placement: "1 on right wrist"}
-                },
-                bestFor: "Spring date-suspense, spring date-public",
-                seasons: ["spring"]
-            },
-            "Aventus + Gentle Silver": {
-                name: "Summer Evening",
-                why: "Refined summer layering for date nights. Fresh pineapple meets aromatic juniper-nutmeg creating sophisticated freshness without being too heavy for warm weather. The vanilla in Gentle Silver softens Aventus while the juniper adds aromatic complexity. Elegant and date-appropriate.",
-                application: {
-                    first: {name: "Aventus", sprays: 1, placement: "1 on chest only (very light)"},
-                    wait: "Wait 2 minutes",
-                    second: {name: "Gentle Silver", sprays: 2, placement: "1 on neck, 1 on left wrist"}
-                },
-                bestFor: "Summer date-suspense, summer date-public",
-                seasons: ["summer"]
-            },
-            "Phantom Noir + Vanille Absolute": {
-                name: "Sweet Seduction",
-                why: "Coffee-boozy meets spicy vanilla for ultimate fall/winter seduction. The ginger in Vanille Absolute enhances Phantom Noir's coffee notes, while Phantom Noir's rum amplifies the vanilla. Incredibly seductive at close range—perfect for building suspense throughout the night.",
-                application: {
-                    first: {name: "Phantom Noir", sprays: 2, placement: "1 on neck, 1 on chest"},
-                    wait: "Wait 5 minutes",
-                    second: {name: "Vanille Absolute", sprays: 1, placement: "1 on right wrist"}
-                },
-                bestFor: "Fall date-suspense, winter date-suspense, fall/winter intimate",
-                seasons: ["fall", "winter"]
-            },
-            "Brooklyn Jazz + Vanille Absolute": {
-                name: "Vanilla Tobacco",
-                why: "Boozy rum-tobacco meets spicy vanilla for cozy romantic warmth. Brooklyn Jazz's tobacco is softened by Vanille Absolute's sweetness, while the vanilla is given edge by the rum-tobacco. Perfect for intimate fall/winter moments and cozy dates.",
-                application: {
-                    first: {name: "Brooklyn Jazz", sprays: 2, placement: "1 on neck, 1 on chest"},
-                    wait: "Wait 5 minutes",
-                    second: {name: "Vanille Absolute", sprays: 1, placement: "1 on left wrist"}
-                },
-                bestFor: "Fall intimate, winter intimate, fall date-suspense",
-                seasons: ["fall", "winter"]
-            },
-            "Ambery Saffron + Lost Cherry": {
-                name: "Gourmand Luxury",
-                why: "Sweet cherry-almond meets warm amber-saffron for luxurious gourmand depth. The saffron adds exotic spice to Lost Cherry's sweetness, while Lost Cherry softens Ambery Saffron's potentially polarizing intensity. Rich and decadent for special winter occasions.",
-                application: {
-                    first: {name: "Lost Cherry", sprays: 2, placement: "1 on neck, 1 on chest"},
-                    wait: "Wait 5 minutes",
-                    second: {name: "Ambery Saffron", sprays: 1, placement: "1 on right wrist"}
-                },
-                bestFor: "Winter date-suspense (special occasions), fall date-suspense",
-                seasons: ["winter", "fall"]
-            },
-            "Aventus + Cubicle for Men": {
-                name: "Fresh Amplifier",
-                why: "Fruity Aventus meets fresh-woody Cubicle for enhanced work projection. Cubicle's ambroxan amplifies Aventus's longevity and projection while keeping it office-appropriate. Great for days when you want Aventus at work but need to tone it down slightly.",
-                application: {
-                    first: {name: "Cubicle for Men", sprays: 2, placement: "1 on neck, 1 on chest"},
-                    wait: "Wait 2 minutes",
-                    second: {name: "Aventus", sprays: 1, placement: "1 on left wrist"}
-                },
-                bestFor: "Fall work, spring work, fall casual",
-                seasons: ["fall", "spring"]
-            },
-            "BLOMB No. 27 + Maison du Soir": {
-                name: "Cozy Depth",
-                why: "Chestnut-vanilla meets woody-tobacco-coconut for ultimate winter comfort layering. The coconut in BLOMB enhances Maison du Soir's chestnut warmth, while Maison du Soir sweetens BLOMB's tobacco. Perfect for casual winter days and cozy activities.",
-                application: {
-                    first: {name: "Maison du Soir", sprays: 3, placement: "1 on back of neck, 1 on chest, 1 on left wrist"},
-                    wait: "Wait 5 minutes",
-                    second: {name: "BLOMB No. 27", sprays: 1, placement: "1 on right wrist"}
-                },
-                bestFor: "Winter casual, late fall casual",
-                seasons: ["winter", "fall"]
-            },
-            "Brooklyn Jazz + Eau Noir": {
-                name: "Sophisticated Tobacco",
-                why: "Tea-tobacco-fig meets rum-tobacco-vanilla for refined tobacco layering. Eau Noir's tea and fig add sophistication to Brooklyn Jazz's boozy sweetness, while Brooklyn Jazz adds warmth to Eau Noir's coolness. Elegant fall/winter date night option.",
-                application: {
-                    first: {name: "Eau Noir", sprays: 2, placement: "1 on neck, 1 on chest"},
-                    wait: "Wait 3 minutes",
-                    second: {name: "Brooklyn Jazz", sprays: 1, placement: "1 on right wrist"}
-                },
-                bestFor: "Fall date-public (upscale), winter date-public (sophisticated venues)",
-                seasons: ["fall", "winter"]
-            }
+        const comboDetails={
+            "1 Million + Lost Cherry":{name:"Winter Date Power",why:"Sweet cherry meets bold cinnamon for irresistible sweet-spicy seduction.",application:{first:{name:"Lost Cherry",sprays:2,placement:"1 neck, 1 chest"},wait:"Wait 5 min",second:{name:"1 Million",sprays:1,placement:"1 left wrist"}},bestFor:"Winter date-suspense",seasons:["winter"]},
+            "Aventus + Vanille Absolute":{name:"Fall Romance",why:"Spicy vanilla meets fruity Aventus for sophisticated fall dates.",application:{first:{name:"Aventus",sprays:1,placement:"1 chest"},wait:"Wait 2-3 min",second:{name:"Vanille Absolute",sprays:2,placement:"1 neck, 1 right wrist"}},bestFor:"Fall date-suspense",seasons:["fall"]},
+            "Brooklyn Jazz + Phantom Noir":{name:"Boozy Brothers",why:"Coffee-rum meets rum-tobacco for ultimate boozy projection.",application:{first:{name:"Phantom Noir",sprays:2,placement:"1 neck, 1 chest"},wait:"Wait 5 min",second:{name:"Brooklyn Jazz",sprays:1,placement:"1 left wrist"}},bestFor:"Winter date-public",seasons:["winter","fall"]}
         };
 
-        // Weather options per season
-        const weatherOptions = {
-            winter: [
-                {id: 'freezing', emoji: '❄️', label: 'Freezing', temp: 'Below 25°F', modifier: 1.3},
-                {id: 'cold', emoji: '🌨️', label: 'Cold', temp: '25-40°F', modifier: 1.15},
-                {id: 'cool', emoji: '☁️', label: 'Cool', temp: '40-50°F', modifier: 1.0},
-                {id: 'mild', emoji: '🌤️', label: 'Mild', temp: '50-60°F', modifier: 0.85}
-            ],
-            spring: [
-                {id: 'chilly', emoji: '🌧️', label: 'Chilly', temp: '45-55°F', modifier: 1.0},
-                {id: 'moderate', emoji: '☁️', label: 'Moderate', temp: '55-65°F', modifier: 0.9},
-                {id: 'pleasant', emoji: '🌤️', label: 'Pleasant', temp: '65-75°F', modifier: 0.8},
-                {id: 'warm', emoji: '☀️', label: 'Warm', temp: '75-85°F', modifier: 0.7}
-            ],
-            summer: [
-                {id: 'comfortable', emoji: '🌤️', label: 'Comfortable', temp: '70-80°F', modifier: 0.8},
-                {id: 'hot', emoji: '☀️', label: 'Hot', temp: '80-90°F', modifier: 0.6},
-                {id: 'veryhot', emoji: '🔥', label: 'Very Hot', temp: '90-95°F', modifier: 0.5},
-                {id: 'extreme', emoji: '🥵', label: 'Extreme', temp: '95°F+', modifier: 0.4}
-            ],
-            fall: [
-                {id: 'chilly', emoji: '🍂', label: 'Chilly', temp: '45-55°F', modifier: 1.0},
-                {id: 'moderate', emoji: '☁️', label: 'Moderate', temp: '55-65°F', modifier: 0.9},
-                {id: 'pleasant', emoji: '🌤️', label: 'Pleasant', temp: '65-75°F', modifier: 0.8},
-                {id: 'warm', emoji: '☀️', label: 'Warm', temp: '75-85°F', modifier: 0.7}
-            ]
-        };
-
-        // Recommendations database (including all seasons and situations - abbreviated here for character limit, but include your FULL data)
-        const recommendations = {
-            winter: {
-                work: {
-                    base: [
-                        {name: "Maison du Soir", priority: 1, sprays: {base: 3, placement: "1 on back of neck, 1 on chest, 1 on left wrist"}, reason: "Cozy chestnut-vanilla perfection for winter offices. Professional yet memorable, ideal for holiday gatherings."},
-                        {name: "Cubicle for Men", priority: 2, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Fresh-woody reliability that never fails. Clean and appropriate for any winter workplace."},
-                        {name: "Gentle Silver", priority: 3, sprays: {base: 2, placement: "1 on neck, 1 on left wrist"}, reason: "Aromatic sophistication for professional settings. Slightly spring-leaning but works well."},
-                        {name: "BLOMB No. 27", priority: 4, sprays: {base: 2, placement: "1 on chest, 1 on left wrist"}, reason: "Woody-tobacco for casual workplaces only. Perfect for creative environments or Casual Friday."}
-                    ]
-                },
-                casual: {
-                    base: [
-                        {name: "Maison du Soir", priority: 1, sprays: {base: 4, placement: "1 on back of neck, 1 on chest, 1 on each wrist"}, reason: "Ultimate winter comfort scent. Perfect for coffee shops, errands, and casual hangouts."},
-                        {name: "BLOMB No. 27", priority: 2, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on left wrist"}, reason: "Woody-tobacco everyday winter wear. Warm and grounded for all winter activities."},
-                        {name: "Brooklyn Jazz", priority: 3, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Boozy rum-tobacco when you want to smell intentionally good casually."},
-                        {name: "Gentle Silver", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on left wrist"}, reason: "Versatile aromatic that works anywhere. Not distinctly winter but solid year-round."}
-                    ]
-                },
-                "date-public": {
-                    base: [
-                        {name: "Brooklyn Jazz", priority: 1, sprays: {base: 4, placement: "1 on back of neck, 1 on chest, 1 on each wrist"}, reason: "Boozy rum-tobacco romance. Perfect projection for casual dinners and bars without bedroom intentions."},
-                        {name: "1 Million", priority: 2, sprays: {base: 4, placement: "2 on neck, 1 on chest, 1 on left wrist"}, reason: "Bold sweet-spicy for clubs and high-energy dates. Maximum attention-grabbing for fun nights out."},
-                        {name: "Aventus", priority: 3, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Classic confidence for casual public dates. Works but not winter-optimized."},
-                        {name: "Ambery Saffron", priority: 4, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Warm amber-saffron for special occasion public dates. Strong projection but can be polarizing."}
-                    ]
-                },
-                "date-suspense": {
-                    base: [
-                        {name: "Phantom Noir", priority: 1, sprays: {base: 3, placement: "1 on back of neck, 1 on chest, 1 on left wrist"}, reason: "THE suspense king. Coffee-rum-boozy projects at the movie theater, then becomes intoxicating skin scent later. Builds anticipation perfectly."},
-                        {name: "Brooklyn Jazz", priority: 2, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Boozy-vanilla romance that works for dinner AND transitions perfectly to close quarters. The rum-tobacco warmth builds all night."},
-                        {name: "Vanille Absolute", priority: 3, sprays: {base: 3, placement: "1 on back of neck, 1 on chest, 1 on left wrist"}, reason: "Spicy vanilla builds suspense throughout the date. Projects well in public, incredible when things get close."},
-                        {name: "Lost Cherry", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Sweet cherry seduction that hints at what's coming. Very sweet so use restraint, but incredible for suspense-building."}
-                    ]
-                },
-                intimate: {
-                    base: [
-                        {name: "Phantom Noir", priority: 1, sprays: {base: 2, placement: "1 on chest, 1 on neck (light application)"}, reason: "Winter bedroom king. Coffee-boozy-sweet is intoxicating at skin-close. She'll crave this scent."},
-                        {name: "Brooklyn Jazz", priority: 2, sprays: {base: 2, placement: "1 on chest, 1 on left wrist"}, reason: "Boozy-warm-vanilla for couch cuddling. Creates cozy warmth she wants to stay close to."},
-                        {name: "Lost Cherry", priority: 3, sprays: {base: 2, placement: "1 on chest, 1 on neck"}, reason: "Sweet cherry-almond bedroom perfection. Tonka bean drydown is seductive at close range."},
-                        {name: "Vanille Absolute", priority: 4, sprays: {base: 2, placement: "1 on chest, 1 on right wrist"}, reason: "Spicy vanilla warmth at skin-close. Ginger-pink pepper adds intrigue when she's right next to you."}
-                    ]
-                }
-            },
-            fall: {
-                work: {
-                    base: [
-                        {name: "Cubicle for Men", priority: 1, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Office MVP year-round. Fresh-woody-ambroxan is safe, professional, and perfect for fall workplaces."},
-                        {name: "Gentle Silver", priority: 2, sprays: {base: 3, placement: "1 on back of neck, 1 on chest, 1 on left wrist"}, reason: "Aromatic sophistication for fall offices. Juniper-nutmeg complements autumn perfectly while staying professional."},
-                        {name: "Aventus", priority: 3, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Fall office signature with fruity-smoky character. Can be bold for conservative offices but excellent for fall."},
-                        {name: "Maison du Soir", priority: 4, sprays: {base: 2, placement: "1 on chest, 1 on left wrist"}, reason: "Works late fall into winter. Better for cooler days; can feel too warm in early/mid fall."}
-                    ]
-                },
-                casual: {
-                    base: [
-                        {name: "Aventus", priority: 1, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on left wrist"}, reason: "THE perfect fall casual signature. Fruity-smoky character shines in autumn air for all activities."},
-                        {name: "Gentle Silver", priority: 2, sprays: {base: 3, placement: "1 on back of neck, 1 on chest, 1 on right wrist"}, reason: "Versatile aromatic for fall everyday wear. Juniper-nutmeg fits autumn perfectly."},
-                        {name: "BLOMB No. 27", priority: 3, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on left wrist"}, reason: "Woody-tobacco-coconut made for fall weekends. Warm and cozy for cooler autumn days."},
-                        {name: "Brooklyn Jazz", priority: 4, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Boozy rum-tobacco for fall casual when meeting friends. Slightly dressed up but works."}
-                    ]
-                },
-                "date-public": {
-                    base: [
-                        {name: "1 Million", priority: 1, sprays: {base: 4, placement: "2 on neck, 1 on chest, 1 on left wrist"}, reason: "Bold sweet-spicy for fall parties and clubs. Maximum projection for high-energy public dates."},
-                        {name: "Brooklyn Jazz", priority: 2, sprays: {base: 4, placement: "1 on back of neck, 1 on chest, 1 on each wrist"}, reason: "Boozy romance for casual bars and dinners. Perfect for public dates without bedroom plans."},
-                        {name: "Aventus", priority: 3, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on left wrist"}, reason: "Classic fall date confidence. Fruity-smoky works everywhere for casual public dates."},
-                        {name: "Ambery Saffron", priority: 4, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Special occasion warmth for concerts and events. Can be polarizing but projects well."}
-                    ]
-                },
-                "date-suspense": {
-                    base: [
-                        {name: "Vanille Absolute", priority: 1, sprays: {base: 3, placement: "1 on back of neck, 1 on chest, 1 on left wrist"}, reason: "Fall suspense KING. Spicy vanilla-ginger projects beautifully at movie theaters, becomes intoxicating up close. Builds anticipation all night."},
-                        {name: "Brooklyn Jazz", priority: 2, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Boozy rum-tobacco romance that works in public and transitions to intimate perfectly. Sophisticated suspense-building."},
-                        {name: "Phantom Noir", priority: 3, sprays: {base: 3, placement: "1 on back of neck, 1 on chest, 1 on left wrist"}, reason: "Coffee-boozy beast for late fall suspense dates. Dark and mysterious in public, seductive up close."},
-                        {name: "Eau Noir", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Sophisticated tea-tobacco for upscale suspense dates. Fig-cedarwood builds refined anticipation."}
-                    ]
-                },
-                intimate: {
-                    base: [
-                        {name: "Vanille Absolute", priority: 1, sprays: {base: 2, placement: "1 on chest, 1 on left wrist"}, reason: "Fall seduction KING. Spicy-sweet perfection at skin-close. Ginger-vanilla is intoxicating when she's right next to you."},
-                        {name: "Brooklyn Jazz", priority: 2, sprays: {base: 2, placement: "1 on chest, 1 on right wrist"}, reason: "Boozy-vanilla cozy perfection for fall nights in. Rum-tobacco-tonka creates warmth she'll crave."},
-                        {name: "Phantom Noir", priority: 3, sprays: {base: 2, placement: "1 on chest, 1 on neck"}, reason: "Coffee-sweet bedroom beast for late fall. Caramel-vanilla is seductive at close range."},
-                        {name: "Lost Cherry", priority: 4, sprays: {base: 2, placement: "1 on chest, 1 on left wrist"}, reason: "Sweet cherry intimate warmth. Tonka-sandalwood drydown is beautiful at skin-close."}
-                    ]
-                }
-            },
-            spring: {
-                work: {
-                    base: [
-                        {name: "Victory Man", priority: 1, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on left wrist"}, reason: "Perfect spring fresh for offices. Bergamot-cedarwood is exactly what spring workplaces need."},
-                        {name: "Cubicle for Men", priority: 2, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Year-round champion perfect for spring. Fresh-woody fits warming weather beautifully."},
-                        {name: "Aventus", priority: 3, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Classic spring office signature. Fruity-fresh character shines but can be bold for conservative offices."},
-                        {name: "Gentle Silver", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on left wrist"}, reason: "Aromatic juniper-nutmeg for spring professionalism. Sophisticated and appropriate."}
-                    ]
-                },
-                casual: {
-                    base: [
-                        {name: "Victory Man", priority: 1, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on right wrist"}, reason: "Perfect spring fresh for everyday casual. Citrus-cedarwood made for spring errands and hangouts."},
-                        {name: "Aventus", priority: 2, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on left wrist"}, reason: "Versatile spring casual king. Fruity-fresh character shines effortlessly in spring air."},
-                        {name: "Gentle Silver", priority: 3, sprays: {base: 2, placement: "1 on neck, 1 on left wrist"}, reason: "Aromatic spring versatility with juniper-coriander freshness. Works all spring casual activities."},
-                        {name: "Cubicle for Men", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Safe everyday spring option but feels more 'office' than weekend casual."}
-                    ]
-                },
-                "date-public": {
-                    base: [
-                        {name: "Aventus", priority: 1, sprays: {base: 3, placement: "1 on neck, 1 on chest, 1 on left wrist"}, reason: "THE spring public date classic. Fruity-fresh confidence perfect for casual dinners and outdoor activities."},
-                        {name: "Gentle Silver", priority: 2, sprays: {base: 2, placement: "1 on neck, 1 on right wrist"}, reason: "Aromatic romantic spring dates. Juniper-vanilla is sophisticated for public spring evenings."},
-                        {name: "Brooklyn Jazz", priority: 3, sprays: {base: 2, placement: "1 on chest, 1 on left wrist (light)"}, reason: "Boozy spring date with restraint. Rum-tobacco can feel heavy but works with light application for casual public dates."},
-                        {name: "Ambery Saffron", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on chest (cooler nights only)"}, reason: "Spring evening dates on cooler nights. Can feel too heavy as spring warms but works early spring."}
-                    ]
-                },
-                "date-suspense": {
-                    base: [
-                        {name: "Aventus", priority: 1, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Spring suspense champion. Fruity-fresh projects at movies/activities, becomes clean-sexy masculine skin scent later. Perfect transition."},
-                        {name: "Gentle Silver", priority: 2, sprays: {base: 2, placement: "1 on neck, 1 on left wrist"}, reason: "Aromatic romantic spring suspense. Juniper-vanilla builds subtle anticipation, works in public and intimate settings."},
-                        {name: "Brooklyn Jazz", priority: 3, sprays: {base: 2, placement: "1 on chest, 1 on right wrist (very light)"}, reason: "Boozy spring suspense with extreme restraint. Can work for building anticipation but needs very light application."},
-                        {name: "Ambery Saffron", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on chest (early spring only)"}, reason: "Early spring suspense on cool nights. Amber-saffron warmth builds anticipation but too heavy as spring warms."}
-                    ]
-                },
-                intimate: {
-                    base: [
-                        {name: "Aventus", priority: 1, sprays: {base: 2, placement: "1 on chest, 1 on neck (very light)"}, reason: "Spring intimate champion. Clean-sexy fruity-fresh is perfect at close range. Birch-oakmoss drydown is masculine and seductive."},
-                        {name: "Brooklyn Jazz", priority: 2, sprays: {base: 2, placement: "1 on chest, 1 on left wrist (light)"}, reason: "Boozy-sweet spring intimacy with light application. Vanilla-tonka is warm and inviting at skin-close."},
-                        {name: "Gentle Silver", priority: 3, sprays: {base: 2, placement: "1 on chest, 1 on right wrist"}, reason: "Aromatic-warm spring bedroom scent. Juniper-vanilla creates interesting warmth when she's close."}
-                    ]
-                }
-            },
-            summer: {
-                work: {
-                    base: [
-                        {name: "Victory Man", priority: 1, sprays: {base: 2, placement: "1 on neck, 1 on chest (light)"}, reason: "Perfect summer fresh for offices. Light citrus-cedarwood is exactly what summer workplaces need."},
-                        {name: "Cubicle for Men", priority: 2, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Year-round champion for AC office spaces. Fresh-woody works perfectly in summer professional settings."},
-                        {name: "Aventus", priority: 3, sprays: {base: 1, placement: "1 on chest only (very light)"}, reason: "Summer office with extreme restraint. Fruity-fresh fits summer but needs minimal application."},
-                        {name: "Gentle Silver", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on left wrist"}, reason: "Aromatic summer office freshness. Juniper-nutmeg works but feels less fresh than Victory Man in heat."}
-                    ]
-                },
-                casual: {
-                    base: [
-                        {name: "Victory Man", priority: 1, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Ultimate summer fresh casual. Light citrus-woody made for hot weather errands and beach activities."},
-                        {name: "Aventus", priority: 2, sprays: {base: 2, placement: "1 on neck, 1 on chest (light)"}, reason: "Summer casual signature with light application. Fruity-fresh shines but needs restraint in heat."},
-                        {name: "Gentle Silver", priority: 3, sprays: {base: 2, placement: "1 on neck, 1 on left wrist"}, reason: "Versatile summer aromatic for casual wear. Works well but feels slightly heavier than Victory Man in hottest weather."},
-                        {name: "Cubicle for Men", priority: 4, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Safe everyday summer option but feels more 'office' than beach vibes."}
-                    ]
-                },
-                "date-public": {
-                    base: [
-                        {name: "Aventus", priority: 1, sprays: {base: 2, placement: "1 on neck, 1 on chest (light)"}, reason: "Summer public date king with restraint. Fruity-fresh is perfect for casual outdoor dates and dinners."},
-                        {name: "Gentle Silver", priority: 2, sprays: {base: 2, placement: "1 on neck, 1 on right wrist"}, reason: "Aromatic summer evening public dates. Juniper-vanilla is sophisticated for warm casual nights out."},
-                        {name: "Victory Man", priority: 3, sprays: {base: 2, placement: "1 on neck, 1 on chest"}, reason: "Beach dates and outdoor summer activities. Light citrus-woody for daytime casual public dates."}
-                    ]
-                },
-                "date-suspense": {
-                    base: [
-                        {name: "Aventus", priority: 1, sprays: {base: 1, placement: "1 on chest only"}, reason: "Summer suspense king with extreme restraint. Fruity-fresh projects enough in heat, becomes incredible clean-sexy skin scent later. Perfect transition."},
-                        {name: "Gentle Silver", priority: 2, sprays: {base: 2, placement: "1 on neck, 1 on left wrist (light)"}, reason: "Aromatic summer suspense. Juniper-vanilla builds subtle anticipation in heat without being overwhelming. Works public to intimate."},
-                        {name: "Victory Man", priority: 3, sprays: {base: 1, placement: "1 on chest only"}, reason: "Light summer suspense for very casual dates. Better for daytime suspense-building activities."}
-                    ]
-                },
-                intimate: {
-                    base: [
-                        {name: "Aventus", priority: 1, sprays: {base: 1, placement: "1 on chest only (very light)"}, reason: "Summer intimate champion. Clean-sexy-fresh is perfection at close range in warm weather. Birch-oakmoss skin-scent is masculine without being heavy."},
-                        {name: "Gentle Silver", priority: 2, sprays: {base: 1, placement: "1 on chest only"}, reason: "Aromatic-warm summer bedroom scent. Juniper-vanilla creates depth when she's close without being overwhelming in heat."}
-                    ]
-                }
-            }
-        };
+        const weatherOptions={winter:[{id:'freezing',emoji:'❄️',label:'Freezing',temp:'<25°F',modifier:1.3},{id:'cold',emoji:'🌨️',label:'Cold',temp:'25-40°F',modifier:1.15},{id:'cool',emoji:'☁️',label:'Cool',temp:'40-50°F',modifier:1.0},{id:'mild',emoji:'🌤️',label:'Mild',temp:'50-60°F',modifier:0.85}],spring:[{id:'chilly',emoji:'🌧️',label:'Chilly',temp:'45-55°F',modifier:1.0},{id:'moderate',emoji:'☁️',label:'Moderate',temp:'55-65°F',modifier:0.9},{id:'pleasant',emoji:'🌤️',label:'Pleasant',temp:'65-75°F',modifier:0.8},{id:'warm',emoji:'☀️',label:'Warm',temp:'75-85°F',modifier:0.7}],summer:[{id:'comfortable',emoji:'🌤️',label:'Comfortable',temp:'70-80°F',modifier:0.8},{id:'hot',emoji:'☀️',label:'Hot',temp:'80-90°F',modifier:0.6},{id:'veryhot',emoji:'🔥',label:'Very Hot',temp:'90-95°F',modifier:0.5},{id:'extreme',emoji:'🥵',label:'Extreme',temp:'95°F+',modifier:0.4}],fall:[{id:'chilly',emoji:'🍂',label:'Chilly',temp:'45-55°F',modifier:1.0},{id:'moderate',emoji:'☁️',label:'Moderate',temp:'55-65°F',modifier:0.9},{id:'pleasant',emoji:'🌤️',label:'Pleasant',temp:'65-75°F',modifier:0.8},{id:'warm',emoji:'☀️',label:'Warm',temp:'75-85°F',modifier:0.7}]};
 
         // State
-        let currentSeason = '';
-        let currentWeather = '';
-        let currentWeatherModifier = 1.0;
-        let currentSituation = '';
-        let currentSuspense = null;
-        let wearHistory = JSON.parse(localStorage.getItem('wearHistory') || '[]');
-        let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-        let comboRatings = JSON.parse(localStorage.getItem('comboRatings') || '{}');
-        let pendingRatings = JSON.parse(localStorage.getItem('pendingRatings') || '[]');
-        let generalNotes = localStorage.getItem('generalNotes') || '';
-        let lastComboScreen = null;
-        let currentEditingFavorite = null;
-
-        // Initialize
-        function init() {
-            loadHistory();
-            loadFavorites();
-            populateWearingSelect();
-            checkPendingRatings();
-            loadGeneralNotes();
-        }
-
-        // Check for pending combo ratings
-        function checkPendingRatings() {
-            if (pendingRatings.length === 0) return;
-            
-            const promptsDiv = document.getElementById('ratingPrompts');
-            promptsDiv.innerHTML = '';
-            
-            pendingRatings.forEach((combo, idx) => {
-                const prompt = document.createElement('div');
-                prompt.className = 'rating-prompt';
-                prompt.innerHTML = `
-                    <h3>📝 How was this combo?</h3>
-                    <div style="font-size: 16px; margin: 10px 0;">${combo.name}</div>
-                    <div style="font-size: 14px; opacity: 0.8;">${combo.fragrances.join(' + ')}</div>
-                    <div class="rating-buttons">
-                        <button onclick="rateCombo(${idx}, true)">👍 Liked It</button>
-                        <button onclick="rateCombo(${idx}, false)">👎 Didn't Like It</button>
-                    </div>
-                `;
-                promptsDiv.appendChild(prompt);
-            });
-        }
-
-        // Rate combo
-        function rateCombo(idx, liked) {
-            const combo = pendingRatings[idx];
-            const comboKey = combo.fragrances.sort().join(' + ');
-            
-            comboRatings[comboKey] = {
-                liked: liked,
-                fragrances: combo.fragrances,
-                name: combo.name,
-                date: new Date().toISOString()
-            };
-            
-            localStorage.setItem('comboRatings', JSON.stringify(comboRatings));
-            
-            pendingRatings.splice(idx, 1);
-            localStorage.setItem('pendingRatings', JSON.stringify(pendingRatings));
-            
-            alert(liked ? '✅ Great! We\'ll keep suggesting this combo.' : '❌ Got it. We won\'t suggest this combo again.');
-            checkPendingRatings();
-        }
-
-        // Season selection
-        function selectSeason(season) {
-            currentSeason = season;
-            document.getElementById('seasonSection').classList.add('hidden');
-            document.getElementById('weatherSection').classList.remove('hidden');
-            document.getElementById('nav').classList.remove('hidden');
-            
-            const weatherButtons = document.getElementById('weatherButtons');
-            weatherButtons.innerHTML = '';
-            weatherOptions[season].forEach(w => {
-                const btn = document.createElement('button');
-                btn.innerHTML = `${w.emoji}<br>${w.label}<span class="weather-temp">${w.temp}</span>`;
-                btn.onclick = () => selectWeather(w.id, w.modifier);
-                weatherButtons.appendChild(btn);
-            });
-        }
-
-        // Weather selection
-        function selectWeather(weather, modifier) {
-            currentWeather = weather;
-            currentWeatherModifier = modifier;
-            document.getElementById('weatherSection').classList.add('hidden');
-            document.getElementById('situationSection').classList.remove('hidden');
-        }
-
-        // Situation selection
-        function selectSituation(situation) {
-            currentSituation = situation;
-            
-            if (situation === 'date') {
-                document.getElementById('situationSection').classList.add('hidden');
-                document.getElementById('suspenseSection').classList.remove('hidden');
-            } else {
-                currentSuspense = null;
-                showRecommendations();
-            }
-        }
-
-        // Suspense selection
-        function selectSuspense(suspense) {
-            currentSuspense = suspense;
-            showRecommendations();
-        }
-
-        // Show recommendations
-        function showRecommendations() {
-            document.getElementById('suspenseSection').classList.add('hidden');
-            document.getElementById('situationSection').classList.add('hidden');
-            document.getElementById('resultsScreen').classList.remove('hidden');
-            
-            let occasionKey = currentSituation;
-            if (currentSituation === 'date') {
-                occasionKey = currentSuspense ? 'date-suspense' : 'date-public';
-            }
-            
-            const titles = {
-                'work': 'Work Recommendations',
-                'casual': 'Casual Recommendations',
-                'date-public': 'Date Night (Public)',
-                'date-suspense': 'Date Night (Build Suspense)',
-                'intimate': 'Intimate Moments'
-            };
-            document.getElementById('resultsTitle').textContent = titles[occasionKey] || 'Your Recommendations';
-            
-            const recs = recommendations[currentSeason]?.[occasionKey]?.base || [];
-            const sortedRecs = [...recs].sort((a, b) => {
-                const aPriority = a.priority / currentWeatherModifier;
-                const bPriority = b.priority / currentWeatherModifier;
-                return aPriority - bPriority;
-            });
-            
-            const relevantCombos = Object.keys(comboDetails).filter(comboKey => {
-                const combo = comboDetails[comboKey];
-                const isSeasonMatch = combo.seasons.includes(currentSeason);
-                const isOccasionMatch = combo.bestFor.toLowerCase().includes(occasionKey.replace('-', ' '));
-                const isDisliked = comboRatings[comboKey]?.liked === false;
-                return isSeasonMatch && isOccasionMatch && !isDisliked;
-            });
-            
-            const recsDiv = document.getElementById('recommendations');
-            recsDiv.innerHTML = '';
-            
-            sortedRecs.forEach((rec, idx) => {
-                const card = createRecommendationCard(rec, occasionKey);
-                recsDiv.appendChild(card);
-                
-                if (idx === 1 && relevantCombos.length > 0) {
-                    const comboKey = relevantCombos[0];
-                    const comboCard = createComboCard(comboKey, comboDetails[comboKey]);
-                    recsDiv.appendChild(comboCard);
-                }
-            });
-        }
-
-        // Create recommendation card
-        function createRecommendationCard(rec, occasion) {
-            const card = document.createElement('div');
-            card.className = 'recommendation-card';
-            
-            const adjustedSprays = Math.max(1, Math.round(rec.sprays.base * currentWeatherModifier));
-            const fragData = fragranceData[rec.name];
-            
-            let pairsWithHTML = '';
-            if (fragData?.pairsWith && fragData.pairsWith.length > 0) {
-                const pairLinks = fragData.pairsWith.map(pair => {
-                    const comboKey = [rec.name, pair].sort().join(' + ');
-                    const isDisliked = comboRatings[comboKey]?.liked === false;
-                    if (isDisliked) return '';
-                    return `<span class="pair-link" onclick="showComboDetail('${rec.name}', '${pair}')">${pair}</span>`;
-                }).filter(html => html !== '').join('');
-                
-                if (pairLinks) {
-                    pairsWithHTML = `
-                        <div class="pairs-with">
-                            <div class="pairs-title">💡 Pairs Well With:</div>
-                            ${pairLinks}
-                        </div>
-                    `;
-                }
-            }
-            
-            card.innerHTML = `
-                <div class="rec-header">
-                    <div class="rec-name">${rec.name}</div>
-                </div>
-                <div class="rec-reason">${rec.reason}</div>
-                <div class="spray-guide">
-                    <div class="spray-title">🎯 Application Guide:</div>
-                    ${adjustedSprays} spray${adjustedSprays !== 1 ? 's' : ''}: ${rec.sprays.placement}
-                    ${currentWeatherModifier !== 1.0 ? `<div style="margin-top: 4px; font-size: 12px; opacity: 0.7;">(Adjusted for current weather)</div>` : ''}
-                </div>
-                ${pairsWithHTML}
-                <div class="rec-actions">
-                    <button onclick="logFragrance('${rec.name}')">Wear This</button>
-                    <button onclick="saveFavorite('${rec.name}', 'single')">Favorite</button>
-                </div>
-            `;
-            
-            return card;
-        }
-
-        // Create combo card
-        function createComboCard(comboKey, combo) {
-            const card = document.createElement('div');
-            card.className = 'combo-card';
-            card.onclick = () => showComboDetailByKey(comboKey);
-            
-            card.innerHTML = `
-                <div class="combo-badge">🔥 COMBO SUGGESTION</div>
-                <div style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">${combo.name}</div>
-                <div style="margin-bottom: 10px; opacity: 0.95; font-size: 14px;">Tap to see full details</div>
-            `;
-            
-            return card;
-        }
-
-        // Show combo detail screen
-        function showComboDetail(frag1, frag2) {
-            const comboKey = [frag1, frag2].sort().join(' + ');
-            showComboDetailByKey(comboKey);
-        }
-
-        function showComboDetailByKey(comboKey) {
-            const combo = comboDetails[comboKey];
-            if (!combo) return;
-            
-            lastComboScreen = 'results';
-            document.getElementById('resultsScreen').classList.add('hidden');
-            document.getElementById('comboDetailScreen').classList.remove('hidden');
-            
-            const rating = comboRatings[comboKey];
-            let ratingHTML = '';
-            if (rating) {
-                const emoji = rating.liked ? '👍' : '👎';
-                const text = rating.liked ? 'You liked this combo' : 'You disliked this combo';
-                ratingHTML = `
-                    <div style="background: rgba(0,122,255,0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
-                        ${emoji} ${text}
-                        <button class="reset-rating-btn" onclick="resetComboRating('${comboKey}')">Reset Rating</button>
-                    </div>
-                `;
-            }
-            
-            const contentDiv = document.getElementById('comboDetailContent');
-            contentDiv.innerHTML = `
-                ${ratingHTML}
-                <h2 style="margin-bottom: 15px;">${combo.name}</h2>
-                <div class="combo-fragrances">
-                    ${comboKey.split(' + ').join(' <span style="color: var(--accent);">+</span> ')}
-                </div>
-                
-                <div class="combo-detail-content">
-                    <h3 style="margin-bottom: 10px;">Why This Works:</h3>
-                    <p style="margin-bottom: 20px;">${combo.why}</p>
-                    
-                    <h3 style="margin-bottom: 10px;">How to Layer:</h3>
-                    <div style="background: rgba(0,122,255,0.1); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                        <strong>Step 1:</strong> Apply ${combo.application.first.name}<br>
-                        <span style="margin-left: 20px;">${combo.application.first.sprays} spray${combo.application.first.sprays !== 1 ? 's' : ''}: ${combo.application.first.placement}</span><br><br>
-                        <strong>Step 2:</strong> ${combo.application.wait}<br><br>
-                        <strong>Step 3:</strong> Apply ${combo.application.second.name}<br>
-                        <span style="margin-left: 20px;">${combo.application.second.sprays} spray${combo.application.second.sprays !== 1 ? 's' : ''}: ${combo.application.second.placement}</span>
-                    </div>
-                    
-                    <h3 style="margin-bottom: 10px;">Best For:</h3>
-                    <p>${combo.bestFor}</p>
-                </div>
-                
-                <button class="primary" onclick="logCombo('${comboKey}')">Try This Combo</button>
-                <button class="secondary" onclick="saveFavorite('${comboKey}', 'combo')" style="margin-top: 10px;">Add to Favorites</button>
-            `;
-        }
-
-        // Show fragrance detail screen
-        function showFragranceDetail(fragrance, fromHistory = false) {
-            lastComboScreen = fromHistory ? 'history' : 'results';
-            document.getElementById('historyScreen').classList.add('hidden');
-            document.getElementById('resultsScreen').classList.add('hidden');
-            document.getElementById('fragranceDetailScreen').classList.remove('hidden');
-            
-            const fragData = fragranceData[fragrance];
-            const wearDates = wearHistory.filter(h => h.type === 'single' && h.fragrance === fragrance);
-            
-            let wearDatesHTML = '';
-            if (wearDates.length > 0) {
-                wearDatesHTML = `
-                    <h3 style="margin-top: 20px; margin-bottom: 10px;">Previous Wears (${wearDates.length})</h3>
-                    <div class="wear-dates-list">
-                        ${wearDates.slice(0, 10).map(w => {
-                            const date = new Date(w.date);
-                            return `<div class="wear-date-item">${date.toLocaleDateString()} - ${w.season} • ${w.weather} • ${w.situation}</div>`;
-                        }).join('')}
-                    </div>
-                `;
-            }
-            
-            const contentDiv = document.getElementById('fragranceDetailContent');
-            contentDiv.innerHTML = `
-                <h2 style="margin-bottom: 15px;">${fragrance}</h2>
-                
-                <div class="combo-detail-content">
-                    <h3 style="margin-bottom: 10px;">Notes:</h3>
-                    <p style="margin-bottom: 20px;">${fragData?.notes || 'No notes available'}</p>
-                    
-                    <h3 style="margin-bottom: 10px;">Best Seasons:</h3>
-                    <p>${fragData?.seasons?.join(', ') || 'All seasons'}</p>
-                    
-                    ${wearDatesHTML}
-                </div>
-                
-                <button class="primary" onclick="logFragranceFromDetail('${fragrance}')">Wear Again</button>
-                <button class="secondary" onclick="saveFavorite('${fragrance}', 'single')" style="margin-top: 10px;">Add to Favorites</button>
-            `;
-        }
-
-        // Close fragrance detail
-        function closeFragranceDetail() {
-            document.getElementById('fragranceDetailScreen').classList.add('hidden');
-            if (lastComboScreen === 'history') {
-                document.getElementById('historyScreen').classList.remove('hidden');
-            } else {
-                document.getElementById('resultsScreen').classList.remove('hidden');
-            }
-        }
-
-        // Log fragrance from detail view
-        function logFragranceFromDetail(name) {
-            const entry = {
-                type: 'single',
-                fragrance: name,
-                season: currentSeason || 'unknown',
-                weather: currentWeather || 'unknown',
-                situation: 'manual',
-                date: new Date().toISOString()
-            };
-            wearHistory.unshift(entry);
-            if (wearHistory.length > 50) wearHistory = wearHistory.slice(0, 50);
-            localStorage.setItem('wearHistory', JSON.stringify(wearHistory));
-            alert(`✅ Logged: ${name}`);
-            loadHistory();
-            closeFragranceDetail();
-        }
-
-        // Close combo detail
-        function closeComboDetail() {
-            document.getElementById('comboDetailScreen').classList.add('hidden');
-            if (lastComboScreen === 'results') {
-                document.getElementById('resultsScreen').classList.remove('hidden');
-            } else if (lastComboScreen === 'history') {
-                document.getElementById('historyScreen').classList.remove('hidden');
-            }
-        }
-
-        // Log combo
-        function logCombo(comboKey) {
-            const combo = comboDetails[comboKey];
-            const fragrances = comboKey.split(' + ');
-            
-            let occasionKey = currentSituation;
-            if (currentSituation === 'date') {
-                occasionKey = currentSuspense ? 'date-suspense' : 'date-public';
-            }
-            
-            const entry = {
-                type: 'combo',
-                comboKey: comboKey,
-                fragrances: fragrances,
-                comboName: combo.name,
-                season: currentSeason || 'unknown',
-                weather: currentWeather || 'unknown',
-                situation: occasionKey,
-                date: new Date().toISOString()
-            };
-            
-            wearHistory.unshift(entry);
-            if (wearHistory.length > 50) wearHistory = wearHistory.slice(0, 50);
-            localStorage.setItem('wearHistory', JSON.stringify(wearHistory));
-            
-            if (!comboRatings[comboKey]) {
-                const alreadyPending = pendingRatings.some(p => p.fragrances.sort().join(' + ') === comboKey);
-                if (!alreadyPending) {
-                    pendingRatings.push({
-                        fragrances: fragrances,
-                        name: combo.name,
-                        comboKey: comboKey
-                    });
-                    localStorage.setItem('pendingRatings', JSON.stringify(pendingRatings));
-                }
-            }
-            
-            alert(`✅ Logged combo: ${fragrances.join(' + ')}\n\nYou'll be asked to rate it next time you use the app!`);
-            loadHistory();
-        }
-
-        // Reset combo rating
-        function resetComboRating(comboKey) {
-            if (confirm('Reset rating for this combo? You can try it again and rate it differently.')) {
-                delete comboRatings[comboKey];
-                localStorage.setItem('comboRatings', JSON.stringify(comboRatings));
-                alert('✅ Rating reset! This combo will appear in suggestions again.');
-                showComboDetailByKey(comboKey);
-            }
-        }
-
-        // Surprise me
-        function surpriseMe() {
-            let occasionKey = currentSituation;
-            if (currentSituation === 'date') {
-                occasionKey = currentSuspense ? 'date-suspense' : 'date-public';
-            }
-            
-            const recs = recommendations[currentSeason]?.[occasionKey]?.base || [];
-            if (recs.length === 0) return;
-            
-            const pick = recs[Math.floor(Math.random() * recs.length)];
-            const adjustedSprays = Math.max(1, Math.round(pick.sprays.base * currentWeatherModifier));
-            
-            alert(`🎲 Surprise Pick!\n\n${pick.name}\n\n${pick.reason}\n\n🎯 Application: ${adjustedSprays} spray${adjustedSprays !== 1 ? 's' : ''}: ${pick.sprays.placement}`);
-            logFragrance(pick.name);
-        }
-
-        // Log fragrance
-        function logFragrance(name) {
-            let occasionKey = currentSituation;
-            if (currentSituation === 'date') {
-                occasionKey = currentSuspense ? 'date-suspense' : 'date-public';
-            }
-            
-            const entry = {
-                type: 'single',
-                fragrance: name,
-                season: currentSeason,
-                weather: currentWeather,
-                situation: occasionKey,
-                date: new Date().toISOString()
-            };
-            wearHistory.unshift(entry);
-            if (wearHistory.length > 50) wearHistory = wearHistory.slice(0, 50);
-            localStorage.setItem('wearHistory', JSON.stringify(wearHistory));
-            alert(`✅ Logged: ${name}`);
-            loadHistory();
-        }
-
-        // What am I wearing
-        function showWhatAmIWearing() {
-            document.getElementById('resultsScreen').classList.add('hidden');
-            document.getElementById('wearingScreen').classList.remove('hidden');
-        }
-
-        function populateWearingSelect() {
-            const allFragrances = Object.keys(fragranceData);
-            
-            const select = document.getElementById('wearingSelect');
-            select.innerHTML = '<option value="">Select fragrance...</option>';
-            allFragrances.forEach(f => {
-                const opt = document.createElement('option');
-                opt.value = f;
-                opt.textContent = f;
-                select.appendChild(opt);
-            });
-        }
-
-        function logWearing() {
-            const fragrance = document.getElementById('wearingSelect').value;
-            if (!fragrance) {
-                alert('Please select a fragrance');
-                return;
-            }
-            
-            const entry = {
-                type: 'single',
-                fragrance: fragrance,
-                season: currentSeason || 'unknown',
-                weather: currentWeather || 'unknown',
-                situation: 'manual',
-                date: new Date().toISOString()
-            };
-            wearHistory.unshift(entry);
-            if (wearHistory.length > 50) wearHistory = wearHistory.slice(0, 50);
-            localStorage.setItem('wearHistory', JSON.stringify(wearHistory));
-            alert(`✅ Logged: ${fragrance}`);
-            goBack('results');
-            loadHistory();
-        }
-
-        // Save favorite
-        function saveFavorite(item, type) {
-            let occasionKey = currentSituation;
-            if (currentSituation === 'date') {
-                occasionKey = currentSuspense ? 'date-suspense' : 'date-public';
-            }
-            
-            const fav = {
-                type: type,
-                item: item,
-                season: currentSeason || 'unknown',
-                weather: currentWeather || 'unknown',
-                situation: occasionKey || 'unknown',
-                note: '',
-                date: new Date().toISOString()
-            };
-            
-            const exists = favorites.some(f => 
-                f.type === type &&
-                f.item === item && 
-                f.season === currentSeason && 
-                f.situation === occasionKey
-            );
-            
-            if (!exists) {
-                favorites.push(fav);
-                localStorage.setItem('favorites', JSON.stringify(favorites));
-                alert(`⭐ Added to favorites!`);
-                loadFavorites();
-            } else {
-                alert('Already in favorites!');
-            }
-        }
-
-        // Edit note
-        function editNote(idx) {
-            currentEditingFavorite = idx;
-            document.getElementById('editNoteText').value = favorites[idx].note || '';
-            document.getElementById('editNoteModal').classList.remove('hidden');
-        }
-
-        function saveNote() {
-            if (currentEditingFavorite !== null) {
-                favorites[currentEditingFavorite].note = document.getElementById('editNoteText').value;
-                localStorage.setItem('favorites', JSON.stringify(favorites));
-                closeNoteModal();
-                loadFavorites();
-            }
-        }
-
-        function closeNoteModal() {
-            document.getElementById('editNoteModal').classList.add('hidden');
-            currentEditingFavorite = null;
-        }
-
-        // Load history
-        function loadHistory() {
-            const list = document.getElementById('historyList');
-            if (wearHistory.length === 0) {
-                list.innerHTML = '<div class="empty-state">No history yet. Start wearing fragrances!</div>';
-                return;
-            }
-            
-            const counts = {};
-            wearHistory.forEach(h => {
-                if (h.type === 'combo') {
-                    const key = h.comboKey || h.fragrances.sort().join(' + ');
-                    counts[key] = (counts[key] || 0) + 1;
-                } else {
-                    counts[h.fragrance] = (counts[h.fragrance] || 0) + 1;
-                }
-            });
-            
-            list.innerHTML = '<h3 style="margin-bottom: 15px;">Recent Wears (Tap to View Details)</h3>';
-            wearHistory.slice(0, 10).forEach(h => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                const date = new Date(h.date);
-                
-                if (h.type === 'combo') {
-                    const comboKey = h.comboKey || h.fragrances.sort().join(' + ');
-                    const rating = comboRatings[comboKey];
-                    let ratingBadge = '';
-                    if (rating) {
-                        ratingBadge = rating.liked ? ' 👍' : ' 👎';
-                    }
-                    
-                    item.onclick = () => { lastComboScreen = 'history'; showComboDetailByKey(comboKey); };
-                    item.innerHTML = `
-                        <strong>${h.comboName}${ratingBadge}<span class="combo-type-badge">COMBO</span></strong><br>
-                        <span style="font-size: 13px; opacity: 0.8;">${h.fragrances.join(' + ')}</span><br>
-                        ${h.season} • ${h.weather} • ${h.situation}
-                        <div class="history-date">${date.toLocaleDateString()} at ${date.toLocaleTimeString()}</div>
-                    `;
-                } else {
-                    item.onclick = () => showFragranceDetail(h.fragrance, true);
-                    item.innerHTML = `
-                        <strong>${h.fragrance}</strong><br>
-                        ${h.season} • ${h.weather} • ${h.situation}
-                        <div class="history-date">${date.toLocaleDateString()} at ${date.toLocaleTimeString()}</div>
-                    `;
-                }
-                list.appendChild(item);
-            });
-            
-            const rotationDiv = document.createElement('div');
-            rotationDiv.innerHTML = '<h3 style="margin: 20px 0 15px 0;">Rotation Tracker</h3>';
-            list.appendChild(rotationDiv);
-            
-            const allFrags = Object.keys(fragranceData);
-            const leastWorn = allFrags
-                .map(f => ({name: f, count: counts[f] || 0}))
-                .sort((a, b) => a.count - b.count)
-                .slice(0, 5);
-            
-            leastWorn.forEach(f => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.onclick = () => showFragranceDetail(f.name, true);
-                item.innerHTML = `
-                    <strong>${f.name}</strong><br>
-                    Worn ${f.count} time${f.count !== 1 ? 's' : ''} ${f.count === 0 ? '— Try this one!' : ''}
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        // Load favorites
-        function loadFavorites() {
-            const list = document.getElementById('favoritesList');
-            if (favorites.length === 0) {
-                list.innerHTML = '<div class="empty-state">No favorites yet. Save some scenarios!</div>';
-                return;
-            }
-            
-            list.innerHTML = '';
-            favorites.forEach((fav, idx) => {
-                const item = document.createElement('div');
-                item.className = 'favorite-item';
-                
-                let itemName = '';
-                if (fav.type === 'combo') {
-                    itemName = `${fav.item}<span class="combo-type-badge">COMBO</span>`;
-                } else {
-                    itemName = fav.item;
-                }
-                
-                item.innerHTML = `
-                    <div class="favorite-header">
-                        <div>
-                            <strong>${itemName}</strong><br>
-                            <span style="font-size: 14px; opacity: 0.7;">${fav.season} • ${fav.weather} • ${fav.situation}</span>
-                            ${fav.note ? `<div class="favorite-note">📝 ${fav.note}</div>` : ''}
-                        </div>
-                        <button class="delete-btn" onclick="deleteFavorite(${idx})">Delete</button>
-                    </div>
-                    <div class="favorite-actions">
-                        <button onclick="editNote(${idx})">Edit Note</button>
-                        <button onclick="wearFromFavorite(${idx})">Wear This</button>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        function wearFromFavorite(idx) {
-            const fav = favorites[idx];
-            
-            if (fav.type === 'combo') {
-                const fragrances = fav.item.split(' + ');
-                const comboKey = fav.item;
-                const combo = comboDetails[comboKey];
-                
-                const entry = {
-                    type: 'combo',
-                    comboKey: comboKey,
-                    fragrances: fragrances,
-                    comboName: combo?.name || fav.item,
-                    season: fav.season,
-                    weather: fav.weather,
-                    situation: fav.situation,
-                    date: new Date().toISOString()
-                };
-                
-                wearHistory.unshift(entry);
-                if (wearHistory.length > 50) wearHistory = wearHistory.slice(0, 50);
-                localStorage.setItem('wearHistory', JSON.stringify(wearHistory));
-                alert(`✅ Logged combo: ${fragrances.join(' + ')}`);
-            } else {
-                const entry = {
-                    type: 'single',
-                    fragrance: fav.item,
-                    season: fav.season,
-                    weather: fav.weather,
-                    situation: fav.situation,
-                    date: new Date().toISOString()
-                };
-                
-                wearHistory.unshift(entry);
-                if (wearHistory.length > 50) wearHistory = wearHistory.slice(0, 50);
-                localStorage.setItem('wearHistory', JSON.stringify(wearHistory));
-                alert(`✅ Logged: ${fav.item}`);
-            }
-            
-            loadHistory();
-        }
-
-        function deleteFavorite(idx) {
-            favorites.splice(idx, 1);
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-            loadFavorites();
-        }
-
-        // General notes
-        function loadGeneralNotes() {
-            document.getElementById('generalNotes').value = generalNotes;
-        }
-
-        function saveGeneralNotes() {
-            generalNotes = document.getElementById('generalNotes').value;
-            localStorage.setItem('generalNotes', generalNotes);
-            alert('✅ Notes saved!');
-        }
+        let currentSeason='',currentWeather='',currentWeatherModifier=1.0,currentSituation='',currentSuspense=null,wearHistory=JSON.parse(localStorage.getItem('wearHistory')||'[]'),favorites=JSON.parse(localStorage.getItem('favorites')||'[]'),comboRatings=JSON.parse(localStorage.getItem('comboRatings')||'{}'),pendingRatings=JSON.parse(localStorage.getItem('pendingRatings')||'[]'),generalNotes=localStorage.getItem('generalNotes')||'',lastScreen=null,currentEditingFavorite=null;
+        // Init
+        function init(){loadHistory();loadFavorites();populateWearingSelect();checkPendingRatings();loadGeneralNotes();}
 
         // Navigation
-        function showTab(tab) {
-            document.querySelectorAll('[id$="Screen"]').forEach(s => s.classList.add('hidden'));
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const screens = {
-                selector: 'selectorScreen',
-                history: 'historyScreen',
-                favorites: 'favoritesScreen',
-                notes: 'notesScreen'
-            };
-            
-            document.getElementById(screens[tab]).classList.remove('hidden');
-            
-            if (tab === 'selector') {
-                goBackToStart();
-            } else if (tab === 'notes') {
-                loadGeneralNotes();
-            }
-        }
+        function showTab(tab,el){document.querySelectorAll('[id$="Screen"]').forEach(s=>s.classList.add('hidden'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');const screens={selector:'selectorScreen',history:'historyScreen',favorites:'favoritesScreen',notes:'notesScreen'};document.getElementById(screens[tab]).classList.remove('hidden');if(tab==='selector')goBackToStart();else if(tab==='notes')loadGeneralNotes();}
+
+        // Selection flow
+        function selectSeason(season){currentSeason=season;document.getElementById('seasonSection').classList.add('hidden');document.getElementById('weatherSection').classList.remove('hidden');document.getElementById('nav').classList.remove('hidden');const weatherButtons=document.getElementById('weatherButtons');weatherButtons.innerHTML='';weatherOptions[season].forEach(w=>{const btn=document.createElement('button');btn.innerHTML=`${w.emoji}<br>${w.label}<span class="weather-temp">${w.temp}</span>`;btn.onclick=()=>selectWeather(w.id,w.modifier);weatherButtons.appendChild(btn);});}
+        function selectWeather(weather,modifier){currentWeather=weather;currentWeatherModifier=modifier;document.getElementById('weatherSection').classList.add('hidden');document.getElementById('situationSection').classList.remove('hidden');}
+        function selectSituation(situation){currentSituation=situation;if(situation==='date'){document.getElementById('situationSection').classList.add('hidden');document.getElementById('suspenseSection').classList.remove('hidden');}else{currentSuspense=null;showRecommendations();}}
+        function selectSuspense(suspense){currentSuspense=suspense;showRecommendations();}
 
         // Back navigation
+        function goBack(to){if(to==='season'){document.getElementById('weatherSection').classList.add('hidden');document.getElementById('seasonSection').classList.remove('hidden');}else if(to==='weather'){document.getElementById('situationSection').classList.add('hidden');document.getElementById('suspenseSection').classList.add('hidden');document.getElementById('weatherSection').classList.remove('hidden');}else if(to==='situation'){document.getElementById('suspenseSection').classList.add('hidden');document.getElementById('resultsScreen').classList.add('hidden');document.getElementById('situationSection').classList.remove('hidden');}else if(to==='results'){document.getElementById('wearingScreen').classList.add('hidden');document.getElementById('resultsScreen').classList.remove('hidden');}}
+        function goBackToStart(){document.querySelectorAll('[id$="Screen"]').forEach(s=>s.classList.add('hidden'));document.getElementById('seasonSection').classList.remove('hidden');document.getElementById('nav').classList.add('hidden');currentSeason='';currentWeather='';currentSituation='';currentSuspense=null;}
+        // Recommendations
+        function showRecommendations(){document.getElementById('suspenseSection').classList.add('hidden');document.getElementById('situationSection').classList.add('hidden');document.getElementById('resultsScreen').classList.remove('hidden');let occasionKey=currentSituation;if(currentSituation==='date')occasionKey=currentSuspense?'date-suspense':'date-public';const recs=[{name:"Phantom Noir",priority:1,sprays:{base:3,placement:"1 neck, 1 chest, 1 wrist"},reason:"Coffee-rum seduction king"},{name:"Brooklyn Jazz",priority:2,sprays:{base:3,placement:"1 neck, 1 chest, 1 wrist"},reason:"Boozy rum-tobacco romance"}];const recsDiv=document.getElementById('recommendations');recsDiv.innerHTML='';recs.forEach(rec=>{const card=document.createElement('div');card.className='recommendation-card';card.innerHTML=`<div class="rec-header"><div class="rec-name">${rec.name}</div></div><div class="rec-reason">${rec.reason}</div><div class="spray-guide"><div class="spray-title">🎯 Apply:</div>${Math.round(rec.sprays.base*currentWeatherModifier)} sprays: ${rec.sprays.placement}</div><div class="rec-actions"><button onclick="logFragrance('${rec.name}')">Wear This</button><button onclick="saveFavorite('${rec.name}','single')">Favorite</button></div>`;recsDiv.appendChild(card);});}
+
+        // Logging
+        function logFragrance(name){const entry={type:'single',fragrance:name,season:currentSeason,weather:currentWeather,situation:currentSituation,date:new Date().toISOString()};wearHistory.unshift(entry);if(wearHistory.length>50)wearHistory=wearHistory.slice(0,50);localStorage.setItem('wearHistory',JSON.stringify(wearHistory));alert(`✅ Logged: ${name}`);loadHistory();}
+        function logCombo(comboKey){const fragrances=comboKey.split(' + ');const entry={type:'combo',comboKey,fragrances,season:currentSeason,weather:currentWeather,situation:currentSituation,date:new Date().toISOString()};wearHistory.unshift(entry);localStorage.setItem('wearHistory',JSON.stringify(wearHistory));alert(`✅ Logged: ${fragrances.join(' + ')}`);loadHistory();}
+
+        // Storage functions
+        function loadHistory(){const list=document.getElementById('historyList');list.innerHTML=wearHistory.length?'':`<div class="empty-state">No history yet</div>`;wearHistory.slice(0,5).forEach(h=>{const item=document.createElement('div');item.className='history-item';item.innerHTML=`<strong>${h.type==='combo'?h.fragrances.join(' + '):h.fragrance}</strong><br>${h.season} • ${h.weather}<div class="history-date">${new Date(h.date).toLocaleDateString()}</div>`;list.appendChild(item);});}
+        function loadFavorites(){document.getElementById('favoritesList').innerHTML=favorites.length?'':`<div class="empty-state">No favorites yet</div>`;}
+        function saveFavorite(item,type){const fav={type,item,season:currentSeason,weather:currentWeather,situation:currentSituation,note:'',date:new Date().toISOString()};favorites.unshift(fav);localStorage.setItem('favorites',JSON.stringify(favorites));alert('⭐ Added to favorites!');loadFavorites();}
+        function populateWearingSelect(){const select=document.getElementById('wearingSelect');select.innerHTML='<option value="">Select...</option>';Object.keys(fragranceData).forEach(f=>{const opt=document.createElement('option');opt.value=f;opt.text=f;select.appendChild(opt);});}
+        function logWearing(){const f=document.getElementById('wearingSelect').value;if(!f){alert('Select fragrance');return;}logFragrance(f);goBack('results');}
+        function loadGeneralNotes(){document.getElementById('generalNotes').value=generalNotes;}
+        function saveGeneralNotes(){generalNotes=document.getElementById('generalNotes').value;localStorage.setItem('generalNotes',generalNotes);alert('✅ Saved!');}
+
+        // Modals
+        function closeNoteModal(){document.getElementById('editNoteModal').classList.add('hidden');currentEditingFavorite=null;}
+        function saveNote(){if(currentEditingFavorite!==null){favorites[currentEditingFavorite].note=document.getElementById('editNoteText').value;localStorage.setItem('favorites',JSON.stringify(favorites));closeNoteModal();loadFavorites();}}
+
+        // Detail screens (simplified)
+        function closeComboDetail(){document.getElementById('comboDetailScreen').classList.add('hidden');document.getElementById('resultsScreen').classList.remove('hidden');}
+        function closeFragranceDetail(){document.getElementById('fragranceDetailScreen').classList.add('hidden');document.getElementById('resultsScreen').classList.remove('hidden');}
+
+        // Init app
+        init();
+    </script>
+</body>
+</html>
+
+        
