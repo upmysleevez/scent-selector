@@ -34,41 +34,36 @@
         .spray-title{font-weight:600;margin-bottom:4px;color:var(--accent);}
         .pairs-with{background:rgba(255,215,0,0.1);padding:10px;border-radius:8px;margin-bottom:12px;font-size:13px;}
         .pairs-title{font-weight:600;margin-bottom:6px;color:#FFD700;}
-        .pair-link{display:inline-block;background:rgba(255,215,0,0.2);padding:6px 12px;border-radius:8px;margin:4px 4px 4px 0;cursor:pointer;transition:all 0.2s;color:var(--text-color);}
-        .pair-link:active{transform:scale(0.95);background:rgba(255,215,0,0.3);}
-        .rec-actions{display:flex;gap:10px;}
+        .pair-link{display:inline-block;background:rgba(255,215,0,0.2);padding:6px 12px;border-radius:8px;margin:4px 4px 4px 0;cursor:pointer;color:var(--text-color);}
+        .rec-actions{display:flex;gap:10px;margin-top:15px;}
         .rec-actions button{flex:1;padding:10px;font-size:14px;aspect-ratio:auto;min-height:auto;}
         .hidden{display:none;}
         .back-button{background:transparent;border:none;color:var(--accent);padding:10px;font-size:16px;cursor:pointer;margin-bottom:20px;aspect-ratio:auto;min-height:auto;}
         .nav-tabs{display:flex;gap:10px;margin-bottom:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-        .nav-tab{padding:10px 20px;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;white-space:nowrap;font-size:14px;aspect-ratio:auto;min-height:auto;}
+        .nav-tab{padding:10px 20px;background:var(--card-bg);border:1px solid var(--border);border-radius:20px;white-space:nowrap;font-size:14px;aspect-ratio:auto;min-height:auto;cursor:pointer;}
         .nav-tab.active{background:var(--accent);color:white;border-color:var(--accent);}
-        .history-item{background:var(--card-bg);padding:15px;border-radius:10px;margin-bottom:10px;font-size:14px;cursor:pointer;transition:all 0.2s;}
-        .history-item:active{transform:scale(0.98);background:var(--border);}
+        .history-item{background:var(--card-bg);padding:15px;border-radius:10px;margin-bottom:10px;font-size:14px;cursor:pointer;}
+        .history-item:active{transform:scale(0.98);}
         .history-date{opacity:0.6;font-size:12px;margin-top:5px;}
         .favorite-item{background:var(--card-bg);padding:15px;border-radius:10px;margin-bottom:10px;}
         .combo-type-badge{display:inline-block;background:rgba(0,122,255,0.2);color:var(--accent);padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;margin-left:8px;}
-        input,select,textarea{width:100%;padding:12px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;color:var(--text-color);font-size:16px;margin-bottom:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;}
+        input,select,textarea{width:100%;padding:12px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;color:var(--text-color);font-size:16px;margin-bottom:10px;font-family:inherit;}
         textarea{min-height:120px;resize:vertical;}
         .empty-state{text-align:center;padding:40px 20px;opacity:0.6;}
+        .delete-btn{background:#FF3B30;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;}
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Navigation -->
         <div id="nav" class="nav-tabs hidden">
-            <button class="nav-tab active" onclick="showTab('selector', this)">Selector</button>
-            <button class="nav-tab" onclick="showTab('history', this)">History</button>
-            <button class="nav-tab" onclick="showTab('favorites', this)">Favorites</button>
-            <button class="nav-tab" onclick="showTab('notes', this)">Notes</button>
+            <button class="nav-tab active" onclick="showTab('selector',this)">Selector</button>
+            <button class="nav-tab" onclick="showTab('history',this)">History</button>
+            <button class="nav-tab" onclick="showTab('favorites',this)">Favorites</button>
+            <button class="nav-tab" onclick="showTab('notes',this)">Notes</button>
         </div>
-
-        <!-- Main Selector Screen -->
         <div id="selectorScreen">
             <h1>Scent Selector</h1>
             <p class="subtitle">Your Personal Fragrance Assistant</p>
-
-            <!-- Season Selection -->
             <div id="seasonSection" class="section">
                 <h2 class="section-title">What's the season?</h2>
                 <div class="button-grid">
@@ -78,15 +73,11 @@
                     <button onclick="selectSeason('fall')">🍂<br>Fall</button>
                 </div>
             </div>
-
-            <!-- Weather Selection -->
             <div id="weatherSection" class="section hidden">
                 <button class="back-button" onclick="goBack('season')">← Back</button>
                 <h2 class="section-title">What's the weather like?</h2>
                 <div id="weatherButtons" class="button-grid"></div>
             </div>
-
-            <!-- Situation Selection -->
             <div id="situationSection" class="section hidden">
                 <button class="back-button" onclick="goBack('weather')">← Back</button>
                 <h2 class="section-title">What's the occasion?</h2>
@@ -97,19 +88,16 @@
                     <button onclick="selectSituation('intimate')">🔥<br>Intimate</button>
                 </div>
             </div>
-
-            <!-- Suspense Selection -->
             <div id="suspenseSection" class="section hidden">
                 <button class="back-button" onclick="goBack('situation')">← Back</button>
                 <h2 class="section-title">Build Suspense?</h2>
-                <p style="text-align:center;opacity:0.7;margin-bottom:20px;font-size:14px;">Planning a date that might lead somewhere special?</p>
+                <p style="text-align:center;opacity:0.7;margin-bottom:20px;font-size:14px;">Are you planning a date that might lead somewhere special?</p>
                 <div class="button-grid">
                     <button onclick="selectSuspense(true)">😏<br>Yes</button>
                     <button onclick="selectSuspense(false)">🍽️<br>No</button>
                 </div>
             </div>
         </div>
-        <!-- Results Screen -->
         <div id="resultsScreen" class="hidden">
             <button class="back-button" onclick="goBackToStart()">← Start Over</button>
             <h2 class="section-title" id="resultsTitle">Your Recommendations</h2>
@@ -117,90 +105,69 @@
             <button class="secondary" onclick="surpriseMe()">🎲 Surprise Me!</button>
             <button class="secondary" onclick="showWhatAmIWearing()">What Am I Wearing?</button>
         </div>
-
-        <!-- What Am I Wearing Screen -->
         <div id="wearingScreen" class="hidden">
             <button class="back-button" onclick="goBack('results')">← Back</button>
             <h2 class="section-title">What Are You Wearing?</h2>
             <select id="wearingSelect"></select>
             <button class="primary" onclick="logWearing()">Log It</button>
         </div>
-
-        <!-- History Screen -->
         <div id="historyScreen" class="hidden">
             <h2 class="section-title">Wear History</h2>
             <div id="historyList"></div>
         </div>
-
-        <!-- Favorites Screen -->
         <div id="favoritesScreen" class="hidden">
             <h2 class="section-title">Favorites</h2>
             <div id="favoritesList"></div>
         </div>
-
-        <!-- Notes Screen -->
         <div id="notesScreen" class="hidden">
             <h2 class="section-title">General Notes</h2>
-            <textarea id="generalNotes" placeholder="Fragrance notes, shopping list, thoughts..."></textarea>
+            <textarea id="generalNotes" placeholder="Add your fragrance notes, shopping list, thoughts..."></textarea>
             <button class="primary" onclick="saveGeneralNotes()">Save Notes</button>
         </div>
     </div>
-
     <script>
-        // Data
         const fragranceData={
-            "Phantom Noir":{notes:"Coffee, rum, vanilla",seasons:["winter","fall"],pairsWith:["Brooklyn Jazz"]},
-            "Brooklyn Jazz":{notes:"Rum, tobacco, vanilla",seasons:["winter","fall"],pairsWith:["Phantom Noir"]},
-            "Aventus":{notes:"Pineapple, birch",seasons:["spring","summer"],pairsWith:["Gentle Silver"]},
-            "Gentle Silver":{notes:"Juniper, nutmeg",seasons:["spring","summer"],pairsWith:["Aventus"]},
-            "Lost Cherry":{notes:"Cherry, almond",seasons:["winter"],pairsWith:["1 Million"]},
-            "1 Million":{notes:"Cinnamon, leather",seasons:["winter"],pairsWith:["Lost Cherry"]},
-            "Cubicle for Men":{notes:"Fresh, woody",seasons:["all"],pairsWith:[]},
-            "Vanille Absolute":{notes:"Vanilla, ginger",seasons:["fall"],pairsWith:["Brooklyn Jazz"]}
+            "Phantom Noir":{notes:"Coffee, rum, vanilla, caramel",seasons:["winter","fall"],pairsWith:["Brooklyn Jazz","1 Million"]},
+            "Brooklyn Jazz":{notes:"Rum, tobacco, vanilla, tonka",seasons:["winter","fall","spring"],pairsWith:["Phantom Noir","Vanille Absolute"]},
+            "Vanille Absolute":{notes:"Vanilla, ginger, pink pepper",seasons:["fall","winter"],pairsWith:["Aventus","Brooklyn Jazz"]},
+            "Lost Cherry":{notes:"Cherry, almond, tonka bean",seasons:["winter","fall"],pairsWith:["1 Million","Ambery Saffron"]},
+            "Aventus":{notes:"Pineapple, birch, oakmoss",seasons:["spring","summer","fall"],pairsWith:["Ambery Saffron","Gentle Silver"]},
+            "Gentle Silver":{notes:"Juniper, nutmeg, vanilla",seasons:["spring","summer","fall","winter"],pairsWith:["Aventus","Cubicle for Men"]},
+            "Maison du Soir":{notes:"Chestnut, cloves, vanilla",seasons:["winter","fall"],pairsWith:["BLOMB No. 27"]},
+            "BLOMB No. 27":{notes:"Tobacco, coconut, sandalwood",seasons:["winter","fall"],pairsWith:["Maison du Soir"]},
+            "Cubicle for Men":{notes:"Fresh, woody, ambroxan",seasons:["spring","summer","fall","winter"],pairsWith:["Gentle Silver"]},
+            "1 Million":{notes:"Cinnamon, leather, amber",seasons:["winter","fall"],pairsWith:["Lost Cherry","Phantom Noir"]},
+            "Ambery Saffron":{notes:"Amber, saffron, woody",seasons:["winter","fall","spring"],pairsWith:["Aventus","Lost Cherry"]}
         };
-
-        const weatherOptions={
-            winter:[{id:'freezing',emoji:'❄️',label:'Freezing',temp:'<25°F',modifier:1.3},{id:'cold',emoji:'🌨️',label:'Cold',temp:'25-40°F',modifier:1.15},{id:'cool',emoji:'☁️',label:'Cool',temp:'40-50°F',modifier:1.0}],
-            spring:[{id:'chilly',emoji:'🌧️',label:'Chilly',temp:'45-55°F',modifier:1.0},{id:'pleasant',emoji:'🌤️',label:'Pleasant',temp:'65-75°F',modifier:0.8}],
-            summer:[{id:'hot',emoji:'☀️',label:'Hot',temp:'80-90°F',modifier:0.6}],
-            fall:[{id:'chilly',emoji:'🍂',label:'Chilly',temp:'45-55°F',modifier:1.0}]
+        const comboDetails={
+            "1 Million + Lost Cherry":{name:"Winter Date Power",why:"Sweet cherry meets bold cinnamon.",application:{first:{name:"Lost Cherry",sprays:2,placement:"1 neck, 1 chest"},wait:"Wait 5 min",second:{name:"1 Million",sprays:1,placement:"1 left wrist"}},bestFor:"Winter date-suspense",seasons:["winter"]},
+            "Aventus + Vanille Absolute":{name:"Fall Romance",why:"Spicy vanilla meets fruity Aventus.",application:{first:{name:"Aventus",sprays:1,placement:"1 chest"},wait:"Wait 2-3 min",second:{name:"Vanille Absolute",sprays:2,placement:"1 neck, 1 right wrist"}},bestFor:"Fall date-suspense",seasons:["fall"]},
+            "Brooklyn Jazz + Phantom Noir":{name:"Boozy Brothers",why:"Coffee-rum meets rum-tobacco.",application:{first:{name:"Phantom Noir",sprays:2,placement:"1 neck, 1 chest"},wait:"Wait 5 min",second:{name:"Brooklyn Jazz",sprays:1,placement:"1 left wrist"}},bestFor:"Winter date-public",seasons:["winter","fall"]}
         };
-
-        // State (NO BROKEN MODAL VARS)
+        const weatherOptions={winter:[{id:'freezing',emoji:'❄️',label:'Freezing',temp:'<25°F',modifier:1.3},{id:'cold',emoji:'🌨️',label:'Cold',temp:'25-40°F',modifier:1.15},{id:'cool',emoji:'☁️',label:'Cool',temp:'40-50°F',modifier:1.0},{id:'mild',emoji:'🌤️',label:'Mild',temp:'50-60°F',modifier:0.85}],spring:[{id:'chilly',emoji:'🌧️',label:'Chilly',temp:'45-55°F',modifier:1.0},{id:'moderate',emoji:'☁️',label:'Moderate',temp:'55-65°F',modifier:0.9},{id:'pleasant',emoji:'🌤️',label:'Pleasant',temp:'65-75°F',modifier:0.8},{id:'warm',emoji:'☀️',label:'Warm',temp:'75-85°F',modifier:0.7}],summer:[{id:'comfortable',emoji:'🌤️',label:'Comfortable',temp:'70-80°F',modifier:0.8},{id:'hot',emoji:'☀️',label:'Hot',temp:'80-90°F',modifier:0.6},{id:'veryhot',emoji:'🔥',label:'Very Hot',temp:'90-95°F',modifier:0.5},{id:'extreme',emoji:'🥵',label:'Extreme',temp:'95°F+',modifier:0.4}],fall:[{id:'chilly',emoji:'🍂',label:'Chilly',temp:'45-55°F',modifier:1.0},{id:'moderate',emoji:'☁️',label:'Moderate',temp:'55-65°F',modifier:0.9},{id:'pleasant',emoji:'🌤️',label:'Pleasant',temp:'65-75°F',modifier:0.8},{id:'warm',emoji:'☀️',label:'Warm',temp:'75-85°F',modifier:0.7}]};
         let currentSeason='',currentWeather='',currentWeatherModifier=1.0,currentSituation='',currentSuspense=null;
         let wearHistory=JSON.parse(localStorage.getItem('wearHistory')||'[]'),favorites=JSON.parse(localStorage.getItem('favorites')||'[]'),generalNotes=localStorage.getItem('generalNotes')||'';
-        // Init
         function init(){loadHistory();loadFavorites();populateWearingSelect();loadGeneralNotes();}
-
-        // Navigation
         function showTab(tab,el){document.querySelectorAll('[id$="Screen"]').forEach(s=>s.classList.add('hidden'));document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));if(el)el.classList.add('active');const screens={selector:'selectorScreen',history:'historyScreen',favorites:'favoritesScreen',notes:'notesScreen'};document.getElementById(screens[tab]).classList.remove('hidden');if(tab==='selector')goBackToStart();else if(tab==='notes')loadGeneralNotes();}
-
-        // Selection flow
         function selectSeason(season){currentSeason=season;document.getElementById('seasonSection').classList.add('hidden');document.getElementById('weatherSection').classList.remove('hidden');document.getElementById('nav').classList.remove('hidden');const weatherButtons=document.getElementById('weatherButtons');weatherButtons.innerHTML='';weatherOptions[season].forEach(w=>{const btn=document.createElement('button');btn.innerHTML=`${w.emoji}<br>${w.label}<span class="weather-temp">${w.temp}</span>`;btn.onclick=()=>selectWeather(w.id,w.modifier);weatherButtons.appendChild(btn);});}
         function selectWeather(weather,modifier){currentWeather=weather;currentWeatherModifier=modifier;document.getElementById('weatherSection').classList.add('hidden');document.getElementById('situationSection').classList.remove('hidden');}
         function selectSituation(situation){currentSituation=situation;if(situation==='date'){document.getElementById('situationSection').classList.add('hidden');document.getElementById('suspenseSection').classList.remove('hidden');}else{currentSuspense=null;showRecommendations();}}
         function selectSuspense(suspense){currentSuspense=suspense;showRecommendations();}
-
-        // Back nav
-        function goBackToStart(){document.querySelectorAll('[id$="Screen"]').forEach(s=>s.classList.add('hidden'));document.getElementById('seasonSection').classList.remove('hidden');document.getElementById('nav').classList.add('hidden');currentSeason='';currentWeather='';currentSituation='';currentSuspense=null;}
+        function goBackToStart(){document.querySelectorAll('[id$="Screen"]').forEach(s=>s.classList.add('hidden'));document.getElementById('selectorScreen').classList.remove('hidden');document.getElementById('nav').classList.add('hidden');currentSeason='';currentWeather='';currentSituation='';currentSuspense=null;}
         function goBack(to){if(to==='season'){document.getElementById('weatherSection').classList.add('hidden');document.getElementById('seasonSection').classList.remove('hidden');}else if(to==='weather'){document.getElementById('situationSection').classList.add('hidden');document.getElementById('suspenseSection').classList.add('hidden');document.getElementById('weatherSection').classList.remove('hidden');}else if(to==='results'){document.getElementById('wearingScreen').classList.add('hidden');document.getElementById('resultsScreen').classList.remove('hidden');}}
-
-        // Recommendations
-        function showRecommendations(){document.getElementById('suspenseSection').classList.add('hidden');document.getElementById('situationSection').classList.add('hidden');document.getElementById('resultsScreen').classList.remove('hidden');let occasion=currentSituation;if(currentSituation==='date')occasion=currentSuspense?'date-suspense':'date-public';const recs=[{name:"Phantom Noir",reason:"Coffee-rum seduction king"},{name:"Brooklyn Jazz",reason:"Boozy romance"},{name:"Aventus",reason:"Fresh confidence"}];const recsDiv=document.getElementById('recommendations');recsDiv.innerHTML='';recs.forEach(rec=>{const card=document.createElement('div');card.className='recommendation-card';card.innerHTML=`<div class="rec-name">${rec.name}</div><div class="rec-reason">${rec.reason}</div><div class="rec-actions"><button onclick="logFragrance('${rec.name}')">Wear This</button><button onclick="saveFavorite('${rec.name}','single')">⭐ Favorite</button></div>`;recsDiv.appendChild(card);});document.getElementById('resultsTitle').textContent=`${currentSituation.replace('-',' ').replace(/\b\w/g,c=>c.toUpperCase())} Recommendations`;}
-
-        // Logging + Storage
+        function showRecommendations(){document.getElementById('suspenseSection').classList.add('hidden');document.getElementById('situationSection').classList.add('hidden');document.getElementById('resultsScreen').classList.remove('hidden');let occasionKey=currentSituation;if(currentSituation==='date')occasionKey=currentSuspense?'date-suspense':'date-public';const recs=[{name:"Phantom Noir",priority:1,sprays:{base:3,placement:"1 neck, 1 chest, 1 wrist"},reason:"Coffee-rum seduction king"},{name:"Brooklyn Jazz",priority:2,sprays:{base:3,placement:"1 neck, 1 chest, 1 wrist"},reason:"Boozy rum-tobacco romance"},{name:"Aventus",priority:3,sprays:{base:2,placement:"1 chest, 1 wrist"},reason:"Fresh confidence"}];const recsDiv=document.getElementById('recommendations');recsDiv.innerHTML='';recs.forEach(rec=>{const card=document.createElement('div');card.className='recommendation-card';card.innerHTML=`<div class="rec-header"><div class="rec-name">${rec.name}</div></div><div class="rec-reason">${rec.reason}</div><div class="spray-guide"><div class="spray-title">🎯 Apply:</div>${Math.round(rec.sprays.base*currentWeatherModifier)} sprays: ${rec.sprays.placement}</div><div class="rec-actions"><button onclick="logFragrance('${rec.name}')">Wear This</button><button onclick="saveFavorite('${rec.name}','single')">⭐ Favorite</button></div>`;recsDiv.appendChild(card);});}
         function logFragrance(name){const entry={type:'single',fragrance:name,season:currentSeason,weather:currentWeather,situation:currentSituation,date:new Date().toISOString()};wearHistory.unshift(entry);if(wearHistory.length>50)wearHistory=wearHistory.slice(0,50);localStorage.setItem('wearHistory',JSON.stringify(wearHistory));alert(`✅ Logged: ${name}`);loadHistory();}
-        function logWearing(){const f=document.getElementById('wearingSelect').value;if(!f){alert('Select fragrance');return;}logFragrance(f);goBack('results');}
-        function saveFavorite(item,type){const fav={type,item,season:currentSeason||'any',situation:currentSituation||'any',date:new Date().toISOString()};favorites.unshift(fav);if(favorites.length>50)favorites=favorites.slice(0,50);localStorage.setItem('favorites',JSON.stringify(favorites));alert('⭐ Added to favorites!');loadFavorites();}
-        function loadHistory(){const list=document.getElementById('historyList');if(wearHistory.length===0){list.innerHTML='<div class="empty-state">No wears logged yet</div>';return;}list.innerHTML='';wearHistory.slice(0,10).forEach(h=>{const item=document.createElement('div');item.className='history-item';item.innerHTML=`<strong>${h.type==='single'?h.fragrance:h.comboKey||h.fragrances?.join(' + ')}</strong><br>${h.season} • ${h.situation}<div class="history-date">${new Date(h.date).toLocaleDateString()}</div>`;list.appendChild(item);});}
-        function loadFavorites(){const list=document.getElementById('favoritesList');if(favorites.length===0){list.innerHTML='<div class="empty-state">No favorites yet</div>';return;}list.innerHTML='';favorites.slice(0,10).forEach(fav=>{const item=document.createElement('div');item.className='favorite-item';item.innerHTML=`<strong>${fav.item}</strong><br>${fav.season} • ${fav.situation}<div class="history-date">${new Date(fav.date).toLocaleDateString()}</div>`;list.appendChild(item);});}
-        function populateWearingSelect(){const select=document.getElementById('wearingSelect');select.innerHTML='<option value="">Choose...</option>';Object.keys(fragranceData).forEach(f=>{const opt=document.createElement('option');opt.value=f;opt.textContent=f;select.appendChild(opt);});}
+        function logWearing(){const f=document.getElementById('wearingSelect').value;if(!f){alert('Select a fragrance');return;}logFragrance(f);goBack('results');}
+        function saveFavorite(item,type){const fav={type,item,note:'',date:new Date().toISOString()};favorites.unshift(fav);if(favorites.length>50)favorites=favorites.slice(0,50);localStorage.setItem('favorites',JSON.stringify(favorites));alert('⭐ Added to favorites!');loadFavorites();}
+        function loadHistory(){const list=document.getElementById('historyList');if(wearHistory.length===0){list.innerHTML='<div class="empty-state">No wears logged yet</div>';return;}list.innerHTML='';wearHistory.slice(0,10).forEach(h=>{const item=document.createElement('div');item.className='history-item';item.innerHTML=`<strong>${h.fragrance}</strong><br>${h.season} • ${h.situation}<div class="history-date">${new Date(h.date).toLocaleDateString()}</div>`;list.appendChild(item);});}
+        function loadFavorites(){const list=document.getElementById('favoritesList');if(favorites.length===0){list.innerHTML='<div class="empty-state">No favorites yet</div>';return;}list.innerHTML='';favorites.forEach((fav,idx)=>{const item=document.createElement('div');item.className='favorite-item';let noteHtml='';if(fav.note){noteHtml=`<div style="background:rgba(255,149,0,0.1);padding:10px;border-radius:8px;margin-top:10px;font-size:13px;font-style:italic;">${fav.note}</div>`;}item.innerHTML=`<div><strong>${fav.item}</strong></div><div style="margin-top:10px;display:flex;gap:8px;"><button class="delete-btn" onclick="deleteFavorite(${idx})">Delete</button><button style="background:#FF9500;color:white;border:none;padding:8px 16px;border-radius:8px;font-size:14px;cursor:pointer;" onclick="editFavoriteNote(${idx})">Edit Note</button></div>${noteHtml}`;list.appendChild(item);});}
+        function deleteFavorite(idx){favorites.splice(idx,1);localStorage.setItem('favorites',JSON.stringify(favorites));loadFavorites();}
+        function editFavoriteNote(idx){const newNote=prompt('Add note for '+favorites[idx].item,favorites[idx].note||'');if(newNote!==null){favorites[idx].note=newNote;localStorage.setItem('favorites',JSON.stringify(favorites));loadFavorites();}}
+        function populateWearingSelect(){const select=document.getElementById('wearingSelect');select.innerHTML='<option value="">Choose a fragrance...</option>';Object.keys(fragranceData).forEach(f=>{const opt=document.createElement('option');opt.value=f;opt.textContent=f;select.appendChild(opt);});}
         function loadGeneralNotes(){document.getElementById('generalNotes').value=generalNotes;}
         function saveGeneralNotes(){generalNotes=document.getElementById('generalNotes').value;localStorage.setItem('generalNotes',generalNotes);alert('✅ Notes saved!');}
         function showWhatAmIWearing(){document.getElementById('resultsScreen').classList.add('hidden');document.getElementById('wearingScreen').classList.remove('hidden');}
-        function surpriseMe(){const recs=[{name:"Phantom Noir"},{name:"Brooklyn Jazz"},{name:"Aventus"}];const pick=recs[Math.floor(Math.random()*recs.length)];alert(`🎲 Surprise: ${pick.name}`);logFragrance(pick.name);}
-
-        // Start app
+        function surpriseMe(){const fragrances=Object.keys(fragranceData);const pick=fragrances[Math.floor(Math.random()*fragrances.length)];alert(`🎲 Surprise: ${pick}`);logFragrance(pick);}
         init();
     </script>
 </body>
