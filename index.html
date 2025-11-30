@@ -27,7 +27,7 @@
 
         /* Safe Areas */
         .safe-top { padding-top: env(safe-area-inset-top); }
-        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        /* safe-bottom is now handled via explicit padding in the nav to allow for extra spacing */
         
         /* Utility */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -134,7 +134,7 @@
         </header>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pb-32" id="main-content">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pb-40" id="main-content">
             
             <!-- VIEW 1: SELECTOR -->
             <div id="view-selector" class="space-y-6 max-w-md mx-auto fade-enter-active">
@@ -280,27 +280,27 @@
         </main>
 
         <!-- FOOTER NAV -->
-        <nav class="safe-bottom fixed bottom-0 w-full bg-charcoal-800/90 backdrop-blur-lg border-t border-white/5 flex justify-around items-center px-4 py-3 z-40">
-            <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1 text-teal-500">
-                <i data-lucide="search" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium">Select</span>
+        <nav class="fixed bottom-0 w-full bg-charcoal-800/90 backdrop-blur-lg border-t border-white/5 flex justify-around items-center px-4 pt-4 z-40" style="padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem);">
+            <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1.5 text-teal-500 active:scale-95 transition-transform">
+                <i data-lucide="search" class="w-8 h-8"></i>
+                <span class="text-xs font-bold tracking-wide">Select</span>
             </button>
-            <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1 text-gray-500 hover:text-teal-300">
-                <i data-lucide="library" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium">Collect</span>
+            <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
+                <i data-lucide="library" class="w-8 h-8"></i>
+                <span class="text-xs font-bold tracking-wide">Collect</span>
             </button>
-            <button onclick="switchView('history')" class="nav-btn flex flex-col items-center gap-1 text-gray-500 hover:text-teal-300">
-                <i data-lucide="history" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium">History</span>
+            <button onclick="switchView('history')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
+                <i data-lucide="history" class="w-8 h-8"></i>
+                <span class="text-xs font-bold tracking-wide">History</span>
             </button>
-            <button onclick="switchView('timeline')" class="nav-btn flex flex-col items-center gap-1 text-gray-500 hover:text-teal-300">
-                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-                <span class="text-[10px] font-medium">Future</span>
+            <button onclick="switchView('timeline')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
+                <i data-lucide="calendar-clock" class="w-8 h-8"></i>
+                <span class="text-xs font-bold tracking-wide">Future</span>
             </button>
         </nav>
     </div>
 
-    <!-- SCOUT ADD MODAL -->
+    <!-- SCOUT ADD MODAL (NEW) -->
     <div id="scout-modal" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
             <h3 class="text-xl font-bold mb-2">Smart Schedule</h3>
@@ -437,7 +437,7 @@
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v18_final_label"; 
+        const APP_ID = "scentApp_db_v19_final_styling"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
 
         let state = {
