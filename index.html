@@ -12,7 +12,7 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Lucide Icons -->
+    <!-- Lucide Icons (Universal Latest Version) -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
@@ -27,7 +27,7 @@
 
         /* Safe Areas */
         .safe-top { padding-top: env(safe-area-inset-top); }
-        /* safe-bottom is now handled via explicit padding in the nav to allow for extra spacing */
+        /* safe-bottom handled via padding in footer */
         
         /* Utility */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -437,7 +437,7 @@
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v19_final_styling"; 
+        const APP_ID = "scentApp_db_v21_universal_icons"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
 
         let state = {
@@ -509,10 +509,24 @@
             loadData();
             initUI();
             initScout();
-            lucide.createIcons();
+            
+            // Wait a moment for icons to load then create
+            setTimeout(() => {
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+            }, 100);
+            
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
             if (isIOS && !window.navigator.standalone) setTimeout(() => document.getElementById('install-prompt').classList.remove('translate-y-full'), 2000);
         });
+
+        // SAFETY: Re-run icon creation periodically to catch dynamic updates if they missed
+        // Force icons to render every 500ms for first 5 seconds
+        let iconInterval = setInterval(() => {
+             if (window.lucide) lucide.createIcons();
+        }, 500);
+        setTimeout(() => clearInterval(iconInterval), 5000);
 
         function loadData() {
             const raw = localStorage.getItem(APP_ID);
@@ -696,7 +710,8 @@
             }
             switchView('results');
             document.getElementById('main-content').scrollTop = 0;
-            lucide.createIcons();
+            // Force redraw of icons after generating HTML
+            if (window.lucide) lucide.createIcons();
         }
 
         function createTierHeader(text) { const div = document.createElement('div'); div.className = 'tier-header'; div.innerText = text; return div; }
@@ -798,7 +813,9 @@
                 `;
                 list.appendChild(div);
             });
-            lucide.createIcons();
+            
+            // Force redraw of icons after generating HTML
+            if (window.lucide) lucide.createIcons();
         }
 
         function openHistoryEdit(index) {
@@ -914,7 +931,8 @@
                 div.innerHTML = `<div class="absolute left-1 top-2 w-3 h-3 ${isNext ? 'bg-teal-500' : 'bg-gray-600'} rounded-full border-4 border-charcoal-700"></div><div class="flex justify-between items-center"><span class="text-xs font-mono ${isNext ? 'text-teal-400' : 'text-gray-400'} uppercase tracking-widest">${item.month} ${item.year}</span><button onclick="deletePlan('${item.id}')" class="text-gray-600 hover:text-red-500"><i data-lucide="trash-2" class="w-3 h-3"></i></button></div><div class="glass-panel p-4 mt-2 rounded-xl border border-white/5 ${!isNext ? 'opacity-80' : ''}"><h3 class="font-bold text-lg">${item.name}</h3><p class="text-sm text-gray-400">${item.description}</p></div>`;
                 container.appendChild(div);
             });
-            lucide.createIcons();
+            // Force redraw of icons after generating HTML
+            if (window.lucide) lucide.createIcons();
         }
         
         function showCollection() {
@@ -924,6 +942,8 @@
                 div.innerHTML = `<div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3><p class="text-[10px] text-gray-400">Wears: ${f.wearCount}</p></div><div class="flex items-center gap-3"><button onclick="openNote('${f.id}')" class="text-gray-400"><i data-lucide="sticky-note" class="w-4 h-4 ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button><button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 px-2 py-1">Reset</button></div>`;
                 list.appendChild(div);
             });
+            // Force redraw of icons after generating HTML
+            if (window.lucide) lucide.createIcons();
         }
         function resetWear(id) { const idx = state.data.fragrances.findIndex(f => f.id === id); if (idx > -1) { state.data.fragrances[idx].wearCount = 0; saveData(); showCollection(); } }
 
