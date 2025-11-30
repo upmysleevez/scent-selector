@@ -383,13 +383,13 @@
         </div>
     </div>
 
-    <!-- TOAST -->
-    <div id="toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] transition-transform duration-300 z-[70]">
+    <!-- TOAST - FIXED (Hidden by default, fixed top margin) -->
+    <div id="toast" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-[100] transition-transform duration-300">
         <i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span>
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v14_final_check"; 
+        const APP_ID = "scentApp_db_v15_toast_patch"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
 
         let state = {
@@ -397,7 +397,6 @@
             data: { fragrances: [], combos: [], history: [], futurePlan: [] }
         };
 
-        // SCOUT DB - MONTAGNE SPECIFIC (Under $50 clones)
         const SCOUT_DB = [
             { name: "Tygr Cologne", reason: "Montagne's clone of Bvlgari Tygar ($370). Perfect high-heat Ambroxan bomb under $50." },
             { name: "Elysian Cologne", reason: "Montagne's clone of Roja Elysium ($300+). A crisp Vetiver-Citrus blend for the Office." },
@@ -853,12 +852,16 @@
         function showToast(msg) {
             const toast = document.getElementById('toast');
             if (toastTimeout) clearTimeout(toastTimeout);
-            
+            toast.classList.remove('hidden'); // Ensure removing hidden class
             toast.querySelector('span').innerText = msg;
-            toast.classList.remove('translate-y-[-150%]'); // Show
+            
+            // Force reflow
+            void toast.offsetWidth;
+
+            toast.classList.remove('translate-y-[-150%]'); // Slide down
             
             toastTimeout = setTimeout(() => {
-                toast.classList.add('translate-y-[-150%]'); // Hide
+                toast.classList.add('translate-y-[-150%]'); // Slide up
             }, 2000);
         }
 
