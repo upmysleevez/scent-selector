@@ -2,217 +2,879 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Scent Selector</title>
+    <meta name="apple-mobile-web-app-title" content="ScentSelector">
+    <meta name="theme-color" content="#1F2121">
+    <title>Fragrance Sommelier</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
     <style>
-        * {margin:0;padding:0;box-sizing:border-box;}
-        :root {
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --card-bg: #1c1c1e;
-            --accent: #0A84FF;
-            --accent-hover: #409CFF;
-            --border: #38383a;
-            --shadow: rgba(0,0,0,0.3);
-            --button-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        /* iOS System Fonts & Base Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif;
+            background-color: #1F2121;
+            color: #F5F5F5;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
         }
-        @media (prefers-color-scheme: light) {
-            :root {
-                --bg-color: #ffffff;
-                --text-color: #000000;
-                --card-bg: #f5f5f7;
-                --accent: #007AFF;
-                --accent-hover: #0051D5;
-                --border: #d1d1d6;
-                --shadow: rgba(0,0,0,0.1);
-                --button-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+        /* Safe Areas */
+        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        
+        /* Utility */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(38, 40, 40, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-active {
+            background-color: #208D8D;
+            color: white;
+            border-color: #208D8D;
+        }
+        
+        /* Timeline Connector Line */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 2rem;
+            bottom: 0;
+            left: 1rem;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 0;
+        }
+
+        /* Custom Form Inputs */
+        .input-glass {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        /* Combo Card Gradient */
+        .combo-gradient {
+            background: linear-gradient(135deg, rgba(38,40,40,0.9) 0%, rgba(32,141,141,0.2) 100%);
+        }
+        
+        /* Tier Headers */
+        .tier-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #9ca3af;
+        }
+        .tier-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: { 50: '#FCFCF9', 100: '#FFFFF5' },
+                        charcoal: { 700: '#1F2121', 800: '#262828' },
+                        teal: { 300: '#32B8C6', 500: '#208D8D' },
+                    }
+                }
             }
         }
-        body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); padding: 20px; padding-bottom: 40px; line-height: 1.6; min-height: 100vh;}
-        .container {max-width: 600px; margin: 0 auto;}
-        h1 {font-size: 40px; font-weight: 700; margin-bottom: 8px; text-align: center;}
-        .subtitle {text-align: center; opacity: 0.6; margin-bottom: 30px; font-size: 16px;}
-        .section {margin-bottom: 30px;}
-        .section-title {font-size: 24px; font-weight: 600; margin-bottom: 20px; text-align: center;}
-        .button-grid {display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px;}
-        button {background: var(--card-bg); border: none; color: var(--text-color); padding: 20px; border-radius: 20px; font-size: 20px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px; box-shadow: var(--button-shadow);}
-        button:active {transform: scale(0.96);}
-        button.selected {background: var(--accent); color: white;}
-        button.primary {background: var(--accent); color: white; width: 100%; margin-top: 10px; aspect-ratio: auto; min-height: 56px; font-size: 18px; border-radius: 12px;}
-        button.primary:active {transform: scale(0.98);}
-        button.secondary {background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border); padding: 12px 24px; aspect-ratio: auto; min-height: auto; width: 100%; margin-top: 10px; border-radius: 12px;}
-        .back-button {background: transparent; box-shadow: none; border: none; color: var(--accent); font-size: 18px; padding: 10px; margin-bottom: 20px; width: auto; aspect-ratio: auto; min-height: auto; display: flex; align-items: center; gap: 8px; justify-content: flex-start;}
-        .hidden {display: none !important;}
-        .recommendation-card {background: var(--card-bg); padding: 16px; border-radius: 12px; margin-bottom: 15px; border: 1px solid var(--border);}
-        .combo-card {background: linear-gradient(135deg, var(--accent) 0%, #0051D5 100%); color: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; border: none; cursor: pointer; transition: transform 0.2s;}
-        .combo-card:active {transform: scale(0.98);}
-        .combo-badge {display: inline-block; background: rgba(255,255,255,0.3); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; margin-bottom: 10px;}
-        .rec-header {display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;}
-        .rec-name {font-size: 18px; font-weight: 600;}
-        .rec-reason {font-size: 14px; line-height: 1.5; opacity: 0.9; margin-bottom: 12px;}
-        .spray-guide {background: rgba(0,122,255,0.1); padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;}
-        .spray-title {font-weight: 600; margin-bottom: 4px; color: var(--accent);}
-        .pairs-with {background: rgba(255,215,0,0.1); padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px;}
-        .pairs-title {font-weight: 600; margin-bottom: 6px; color: #FFD700;}
-        .pair-link {display: inline-block; background: rgba(255,215,0,0.2); padding: 6px 12px; border-radius: 8px; margin: 4px 4px 4px 0; cursor: pointer; color: var(--text-color); border: none; font-size: 13px; font-family: inherit;}
-        .pair-link:active {transform: scale(0.95);}
-        .rec-actions {display: flex; gap: 10px; margin-top: 15px;}
-        .rec-actions button {flex: 1; padding: 10px; font-size: 14px; aspect-ratio: auto; min-height: auto;}
-        .history-item {background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px; font-size: 14px;}
-        .history-actions {display: flex; gap: 10px; margin-top: 10px;}
-        .history-actions button {flex: 1; padding: 8px; font-size: 12px; aspect-ratio: auto; min-height: auto;}
-        .favorite-item {background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px;}
-        .wear-count {font-size: 12px; opacity: 0.6; margin-top: 4px;}
-        .empty-state {text-align: center; padding: 40px 20px; opacity: 0.6;}
-        .nav-tabs {display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto;}
-        .nav-tab {padding: 10px 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; white-space: nowrap; font-size: 14px; cursor: pointer; flex-shrink: 0;}
-        .nav-tab.active {background: var(--accent); color: white; border-color: var(--accent);}
-        .note-card {background: var(--card-bg); padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border);}
-        .note-header {display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;}
-        .note-title {font-weight: 600; font-size: 14px;}
-        .note-date {font-size: 12px; opacity: 0.6;}
-        .note-content {font-size: 13px; opacity: 0.9; line-height: 1.5; margin-bottom: 10px; word-wrap: break-word;}
-        .note-actions {display: flex; gap: 8px;}
-        .note-actions button {flex: 1; padding: 6px; font-size: 12px; min-height: auto;}
-        .modal {display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);}
-        .modal.active {display: flex; align-items: center; justify-content: center;}
-        .modal-content {background: var(--card-bg); padding: 25px; border-radius: 15px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;}
-        .modal-header {font-size: 18px; font-weight: 600; margin-bottom: 20px;}
-        .form-group {margin-bottom: 15px;}
-        .form-label {font-size: 14px; font-weight: 500; margin-bottom: 8px; display: block;}
-        .form-input, .form-textarea {width: 100%; padding: 10px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px;}
-        .form-textarea {min-height: 100px; resize: vertical;}
-        .modal-actions {display: flex; gap: 10px; margin-top: 20px;}
-        .modal-actions button {flex: 1;}
-    </style>
+    </script>
 </head>
-<body>
-    <div class="container">
-        <h1>🌹 Scent Selector</h1>
-        <p class="subtitle">Smart Fragrance Assistant</p>
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="app.showTab('selector', this)">Find Scent</button>
-            <button class="nav-tab" onclick="app.showTab('history', this)">History</button>
-            <button class="nav-tab" onclick="app.showTab('favorites', this)">Favorites</button>
-            <button class="nav-tab" onclick="app.showTab('notes', this)">Notes</button>
-        </div>
-        <div id="selectorScreen">
-            <div id="seasonSection" class="section">
-                <h2 class="section-title">🌍 Pick Your Season</h2>
-                <div class="button-grid">
-                    <button onclick="app.selectSeason('winter')">❄️<br>Winter</button>
-                    <button onclick="app.selectSeason('spring')">🌸<br>Spring</button>
-                    <button onclick="app.selectSeason('summer')">☀️<br>Summer</button>
-                    <button onclick="app.selectSeason('fall')">🍂<br>Fall</button>
-                </div>
+<body class="h-screen w-screen flex flex-col overflow-hidden text-gray-100 selection:bg-teal-500 selection:text-white">
+
+    <!-- INSTALL PROMPT -->
+    <div id="install-prompt" class="hidden fixed bottom-0 left-0 right-0 z-50 p-4 safe-bottom bg-teal-500 text-white shadow-2xl rounded-t-2xl transform transition-transform duration-300 translate-y-full">
+        <div class="flex items-start justify-between">
+            <div>
+                <h3 class="font-bold text-lg">Prevent Data Loss</h3>
+                <p class="text-sm opacity-90 mt-1 pr-4">Safari deletes data after 7 days. Tap <span class="font-bold">Share</span> <i data-lucide="share" class="inline w-4 h-4"></i> then <span class="font-bold">Add to Home Screen</span>.</p>
             </div>
-            <div id="weatherSection" class="section hidden">
-                <button class="back-button" onclick="app.goBack('season')">← Back</button>
-                <h2 class="section-title">🌡️ Weather?</h2>
-                <div id="weatherButtons" class="button-grid"></div>
-            </div>
-            <div id="situationSection" class="section hidden">
-                <button class="back-button" onclick="app.goBack('weather')">← Back</button>
-                <h2 class="section-title">📍 What's the Occasion?</h2>
-                <div class="button-grid">
-                    <button onclick="app.selectSituation('work')">💼<br>Work</button>
-                    <button onclick="app.selectSituation('casual')">👕<br>Casual</button>
-                    <button onclick="app.selectSituation('date')">🍽️<br>Date Night</button>
-                    <button onclick="app.selectSituation('intimate')">💑<br>Intimate</button>
-                </div>
-            </div>
-            <div id="suspenseSection" class="section hidden">
-                <button class="back-button" onclick="app.goBack('situation')">← Back</button>
-                <h2 class="section-title">Building Suspense?</h2>
-                <p style="text-align:center;opacity:0.7;margin-bottom:20px;font-size:14px;">Are you planning a date that might get intimate?</p>
-                <div class="button-grid">
-                    <button onclick="app.selectSuspense(true)">✨<br>Yes</button>
-                    <button onclick="app.selectSuspense(false)">😌<br>No</button>
-                </div>
-            </div>
-            <div id="resultsScreen" class="section hidden">
-                <button class="back-button" onclick="app.goBackToStart()">← Start Over</button>
-                <h2 class="section-title">✨ Your Recommendations</h2>
-                <div id="recommendations"></div>
-                <button class="secondary" onclick="app.surpriseMe()" style="margin-top:20px;">🎲 Surprise Me</button>
-            </div>
-        </div>
-        <div id="historyScreen" class="hidden">
-            <h2 class="section-title">📋 Wear History</h2>
-            <div id="historyList"></div>
-        </div>
-        <div id="favoritesScreen" class="hidden">
-            <h2 class="section-title">❤️ Favorites</h2>
-            <div id="favoritesList"></div>
-        </div>
-        <div id="notesScreen" class="hidden">
-            <h2 class="section-title">📝 Notes</h2>
-            <button class="primary" onclick="app.openNoteModal()" style="margin-bottom:20px;">+ Add Note</button>
-            <div id="notesList"></div>
+            <button onclick="dismissInstallPrompt()" class="p-2 bg-white/20 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
     </div>
-    <div id="editHistoryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">Edit History Entry</div>
-            <div class="form-group"><label class="form-label">Fragrance/Combo Name</label><input type="text" id="editFragranceName" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Season</label><input type="text" id="editSeason" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Weather</label><input type="text" id="editWeather" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Situation</label><input type="text" id="editSituation" class="form-input"></div>
-            <div class="modal-actions">
-                <button class="primary" onclick="app.saveHistoryEdit()">Save</button>
-                <button class="secondary" onclick="app.closeEditHistoryModal()">Cancel</button>
+
+    <!-- MAIN APP -->
+    <div id="app-container" class="flex-1 flex flex-col relative h-full">
+        
+        <!-- HEADER -->
+        <header class="safe-top px-6 pt-4 pb-2 flex justify-between items-center z-10 bg-charcoal-700/90 backdrop-blur-md sticky top-0 border-b border-white/5">
+            <div>
+                <h1 class="text-xs font-bold uppercase tracking-widest text-teal-300">ScentSelector</h1>
+                <p class="text-xl font-semibold text-white tracking-tight" id="header-title">Daily Ritual</p>
+            </div>
+            <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                <i data-lucide="settings" class="w-6 h-6 text-gray-400"></i>
+            </button>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pb-32" id="main-content">
+            
+            <!-- VIEW 1: SELECTOR -->
+            <div id="view-selector" class="space-y-6 max-w-md mx-auto fade-enter-active">
+                
+                <!-- Situation -->
+                <section>
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Situation</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="setContext('situation', 'office')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="office">
+                            <i data-lucide="briefcase" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Office</span>
+                        </button>
+                        <button onclick="setContext('situation', 'gym')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="gym">
+                            <i data-lucide="dumbbell" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Gym</span>
+                        </button>
+                        <button onclick="setContext('situation', 'date_night')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="date_night">
+                            <i data-lucide="wine" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Date Night</span>
+                        </button>
+                        <button onclick="setContext('situation', 'casual')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="casual">
+                            <i data-lucide="coffee" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Casual</span>
+                        </button>
+                        <button onclick="setContext('situation', 'intimate')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all col-span-2" data-group="situation" data-val="intimate">
+                            <i data-lucide="flame" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Intimate</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Weather -->
+                <section>
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Weather</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="setContext('weather', 'sunny')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="sunny">
+                            <i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i>
+                            <span class="text-sm">Sunny</span>
+                        </button>
+                        <button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="rainy">
+                            <i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i>
+                            <span class="text-sm">Rainy/Cold</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Season -->
+                <section>
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Season</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="setContext('season', 'winter')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="winter">Winter</button>
+                        <button onclick="setContext('season', 'spring')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="spring">Spring</button>
+                        <button onclick="setContext('season', 'summer')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="summer">Summer</button>
+                        <button onclick="setContext('season', 'fall')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="fall">Fall</button>
+                    </div>
+                </section>
+
+                <!-- Suspense Toggle -->
+                <section id="suspense-section" class="hidden transition-all duration-300">
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-teal-500/30 border">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-teal-500/20 p-2 rounded-lg">
+                                <i data-lucide="ghost" class="w-5 h-5 text-teal-300"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-teal-100">Suspense Mode</h4>
+                                <p class="text-xs text-gray-400">Prioritize mystery & depth</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="suspense-toggle" class="sr-only peer" onchange="toggleSuspense()">
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+                        </label>
+                    </div>
+                </section>
+
+                <button onclick="generateRecommendations()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-900/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <span>Find My Scent</span>
+                </button>
+            </div>
+
+            <!-- VIEW 2: RESULTS (TIERED) -->
+            <div id="view-results" class="hidden space-y-4 max-w-md mx-auto">
+                <button onclick="resetView()" class="mb-4 text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Filter
+                </button>
+                <div id="results-container" class="space-y-2"></div>
+            </div>
+
+            <!-- VIEW 3: COLLECTION -->
+            <div id="view-collection" class="hidden space-y-4 max-w-md mx-auto relative">
+                <div class="flex justify-between items-center mb-4">
+                     <h2 class="text-2xl font-bold">My Collection</h2>
+                     <button onclick="openSmartAdd()" class="bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 shadow-lg">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Smart Add
+                     </button>
+                </div>
+                <div id="collection-list" class="space-y-3"></div>
+            </div>
+
+            <!-- VIEW 4: TIMELINE / FUTURE -->
+            <div id="view-timeline" class="hidden space-y-4 max-w-md mx-auto relative">
+                <div class="bg-gradient-to-r from-teal-900/40 to-charcoal-800 p-1 rounded-2xl mb-6 border border-teal-500/30">
+                    <div class="glass-panel rounded-xl p-5 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-3 opacity-10">
+                            <i data-lucide="radar" class="w-24 h-24"></i>
+                        </div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="bg-teal-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">Weekly Scout</span>
+                            <span class="text-[10px] text-teal-300" id="week-label">Week 48</span>
+                        </div>
+                        <h3 class="font-bold text-xl text-white mb-1" id="scout-name">Loading...</h3>
+                        <p class="text-xs text-gray-300 mb-3" id="scout-reason">Analyzing your collection gaps...</p>
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[9px] text-teal-400 uppercase font-bold tracking-wider">Target: Montagne Parfums ($40-$50)</span>
+                            <button onclick="addScoutToPlan()" class="text-xs font-bold text-white flex items-center gap-1 mt-2 hover:text-teal-300">
+                                Add to Plan <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Acquisition Plan</h2>
+                    <button onclick="openPlanModal()" class="bg-teal-500 p-2 rounded-full shadow-lg active:scale-90 transition-transform">
+                        <i data-lucide="plus" class="w-5 h-5 text-white"></i>
+                    </button>
+                </div>
+                <div id="timeline-list" class="relative space-y-0 timeline-line pl-2"></div>
+            </div>
+
+            <!-- VIEW 5: HISTORY -->
+            <div id="view-history" class="hidden space-y-4 max-w-md mx-auto relative">
+                <h2 class="text-2xl font-bold mb-4">Wear Log</h2>
+                <div id="history-list" class="space-y-3"></div>
+            </div>
+
+        </main>
+
+        <!-- FOOTER NAV -->
+        <nav class="safe-bottom fixed bottom-0 w-full bg-charcoal-800/90 backdrop-blur-lg border-t border-white/5 flex justify-around items-center px-4 py-3 z-40">
+            <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1 text-teal-500">
+                <i data-lucide="search" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Select</span>
+            </button>
+            <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1 text-gray-500 hover:text-teal-300">
+                <i data-lucide="library" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Collect</span>
+            </button>
+            <button onclick="switchView('history')" class="nav-btn flex flex-col items-center gap-1 text-gray-500 hover:text-teal-300">
+                <i data-lucide="history" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">History</span>
+            </button>
+            <button onclick="switchView('timeline')" class="nav-btn flex flex-col items-center gap-1 text-gray-500 hover:text-teal-300">
+                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+                <span class="text-[10px] font-medium">Future</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- HISTORY EDIT MODAL -->
+    <div id="history-edit-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
+            <h3 class="text-xl font-bold mb-4">Edit Log</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label>
+                    <input type="datetime-local" id="hist-edit-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label>
+                    <select id="hist-edit-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button onclick="closeHistoryEdit()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button>
+                    <button onclick="saveHistoryEdit()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Update Log</button>
+                </div>
+                <button onclick="deleteHistoryEntry()" class="w-full text-red-400 text-xs font-bold py-2 mt-2 hover:text-red-300">Delete Entry</button>
             </div>
         </div>
     </div>
-    <div id="noteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header" id="noteModalTitle">Add Note</div>
-            <div class="form-group"><label class="form-label">Fragrance/Combo Name</label><input type="text" id="noteName" class="form-input"></div>
-            <div class="form-group"><label class="form-label">Note</label><textarea id="noteContent" class="form-textarea" placeholder="Write your thoughts about this fragrance..."></textarea></div>
-            <div class="modal-actions">
-                <button class="primary" onclick="app.saveNote()">Save Note</button>
-                <button class="secondary" onclick="app.closeNoteModal()">Cancel</button>
+
+    <!-- SMART ADD MODAL -->
+    <div id="smart-add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Smart Add</h3>
+                <button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
+            <div class="space-y-4 overflow-y-auto no-scrollbar flex-1">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label>
+                    <input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name">
+                    <input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House">
+                </div>
+                <div class="bg-teal-900/20 p-4 rounded-xl border border-teal-500/20">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i>
+                        <label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label>
+                    </div>
+                    <textarea id="sa-text" class="w-full bg-black/40 text-xs text-gray-300 p-3 rounded-lg border border-white/10 h-32 focus:outline-none focus:border-teal-500" placeholder="Paste notes/description..."></textarea>
+                    <button onclick="analyzeText()" class="w-full mt-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-2 rounded-lg">Analyze & Auto-Fill</button>
+                </div>
+                <div id="sa-results" class="hidden space-y-3">
+                    <div class="p-3 bg-white/5 rounded-lg">
+                        <h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4>
+                        <div id="sa-tags" class="flex flex-wrap gap-1"></div>
+                    </div>
+                     <div class="p-3 bg-white/5 rounded-lg">
+                        <h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4>
+                        <p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="saveSmartAdd()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Save to Collection</button>
         </div>
     </div>
+
+    <!-- SETTINGS / PLAN / NOTES MODALS -->
+    <div id="settings-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
+            <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">Data</h3><button onclick="toggleSettings()" class="p-2"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+            <textarea id="backup-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" readonly></textarea>
+            <button onclick="copyData()" class="w-full bg-teal-500 py-2 rounded-lg text-xs font-bold mb-2">Copy</button>
+            <textarea id="restore-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" placeholder="Paste JSON"></textarea>
+            <button onclick="restoreData()" class="w-full bg-red-600 py-2 rounded-lg text-xs font-bold">Restore</button>
+        </div>
+    </div>
+    
+    <div id="plan-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6">
+            <h3 class="mb-4 font-bold">Add Plan</h3>
+            <input id="plan-name" class="w-full input-glass p-3 mb-2 rounded" placeholder="Name">
+            <input id="plan-desc" class="w-full input-glass p-3 mb-2 rounded" placeholder="Desc">
+            <div class="flex gap-2"><button onclick="closePlanModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="savePlan()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div>
+        </div>
+    </div>
+    
+    <div id="notes-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6">
+            <h3 class="mb-2 font-bold">Notes</h3>
+            <textarea id="note-input" class="w-full input-glass p-3 h-32 mb-4 rounded"></textarea>
+            <div class="flex gap-2"><button onclick="closeNotesModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="saveNote()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] transition-transform duration-300 z-[70]">
+        <i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span>
+    </div>
+
     <script>
-        const app = {
-            state: {currentSeason: '', currentWeather: '', currentSituation: '', currentSuspense: null, wearHistory: JSON.parse(localStorage.getItem('wearHistory') || '[]'), favorites: JSON.parse(localStorage.getItem('favorites') || '[]'), wearCount: JSON.parse(localStorage.getItem('wearCount') || '{}'), notes: JSON.parse(localStorage.getItem('notes') || '[]'), editingHistoryIndex: null, editingNoteIndex: null},
-            fragrances: {"Maison du Soir": {notes: "Chestnut, cloves, vanilla", pairs: ["BLOMB No. 27", "Brooklyn Jazz"]}, "Cubicle for Men": {notes: "Fresh, woody, ambroxan", pairs: ["Gentle Silver", "Aventus"]}, "Gentle Silver": {notes: "Juniper, nutmeg, vanilla", pairs: ["Aventus", "Cubicle for Men"]}, "BLOMB No. 27": {notes: "Tobacco, coconut, sandalwood", pairs: ["Maison du Soir", "Cubicle for Men"]}, "Aventus": {notes: "Pineapple, birch, oakmoss", pairs: ["Gentle Silver", "Vanille Absolute"]}, "Brooklyn Jazz": {notes: "Rum, tobacco, vanilla, tonka", pairs: ["Phantom Noir", "Vanille Absolute"]}, "Phantom Noir": {notes: "Coffee, rum, vanilla, caramel", pairs: ["Brooklyn Jazz", "1 Million"]}, "Lost Cherry": {notes: "Cherry, almond, tonka bean", pairs: ["1 Million", "Ambery Saffron"]}, "Vanille Absolute": {notes: "Vanilla, ginger, pink pepper", pairs: ["Aventus", "Brooklyn Jazz"]}, "1 Million": {notes: "Cinnamon, leather, amber", pairs: ["Lost Cherry", "Phantom Noir"]}, "Eau Noir": {notes: "Dark woody, oud, leather", pairs: ["Phantom Noir", "BLOMB No. 27"]}, "Ambery Saffron": {notes: "Amber, saffron, woody", pairs: ["Aventus", "Lost Cherry"]}, "Victory Man": {notes: "Fresh citrus, woody", pairs: ["Aventus", "Gentle Silver"]}},
-            combos: {"Phantom Noir + Brooklyn Jazz": {name: "Boozy Brothers", rating: 5, why: "Coffee-rum meets rum-tobacco perfection", sprays: "3 total", locations: "Phantom: neck + chest | Brooklyn Jazz: left wrist"}, "Aventus + Vanille Absolute": {name: "Fall Romance", rating: 5, why: "Spicy vanilla meets fruity confidence", sprays: "3 total", locations: "Aventus: chest | Vanille: neck + right wrist"}, "1 Million + Lost Cherry": {name: "Winter Date Power", rating: 5, why: "Sweet cherry meets bold cinnamon", sprays: "3 total", locations: "Lost Cherry: neck + chest | 1 Million: left wrist"}, "Brooklyn Jazz + Vanille Absolute": {name: "Cozy Seduction", rating: 5, why: "Boozy-warm meets spicy-vanilla", sprays: "3 total", locations: "Brooklyn Jazz: neck + chest | Vanille: wrists"}, "Cubicle for Men + Gentle Silver": {name: "Fresh Power Duo", rating: 4, why: "Professional freshness doubled", sprays: "2 total", locations: "Cubicle: chest | Gentle Silver: neck"}, "Aventus + Gentle Silver": {name: "Spring Confidence", rating: 4, why: "Fresh citrus meets aromatic sophistication", sprays: "2 total", locations: "Aventus: chest | Gentle Silver: neck + wrists"}},
-            weatherOptions: {winter: [{id: 'cold', emoji: '❄️', label: 'Freezing', temp: '<25°F'}, {id: 'cold', emoji: '🥶', label: 'Cold', temp: '25-40°F'}, {id: 'cool', emoji: '🌤️', label: 'Cool/Rainy', temp: '40-50°F'}, {id: 'mild', emoji: '🌡️', label: 'Mild', temp: '50-60°F'}], spring: [{id: 'chilly', emoji: '🧊', label: 'Chilly', temp: '45-55°F'}, {id: 'mild', emoji: '🌤️', label: 'Moderate', temp: '55-65°F'}, {id: 'warm', emoji: '☀️', label: 'Pleasant', temp: '65-75°F'}, {id: 'warm', emoji: '🌞', label: 'Warm', temp: '75-85°F'}], summer: [{id: 'comfortable', emoji: '😊', label: 'Comfortable', temp: '70-80°F'}, {id: 'hot', emoji: '☀️', label: 'Hot', temp: '80-90°F'}, {id: 'hot', emoji: '🔥', label: 'Very Hot', temp: '90-95°F'}, {id: 'hot', emoji: '🌡️', label: 'Extreme', temp: '95°F+'}], fall: [{id: 'chilly', emoji: '🧊', label: 'Chilly', temp: '45-55°F'}, {id: 'mild', emoji: '🌤️', label: 'Moderate', temp: '55-65°F'}, {id: 'warm', emoji: '☀️', label: 'Pleasant', temp: '65-75°F'}, {id: 'warm', emoji: '🌞', label: 'Warm', temp: '75-85°F'}]},
-            recommendations: {winter: {cold: {work: [{name: "Maison du Soir", rating: 5, reason: "Ultimate winter office. Cozy chestnut-vanilla, professional yet memorable.", sprays: 2, locations: "Neck and chest"}, {name: "Cubicle for Men", rating: 4, reason: "Year-round office champion. Fresh-woody keeps you smelling clean.", sprays: 2, locations: "Wrists and neck"}, {name: "Gentle Silver", rating: 4, reason: "Aromatic-woody sophistication. Juniper-nutmeg refined.", sprays: 2, locations: "Neck and inner elbows"}], casual: [{name: "Maison du Soir", rating: 5, reason: "Perfect cozy winter errands. Chestnut-cloves-vanilla screams comfort.", sprays: 3, locations: "Neck, wrists, chest"}, {name: "BLOMB No. 27", rating: 5, reason: "Woody-tobacco-coconut made for winter. Warm and grounded.", sprays: 2, locations: "Neck and chest"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy rum-tobacco intentional and seductive.", sprays: 3, locations: "Neck, chest, wrists"}], date_relaxed: [{name: "Phantom Noir", rating: 5, reason: "Winter date night KING. Coffee-rum-boozy-sweet projects beautifully.", sprays: 3, locations: "Neck, chest, upper back"}, {name: "Brooklyn Jazz", rating: 5, reason: "Boozy rum-tobacco-vanilla romance perfected.", sprays: 3, locations: "Neck, chest, wrists"}, {name: "Lost Cherry", rating: 4, reason: "Sweet cherry-almond gourmand incredibly seductive.", sprays: 3, locations: "Neck and chest"}], date_building: [{name: "Phantom Noir", rating: 5, reason: "MAXIMUM SEDUCTION. Winter intimacy peaked.", sprays: 3, locations: "Neck, chest, wrists"}, {name: "Brooklyn Jazz", rating: 5, reason: "Boozy rum-tobacco seduction for winter nights.", sprays: 3, locations: "Neck, chest, upper back"}, {name: "1 Million", rating: 4, reason: "Bold spicy seduction.", sprays: 3, locations: "Neck and wrists"}], intimate: [{name: "Phantom Noir", rating: 5, reason: "Winter seduction KING at skin-close range.", sprays: 2, locations: "Neck and wrists only"}, {name: "Brooklyn Jazz", rating: 5, reason: "Boozy-warm-vanilla perfection for intimate moments.", sprays: 2, locations: "Neck and inner elbows"}, {name: "1 Million", rating: 4, reason: "Bold sensuality at close range.", sprays: 2, locations: "Wrists and neck"}]}, mild: {work: [{name: "Cubicle for Men", rating: 5, reason: "Still your office champion.", sprays: 2, locations: "Wrists and neck"}, {name: "Gentle Silver", rating: 4, reason: "Aromatic sophistication.", sprays: 2, locations: "Neck"}, {name: "Aventus", rating: 4, reason: "Confident professionalism.", sprays: 2, locations: "Chest"}], casual: [{name: "Aventus", rating: 5, reason: "Versatile casual wear.", sprays: 2, locations: "Neck and wrists"}, {name: "Brooklyn Jazz", rating: 4, reason: "Casual confidence.", sprays: 2, locations: "Neck and chest"}, {name: "BLOMB No. 27", rating: 4, reason: "Casual woody warmth.", sprays: 2, locations: "Chest"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Date night classic.", sprays: 2, locations: "Neck, chest, wrists"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy charm.", sprays: 2, locations: "Neck and chest"}, {name: "Lost Cherry", rating: 4, reason: "Sweet attraction.", sprays: 2, locations: "Wrists and neck"}], date_building: [{name: "Phantom Noir", rating: 5, reason: "Still seductive.", sprays: 2, locations: "Neck and wrists"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy seduction.", sprays: 2, locations: "Neck and chest"}, {name: "1 Million", rating: 4, reason: "Spicy seduction.", sprays: 2, locations: "Chest and wrists"}], intimate: [{name: "Phantom Noir", rating: 5, reason: "Intimate champion.", sprays: 2, locations: "Wrists and neck only"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy intimacy.", sprays: 2, locations: "Neck and wrists"}, {name: "Lost Cherry", rating: 4, reason: "Sweet intimacy.", sprays: 2, locations: "Wrists only"}]}, cool: {work: [{name: "Cubicle for Men", rating: 5, reason: "Perfect for cool rainy offices.", sprays: 2, locations: "Wrists and neck"}, {name: "Gentle Silver", rating: 4, reason: "Sophisticated and fresh.", sprays: 2, locations: "Neck"}, {name: "Maison du Soir", rating: 4, reason: "Cozy warmth.", sprays: 2, locations: "Chest"}], casual: [{name: "Aventus", rating: 5, reason: "Cool weather classic.", sprays: 2, locations: "Neck and wrists"}, {name: "Brooklyn Jazz", rating: 4, reason: "Warming boozy vibes.", sprays: 2, locations: "Chest"}, {name: "BLOMB No. 27", rating: 4, reason: "Woody casual.", sprays: 2, locations: "Neck and chest"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Versatile date scent.", sprays: 2, locations: "Neck and chest"}, {name: "Brooklyn Jazz", rating: 4, reason: "Romantic warmth.", sprays: 2, locations: "Neck and wrists"}, {name: "Phantom Noir", rating: 4, reason: "Cozy date vibes.", sprays: 2, locations: "Neck"}], date_building: [{name: "Phantom Noir", rating: 5, reason: "Building tension.", sprays: 2, locations: "Neck and wrists"}, {name: "Brooklyn Jazz", rating: 4, reason: "Warm seduction.", sprays: 2, locations: "Neck and chest"}, {name: "1 Million", rating: 4, reason: "Bold confidence.", sprays: 2, locations: "Wrists"}], intimate: [{name: "Phantom Noir", rating: 5, reason: "Intimate warmth.", sprays: 2, locations: "Wrists and neck"}, {name: "Brooklyn Jazz", rating: 4, reason: "Close-range charm.", sprays: 2, locations: "Neck"}, {name: "Vanille Absolute", rating: 4, reason: "Sweet intimacy.", sprays: 2, locations: "Wrists"}]}}, fall: {cold: {work: [{name: "Cubicle for Men", rating: 5, reason: "Office MVP for fall.", sprays: 2, locations: "Wrists and neck"}, {name: "Gentle Silver", rating: 5, reason: "Aromatic juniper-nutmeg sophistication.", sprays: 2, locations: "Neck and inner elbows"}, {name: "Aventus", rating: 4, reason: "Perfect fall signature.", sprays: 2, locations: "Neck and chest"}], casual: [{name: "Aventus", rating: 5, reason: "THE perfect fall casual signature.", sprays: 2, locations: "Neck and wrists"}, {name: "BLOMB No. 27", rating: 4, reason: "Woody-tobacco for fall weekends.", sprays: 2, locations: "Neck and chest"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy fall warmth.", sprays: 2, locations: "Chest"}], date_relaxed: [{name: "Vanille Absolute", rating: 5, reason: "Fall date night KING. Spicy vanilla-ginger autumn romance.", sprays: 3, locations: "Neck, chest, upper back"}, {name: "Brooklyn Jazz", rating: 5, reason: "Boozy rum-tobacco romance.", sprays: 3, locations: "Neck, chest, wrists"}, {name: "Lost Cherry", rating: 4, reason: "Sweet cherry seduction.", sprays: 2, locations: "Neck and chest"}], date_building: [{name: "Vanille Absolute", rating: 5, reason: "Fall seduction with spicy-sweet warmth.", sprays: 3, locations: "Neck, chest, wrists"}, {name: "Brooklyn Jazz", rating: 5, reason: "Boozy rum-tobacco seduction.", sprays: 3, locations: "Neck, chest, upper back"}, {name: "Phantom Noir", rating: 4, reason: "Coffee-rum seduction.", sprays: 2, locations: "Neck and wrists"}], intimate: [{name: "Vanille Absolute", rating: 5, reason: "Fall seduction KING. Spicy-sweet-warm perfection at skin-close.", sprays: 2, locations: "Wrists and neck only"}, {name: "Brooklyn Jazz", rating: 5, reason: "Boozy-vanilla cozy perfection.", sprays: 2, locations: "Neck and inner elbows"}, {name: "Phantom Noir", rating: 4, reason: "Coffee-rum intimacy.", sprays: 2, locations: "Wrists and neck"}]}, mild: {work: [{name: "Cubicle for Men", rating: 5, reason: "Office champion.", sprays: 2, locations: "Wrists and neck"}, {name: "Aventus", rating: 4, reason: "Confident and fresh.", sprays: 2, locations: "Chest"}, {name: "Gentle Silver", rating: 4, reason: "Sophisticated.", sprays: 2, locations: "Neck"}], casual: [{name: "Aventus", rating: 5, reason: "Versatile fall casual.", sprays: 2, locations: "Neck and wrists"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy charm.", sprays: 2, locations: "Chest"}, {name: "Maison du Soir", rating: 4, reason: "Cozy casual.", sprays: 3, locations: "Neck, chest, wrists"}], date_relaxed: [{name: "Vanille Absolute", rating: 5, reason: "Fall romance.", sprays: 2, locations: "Neck and chest"}, {name: "Lost Cherry", rating: 4, reason: "Sweet attraction.", sprays: 2, locations: "Wrists and neck"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy charm.", sprays: 2, locations: "Chest"}], date_building: [{name: "Vanille Absolute", rating: 5, reason: "Spicy-sweet seduction.", sprays: 2, locations: "Neck and wrists"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy seduction.", sprays: 2, locations: "Chest"}, {name: "1 Million", rating: 4, reason: "Spicy seduction.", sprays: 2, locations: "Wrists"}], intimate: [{name: "Vanille Absolute", rating: 5, reason: "Perfect intimacy.", sprays: 2, locations: "Wrists and neck only"}, {name: "Brooklyn Jazz", rating: 4, reason: "Boozy intimacy.", sprays: 2, locations: "Neck and wrists"}, {name: "Phantom Noir", rating: 4, reason: "Coffee-rum intimacy.", sprays: 2, locations: "Wrists"}]}, warm: {work: [{name: "Victory Man", rating: 5, reason: "Fresh fall professional.", sprays: 2, locations: "Wrists and neck"}, {name: "Cubicle for Men", rating: 4, reason: "Office champion.", sprays: 2, locations: "Chest"}, {name: "Gentle Silver", rating: 4, reason: "Sophisticated professional.", sprays: 2, locations: "Neck"}], casual: [{name: "Victory Man", rating: 5, reason: "Perfect fall fresh casual.", sprays: 2, locations: "Neck and wrists"}, {name: "Aventus", rating: 4, reason: "Versatile casual wear.", sprays: 2, locations: "Chest"}, {name: "Gentle Silver", rating: 4, reason: "Casual sophistication.", sprays: 2, locations: "Neck"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Fall date king.", sprays: 2, locations: "Neck and chest"}, {name: "Victory Man", rating: 4, reason: "Fresh fall date.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Sophisticated date.", sprays: 2, locations: "Chest"}], date_building: [{name: "Aventus", rating: 5, reason: "Fresh fall seduction.", sprays: 2, locations: "Neck and wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh confidence.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Aromatic seduction.", sprays: 1, locations: "Neck"}], intimate: [{name: "Aventus", rating: 5, reason: "Fall intimate champion.", sprays: 2, locations: "Wrists and neck only"}, {name: "Victory Man", rating: 4, reason: "Fresh fall intimacy.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Aromatic intimacy.", sprays: 1, locations: "Wrists only"}]}}, spring: {mild: {work: [{name: "Cubicle for Men", rating: 5, reason: "Year-round office champion.", sprays: 2, locations: "Wrists and neck"}, {name: "Gentle Silver", rating: 4, reason: "Sophistication.", sprays: 2, locations: "Neck"}, {name: "Aventus", rating: 4, reason: "Confident fresh.", sprays: 2, locations: "Chest"}], casual: [{name: "Victory Man", rating: 5, reason: "Spring fresh casual.", sprays: 2, locations: "Neck and wrists"}, {name: "Aventus", rating: 4, reason: "Versatile casual.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Aromatic casual.", sprays: 2, locations: "Neck"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Spring date classic.", sprays: 2, locations: "Neck, chest, wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh spring date.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Sophisticated date.", sprays: 2, locations: "Chest"}], date_building: [{name: "Aventus", rating: 5, reason: "Fresh confidence.", sprays: 2, locations: "Neck and wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh spring seduction.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Aromatic seduction.", sprays: 2, locations: "Neck"}], intimate: [{name: "Aventus", rating: 5, reason: "Spring intimate champion.", sprays: 2, locations: "Wrists and neck only"}, {name: "Victory Man", rating: 4, reason: "Fresh intimacy.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Aromatic intimacy.", sprays: 1, locations: "Wrists only"}]}, warm: {work: [{name: "Victory Man", rating: 5, reason: "Fresh spring pro.", sprays: 2, locations: "Wrists and neck"}, {name: "Aventus", rating: 4, reason: "Fresh confidence pro.", sprays: 2, locations: "Chest"}, {name: "Cubicle for Men", rating: 4, reason: "Office champion.", sprays: 2, locations: "Wrists"}], casual: [{name: "Victory Man", rating: 5, reason: "Spring fresh casual.", sprays: 2, locations: "Neck and wrists"}, {name: "Aventus", rating: 4, reason: "Versatile casual.", sprays: 2, locations: "Chest"}, {name: "Gentle Silver", rating: 4, reason: "Casual sophistication.", sprays: 2, locations: "Neck"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Spring date king.", sprays: 2, locations: "Neck and chest"}, {name: "Victory Man", rating: 4, reason: "Fresh spring date.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Sophisticated date.", sprays: 2, locations: "Chest"}], date_building: [{name: "Aventus", rating: 5, reason: "Fresh spring seduction.", sprays: 2, locations: "Neck and wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh confidence.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Aromatic seduction.", sprays: 1, locations: "Neck"}], intimate: [{name: "Aventus", rating: 5, reason: "Spring intimate champion.", sprays: 2, locations: "Wrists and neck only"}, {name: "Victory Man", rating: 4, reason: "Fresh spring intimacy.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Aromatic intimacy.", sprays: 1, locations: "Wrists only"}]}, chilly: {work: [{name: "Cubicle for Men", rating: 5, reason: "Office MVP for spring chill.", sprays: 2, locations: "Wrists and neck"}, {name: "Gentle Silver", rating: 4, reason: "Aromatic sophistication.", sprays: 2, locations: "Neck"}, {name: "Aventus", rating: 4, reason: "Fresh and confident.", sprays: 2, locations: "Chest"}], casual: [{name: "Aventus", rating: 5, reason: "Spring chilly casual champion.", sprays: 2, locations: "Neck and wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh and uplifting.", sprays: 2, locations: "Chest and wrists"}, {name: "Cubicle for Men", rating: 4, reason: "Fresh and reliable.", sprays: 2, locations: "Wrists and neck"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Perfect spring chilly date.", sprays: 2, locations: "Neck and chest"}, {name: "Victory Man", rating: 4, reason: "Fresh and charming.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Sophisticated choice.", sprays: 2, locations: "Chest"}], date_building: [{name: "Aventus", rating: 5, reason: "Fresh spring seduction.", sprays: 2, locations: "Neck and wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh and confident.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Aromatic seduction.", sprays: 2, locations: "Neck"}], intimate: [{name: "Aventus", rating: 5, reason: "Spring intimate champion.", sprays: 2, locations: "Wrists and neck only"}, {name: "Victory Man", rating: 4, reason: "Fresh and intimate.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Aromatic intimacy.", sprays: 1, locations: "Wrists only"}]}}, summer: {hot: {work: [{name: "Victory Man", rating: 5, reason: "Summer fresh pro.", sprays: 2, locations: "Wrists and neck"}, {name: "Cubicle for Men", rating: 5, reason: "Office AC champion.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Cool aromatic pro.", sprays: 2, locations: "Neck"}], casual: [{name: "Victory Man", rating: 5, reason: "Ultimate summer casual.", sprays: 2, locations: "Neck and wrists"}, {name: "Aventus", rating: 4, reason: "Versatile casual.", sprays: 2, locations: "Chest and wrists"}, {name: "Cubicle for Men", rating: 4, reason: "Fresh casual.", sprays: 2, locations: "Wrists and neck"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Summer date king.", sprays: 2, locations: "Neck and chest"}, {name: "Victory Man", rating: 4, reason: "Fresh summer date.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Cool date.", sprays: 2, locations: "Chest"}], date_building: [{name: "Aventus", rating: 5, reason: "Fresh summer seduction.", sprays: 2, locations: "Neck and wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh seduction.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Cool seduction.", sprays: 2, locations: "Neck"}], intimate: [{name: "Aventus", rating: 5, reason: "Summer intimate champion.", sprays: 2, locations: "Wrists and neck only"}, {name: "Victory Man", rating: 4, reason: "Fresh summer intimacy.", sprays: 2, locations: "Wrists only"}, {name: "Gentle Silver", rating: 3, reason: "Cool intimacy.", sprays: 1, locations: "Wrists"}]}, warm: {work: [{name: "Victory Man", rating: 5, reason: "Summer fresh pro.", sprays: 2, locations: "Wrists and neck"}, {name: "Aventus", rating: 4, reason: "Fresh confidence pro.", sprays: 2, locations: "Chest"}, {name: "Cubicle for Men", rating: 4, reason: "Office champion.", sprays: 2, locations: "Wrists"}], casual: [{name: "Victory Man", rating: 5, reason: "Ultimate summer casual.", sprays: 2, locations: "Neck and wrists"}, {name: "Aventus", rating: 4, reason: "Versatile casual.", sprays: 2, locations: "Chest"}, {name: "Gentle Silver", rating: 4, reason: "Cool casual.", sprays: 2, locations: "Neck"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Summer date king.", sprays: 2, locations: "Neck and chest"}, {name: "Victory Man", rating: 4, reason: "Fresh date.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Cool date.", sprays: 2, locations: "Chest"}], date_building: [{name: "Aventus", rating: 5, reason: "Fresh summer seduction.", sprays: 2, locations: "Neck and wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh seduction.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Cool seduction.", sprays: 1, locations: "Neck"}], intimate: [{name: "Aventus", rating: 5, reason: "Summer intimate champion.", sprays: 2, locations: "Wrists and neck only"}, {name: "Victory Man", rating: 4, reason: "Fresh intimacy.", sprays: 2, locations: "Wrists only"}, {name: "Gentle Silver", rating: 3, reason: "Cool intimacy.", sprays: 1, locations: "Wrists"}]}, comfortable: {work: [{name: "Victory Man", rating: 5, reason: "Fresh summer pro.", sprays: 2, locations: "Wrists and neck"}, {name: "Aventus", rating: 4, reason: "Confident pro.", sprays: 2, locations: "Chest"}, {name: "Cubicle for Men", rating: 4, reason: "Office champion.", sprays: 2, locations: "Wrists"}], casual: [{name: "Victory Man", rating: 5, reason: "Ultimate summer casual.", sprays: 2, locations: "Neck and wrists"}, {name: "Aventus", rating: 4, reason: "Versatile casual.", sprays: 2, locations: "Chest"}, {name: "Gentle Silver", rating: 4, reason: "Cool casual.", sprays: 2, locations: "Neck"}], date_relaxed: [{name: "Aventus", rating: 5, reason: "Summer date king.", sprays: 2, locations: "Neck and chest"}, {name: "Victory Man", rating: 4, reason: "Fresh date.", sprays: 2, locations: "Neck and wrists"}, {name: "Gentle Silver", rating: 4, reason: "Cool date.", sprays: 2, locations: "Chest"}], date_building: [{name: "Aventus", rating: 5, reason: "Fresh summer seduction.", sprays: 2, locations: "Neck and wrists"}, {name: "Victory Man", rating: 4, reason: "Fresh seduction.", sprays: 2, locations: "Chest and wrists"}, {name: "Gentle Silver", rating: 3, reason: "Cool seduction.", sprays: 1, locations: "Neck"}], intimate: [{name: "Aventus", rating: 5, reason: "Summer intimate champion.", sprays: 2, locations: "Wrists and neck only"}, {name: "Victory Man", rating: 4, reason: "Fresh intimacy.", sprays: 2, locations: "Wrists only"}, {name: "Gentle Silver", rating: 3, reason: "Cool intimacy.", sprays: 1, locations: "Wrists"}]}}},
-            init() {this.loadHistory(); this.loadFavorites(); this.loadNotes();},
-            showTab(tab, el) {document.querySelectorAll('[id$="Screen"]').forEach(s => s.classList.add('hidden')); document.getElementById(tab + 'Screen').classList.remove('hidden'); document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active')); el.classList.add('active');},
-            selectSeason(season) {this.state.currentSeason = season; document.getElementById('seasonSection').classList.add('hidden'); const weatherButtons = document.getElementById('weatherButtons'); weatherButtons.innerHTML = ''; const options = this.weatherOptions[season] || []; options.forEach(w => {const btn = document.createElement('button'); btn.innerHTML = `${w.emoji}<br>${w.label}<span class="wear-count" style="display:block;font-size:11px;opacity:0.7;margin-top:4px;">${w.temp}</span>`; btn.onclick = () => this.selectWeather(w.id); weatherButtons.appendChild(btn);}); document.getElementById('weatherSection').classList.remove('hidden');},
-            selectWeather(weather) {this.state.currentWeather = weather; document.getElementById('weatherSection').classList.add('hidden'); document.getElementById('situationSection').classList.remove('hidden');},
-            selectSituation(situation) {this.state.currentSituation = situation; if(situation === 'date') {document.getElementById('situationSection').classList.add('hidden'); document.getElementById('suspenseSection').classList.remove('hidden');} else {this.state.currentSuspense = 'relaxed'; this.showRecommendations();}},
-            selectSuspense(val) {this.state.currentSuspense = val ? 'building' : 'relaxed'; this.showRecommendations();},
-            goBack(to) {if(to === 'season') {this.state.currentSeason = ''; this.state.currentWeather = ''; this.state.currentSituation = ''; this.state.currentSuspense = null; document.getElementById('weatherSection').classList.add('hidden'); document.getElementById('situationSection').classList.add('hidden'); document.getElementById('suspenseSection').classList.add('hidden'); document.getElementById('resultsScreen').classList.add('hidden'); document.getElementById('seasonSection').classList.remove('hidden');} else if(to === 'weather') {this.state.currentWeather = ''; this.state.currentSituation = ''; this.state.currentSuspense = null; document.getElementById('situationSection').classList.add('hidden'); document.getElementById('suspenseSection').classList.add('hidden'); document.getElementById('resultsScreen').classList.add('hidden'); document.getElementById('seasonSection').classList.add('hidden'); document.getElementById('weatherSection').classList.remove('hidden');} else if(to === 'situation') {this.state.currentSituation = ''; this.state.currentSuspense = null; document.getElementById('suspenseSection').classList.add('hidden'); document.getElementById('resultsScreen').classList.add('hidden'); document.getElementById('situationSection').classList.remove('hidden');}},
-            showRecommendations() {document.getElementById('suspenseSection').classList.add('hidden'); document.getElementById('situationSection').classList.add('hidden'); document.getElementById('weatherSection').classList.add('hidden'); document.getElementById('seasonSection').classList.add('hidden'); document.getElementById('resultsScreen').classList.remove('hidden'); this.renderRecommendations();},
-            renderRecommendations() {let key = this.state.currentSituation; if(this.state.currentSituation === 'date') {key = 'date_' + this.state.currentSuspense;} let recs = this.recommendations[this.state.currentSeason]?.[this.state.currentWeather]?.[key] || []; recs = recs.map(r => ({...r, count: this.state.wearCount[r.name] || 0, type: 'fragrance', id: r.name})); const comboKeys = Object.keys(this.combos).filter(k => {const [f1, f2] = k.split(' + '); return recs.some(r => r.name === f1.trim()) || recs.some(r => r.name === f2.trim());}); const comboRecs = comboKeys.map(comboKey => {const combo = this.combos[comboKey]; return {name: combo.name, comboKey: comboKey, rating: combo.rating, reason: combo.why, sprays: combo.sprays, locations: combo.locations, count: 0, type: 'combo', id: comboKey};}); let allRecs = [...recs, ...comboRecs]; allRecs.sort((a, b) => {if(a.rating !== b.rating) return b.rating - a.rating; if(a.count !== b.count) return a.count - b.count; return 0;}); const div = document.getElementById('recommendations'); div.innerHTML = ''; if(!allRecs || allRecs.length === 0) {div.innerHTML = '<div class="empty-state">No recommendations available</div>'; return;} allRecs.forEach(rec => {if(rec.type === 'combo') {const stars = '⭐'.repeat(rec.rating) + '☆'.repeat(5-rec.rating); const card = document.createElement('div'); card.className = 'combo-card'; card.innerHTML = `<div class="combo-badge">💥 COMBO</div><div style="font-size:18px;font-weight:600;margin-bottom:6px;">${rec.name}</div><div style="font-size:18px;letter-spacing:2px;margin-bottom:10px;">${stars}</div><div style="margin-bottom:12px;opacity:0.95;font-size:14px;">${rec.reason}</div><div style="font-size:13px;opacity:0.9;">💨 ${rec.sprays}</div><div style="font-size:13px;opacity:0.9;margin-top:6px;">📍 ${rec.locations}</div><button class="primary" style="margin-top:15px;background:rgba(255,255,255,0.2);border:none;border-radius:8px;color:white;width:100%;min-height:44px;font-size:14px;" onclick="app.logCombo('${rec.comboKey.replace(/'/g, "\\'")}')">Try This Combo</button>`; div.appendChild(card);} else {const stars = '⭐'.repeat(rec.rating) + '☆'.repeat(5-rec.rating); const wearText = rec.count > 0 ? `(Worn ${rec.count}x)` : '(Never worn)'; const card = document.createElement('div'); card.className = 'recommendation-card'; const pairsHtml = this.fragrances[rec.name]?.pairs ? `<div class="pairs-with"><div class="pairs-title">💡 Pairs Well With:</div>${this.fragrances[rec.name].pairs.map(p => `<button class="pair-link" onclick="alert('Try: ${rec.name} + ${p}')">${p}</button>`).join('')}</div>` : ''; card.innerHTML = `<div class="rec-header"><div><div class="rec-name">${rec.name}</div><div class="wear-count">${wearText}</div></div><div style="font-size:18px;letter-spacing:2px;">${stars}</div></div><div class="rec-reason"><strong>Why:</strong> ${rec.reason}</div><div style="font-weight:600;color:var(--accent);margin:10px 0;">💨 ${rec.sprays} Sprays</div><div class="spray-guide"><div class="spray-title">📍 Spray Locations:</div>${rec.locations}</div>${pairsHtml}<div class="rec-actions"><button class="primary" onclick="app.logFragrance('${rec.name.replace(/'/g, "\\'")}')">Wear This</button><button class="secondary" onclick="app.saveFavorite('${rec.name.replace(/'/g, "\\'")}')">❤️ Fav</button><button class="secondary" onclick="app.openNoteModal('${rec.name.replace(/'/g, "\\'")}')">📝</button></div>`; div.appendChild(card);}});},
-            logFragrance(name) {this.state.wearCount[name] = (this.state.wearCount[name] || 0) + 1; localStorage.setItem('wearCount', JSON.stringify(this.state.wearCount)); const entry = {type: 'single', fragrance: name, season: this.state.currentSeason, weather: this.state.currentWeather, situation: this.state.currentSituation, date: new Date().toISOString()}; this.state.wearHistory.unshift(entry); if(this.state.wearHistory.length > 100) this.state.wearHistory = this.state.wearHistory.slice(0,100); localStorage.setItem('wearHistory', JSON.stringify(this.state.wearHistory)); alert(`✅ Logged: ${name}`); this.loadHistory(); this.goBackToStart();},
-            logCombo(comboKey) {const frags = comboKey.split(' + '); frags.forEach(f => {const fname = f.trim(); this.state.wearCount[fname] = (this.state.wearCount[fname] || 0) + 1;}); localStorage.setItem('wearCount', JSON.stringify(this.state.wearCount)); const entry = {type: 'combo', combo: comboKey, season: this.state.currentSeason, weather: this.state.currentWeather, situation: this.state.currentSituation, date: new Date().toISOString()}; this.state.wearHistory.unshift(entry); if(this.state.wearHistory.length > 100) this.state.wearHistory = this.state.wearHistory.slice(0,100); localStorage.setItem('wearHistory', JSON.stringify(this.state.wearHistory)); alert(`✅ Logged combo: ${comboKey}`); this.loadHistory(); this.goBackToStart();},
-            saveFavorite(item) {const fav = {item, date: new Date().toISOString()}; this.state.favorites.unshift(fav); if(this.state.favorites.length > 50) this.state.favorites = this.state.favorites.slice(0,50); localStorage.setItem('favorites', JSON.stringify(this.state.favorites)); alert('Added to favorites!'); this.loadFavorites();},
-            goBackToStart() {this.state.currentSeason = ''; this.state.currentWeather = ''; this.state.currentSituation = ''; this.state.currentSuspense = null; document.getElementById('weatherSection').classList.add('hidden'); document.getElementById('situationSection').classList.add('hidden'); document.getElementById('suspenseSection').classList.add('hidden'); document.getElementById('resultsScreen').classList.add('hidden'); document.getElementById('seasonSection').classList.remove('hidden'); document.querySelectorAll('[id$="Screen"]').forEach(s => {if(s.id !== 'selectorScreen') s.classList.add('hidden');}); document.getElementById('selectorScreen').classList.remove('hidden'); document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active')); document.querySelectorAll('.nav-tab')[0].classList.add('active');},
-            loadHistory() {const list = document.getElementById('historyList'); if(this.state.wearHistory.length === 0) {list.innerHTML = '<div class="empty-state">No wears logged yet. Start by finding a scent!</div>'; return;} list.innerHTML = ''; this.state.wearHistory.slice(0, 30).forEach((h, idx) => {const item = document.createElement('div'); item.className = 'history-item'; const fragName = h.fragrance || h.combo || 'Unknown'; const typeLabel = h.type === 'combo' ? '💥' : '✨'; const dateStr = new Date(h.date).toLocaleDateString(); const timeStr = new Date(h.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); item.innerHTML = `<div>${typeLabel} <strong>${fragName}</strong></div><div style="font-size:12px;opacity:0.7;margin-top:4px;">${h.season} • ${h.situation || 'unknown'} • ${dateStr} ${timeStr}</div><div class="history-actions"><button class="primary" onclick="app.openEditHistoryModal(${idx})">✏️ Edit</button><button class="secondary" onclick="app.deleteHistoryEntry(${idx})">🗑️ Delete</button></div>`; list.appendChild(item);});},
-            openEditHistoryModal(idx) {this.state.editingHistoryIndex = idx; const entry = this.state.wearHistory[idx]; document.getElementById('editFragranceName').value = entry.fragrance || entry.combo || ''; document.getElementById('editSeason').value = entry.season || ''; document.getElementById('editWeather').value = entry.weather || ''; document.getElementById('editSituation').value = entry.situation || ''; document.getElementById('editHistoryModal').classList.add('active');},
-            closeEditHistoryModal() {document.getElementById('editHistoryModal').classList.remove('active'); this.state.editingHistoryIndex = null;},
-            saveHistoryEdit() {const idx = this.state.editingHistoryIndex; if(idx === null) return; const oldName = this.state.wearHistory[idx].fragrance || this.state.wearHistory[idx].combo; const newName = document.getElementById('editFragranceName').value.trim(); if(oldName && newName && oldName !== newName) {this.state.wearCount[oldName] = (this.state.wearCount[oldName] || 1) - 1; if(this.state.wearCount[oldName] < 0) this.state.wearCount[oldName] = 0; this.state.wearCount[newName] = (this.state.wearCount[newName] || 0) + 1; localStorage.setItem('wearCount', JSON.stringify(this.state.wearCount));} this.state.wearHistory[idx].fragrance = this.state.wearHistory[idx].type === 'single' ? newName : undefined; this.state.wearHistory[idx].combo = this.state.wearHistory[idx].type === 'combo' ? newName : undefined; this.state.wearHistory[idx].season = document.getElementById('editSeason').value.trim(); this.state.wearHistory[idx].weather = document.getElementById('editWeather').value.trim(); this.state.wearHistory[idx].situation = document.getElementById('editSituation').value.trim(); localStorage.setItem('wearHistory', JSON.stringify(this.state.wearHistory)); alert('✅ Entry updated'); this.closeEditHistoryModal(); this.loadHistory();},
-            deleteHistoryEntry(idx) {if(!confirm('Delete this history entry?')) return; const entry = this.state.wearHistory[idx]; const fragName = entry.fragrance || entry.combo; if(fragName) {this.state.wearCount[fragName] = (this.state.wearCount[fragName] || 1) - 1; if(this.state.wearCount[fragName] < 0) this.state.wearCount[fragName] = 0; localStorage.setItem('wearCount', JSON.stringify(this.state.wearCount));} this.state.wearHistory.splice(idx, 1); localStorage.setItem('wearHistory', JSON.stringify(this.state.wearHistory)); alert('✅ Entry deleted'); this.loadHistory();},
-            loadFavorites() {const list = document.getElementById('favoritesList'); if(this.state.favorites.length === 0) {list.innerHTML = '<div class="empty-state">No favorites yet. Add your favorite scents!</div>'; return;} list.innerHTML = ''; this.state.favorites.forEach((fav, idx) => {const item = document.createElement('div'); item.className = 'favorite-item'; const dateStr = new Date(fav.date).toLocaleDateString(); item.innerHTML = `<div><strong>${fav.item}</strong><div style="font-size:12px;opacity:0.6;margin-top:4px;">Added ${dateStr}</div></div><button class="secondary" onclick="app.deleteFavorite(${idx})" style="width:100%;margin-top:10px;padding:8px;">Remove</button>`; list.appendChild(item);});},
-            deleteFavorite(idx) {this.state.favorites.splice(idx, 1); localStorage.setItem('favorites', JSON.stringify(this.state.favorites)); this.loadFavorites();},
-            openNoteModal(fragName = '') {document.getElementById('noteName').value = fragName; document.getElementById('noteContent').value = ''; document.getElementById('noteModalTitle').textContent = 'Add Note'; this.state.editingNoteIndex = null; const saveBtn = document.querySelector('#noteModal .primary'); saveBtn.onclick = () => this.saveNote(); document.getElementById('noteModal').classList.add('active');},
-            closeNoteModal() {document.getElementById('noteModal').classList.remove('active'); document.getElementById('noteName').value = ''; document.getElementById('noteContent').value = '';},
-            saveNote() {const name = document.getElementById('noteName').value.trim(); const content = document.getElementById('noteContent').value.trim(); if(!name || !content) {alert('Please fill in fragrance name and note'); return;} if(this.state.editingNoteIndex !== null) {this.state.notes[this.state.editingNoteIndex].name = name; this.state.notes[this.state.editingNoteIndex].content = content; this.state.notes[this.state.editingNoteIndex].date = new Date().toISOString(); alert('✅ Note updated');} else {const note = {name: name, content: content, date: new Date().toISOString()}; this.state.notes.unshift(note); if(this.state.notes.length > 100) this.state.notes = this.state.notes.slice(0, 100); alert('✅ Note saved');} localStorage.setItem('notes', JSON.stringify(this.state.notes)); this.closeNoteModal(); this.loadNotes();},
-            loadNotes() {const list = document.getElementById('notesList'); if(this.state.notes.length === 0) {list.innerHTML = '<div class="empty-state">No notes yet. Add notes about your fragrances!</div>'; return;} list.innerHTML = ''; this.state.notes.forEach((note, idx) => {const item = document.createElement('div'); item.className = 'note-card'; const dateStr = new Date(note.date).toLocaleDateString(); const timeStr = new Date(note.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); item.innerHTML = `<div class="note-header"><div><div class="note-title">${note.name}</div><div class="note-date">${dateStr} ${timeStr}</div></div></div><div class="note-content">${note.content.replace(/\n/g, '<br>')}</div><div class="note-actions"><button class="primary" onclick="app.editNote(${idx})">✏️ Edit</button><button class="secondary" onclick="app.deleteNote(${idx})">🗑️ Delete</button></div>`; list.appendChild(item);});},
-            editNote(idx) {const note = this.state.notes[idx]; document.getElementById('noteName').value = note.name; document.getElementById('noteContent').value = note.content; document.getElementById('noteModalTitle').textContent = 'Edit Note'; this.state.editingNoteIndex = idx; document.getElementById('noteModal').classList.add('active');},
-            deleteNote(idx) {if(!confirm('Delete this note?')) return; this.state.notes.splice(idx, 1); localStorage.setItem('notes', JSON.stringify(this.state.notes)); alert('✅ Note deleted'); this.loadNotes();},
-            surpriseMe() {const allFrags = Object.keys(this.fragrances); const pick = allFrags[Math.floor(Math.random() * allFrags.length)]; alert(`🎲 Random pick: ${pick}\n\n${this.fragrances[pick].notes}`); this.logFragrance(pick);}
+        const APP_ID = "scentApp_db_v14_final_check"; 
+        const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
+
+        let state = {
+            context: { season: 'fall', weather: 'sunny', situation: 'office', suspense: false },
+            data: { fragrances: [], combos: [], history: [], futurePlan: [] }
         };
-        window.addEventListener('DOMContentLoaded', () => {app.init();});
+
+        // SCOUT DB - MONTAGNE SPECIFIC (Under $50 clones)
+        const SCOUT_DB = [
+            { name: "Tygr Cologne", reason: "Montagne's clone of Bvlgari Tygar ($370). Perfect high-heat Ambroxan bomb under $50." },
+            { name: "Elysian Cologne", reason: "Montagne's clone of Roja Elysium ($300+). A crisp Vetiver-Citrus blend for the Office." },
+            { name: "Chilly Pacific", reason: "Montagne's clone of LV Pacific Chill ($320). A playful Mint/Lemon profile for Summer." },
+            { name: "Malay Aklan", reason: "Montagne's clone of Millésime Impérial. A salty marine melon scent for high humidity." },
+            { name: "Afternoon Dive", reason: "Montagne's clone of LV Afternoon Swim. Pure mandarin orange freshness." },
+            { name: "Ambre Musc", reason: "Montagne's clone of YSL Tuxedo. A sophisticated patchouli/amber for Date Night." },
+            { name: "Parfum de Cerise", reason: "Montagne's clone of Lost Cherry. Good backup if you want to save your Tom Ford." }
+        ];
+
+        const KEYWORDS = {
+            winter: ["oud", "vanilla", "tobacco", "leather", "chocolate", "coffee", "rum", "cinnamon", "spice", "amber", "chestnut", "smoke", "incense"],
+            summer: ["lime", "lemon", "bergamot", "citrus", "sea", "salt", "aquatic", "marine", "coconut", "mint", "ginger", "fresh"],
+            fall: ["iris", "sandalwood", "fig", "tea", "cardamom", "cedar", "vetiver"],
+            date: ["rose", "jasmine", "musk", "patchouli", "saffron", "sweet", "boozy", "gourmand"],
+            office: ["soap", "clean", "white musk", "lavender", "neroli", "cotton"]
+        };
+
+        let tempSmartObj = null; 
+        let currentNoteId = null; 
+        let currentScout = null;
+        let editingHistoryIndex = null; 
+        let toastTimeout;
+
+        // --- DEFAULTS ---
+        const CUSTOM_DB = [
+            { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "2-3 sprays (neck + wrists).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "" },
+            { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "3-4 sprays (neck + chest).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "" },
+            { id: "creed_aventus", name: "Aventus", brand: "Creed", inspiration: "Original", tags: ["fresh", "smoky", "fruity", "king", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 4, intimate: 3 }, sprayInstructions: "3 sprays (neck).", description: "Smoky pineapple and birch. The ultimate confidence booster.", wearCount: 0, userNotes: "" },
+            { id: "victory_man", name: "Victory Man", brand: "XXIV", inspiration: "Unknown/Fresh", tags: ["fresh", "citrus", "cedar", "gym"], weatherAffinity: { winter_sunny: -1, winter_rainy: -2, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 0 }, situationRatings: { office: 4, gym: 5, casual: 4, date_night: 1, intimate: 1 }, sprayInstructions: "4-5 sprays. High heat safe.", description: "Bergamot and Cedarwood bomb. Clean, sharp, and energizing.", wearCount: 0, userNotes: "" },
+            { id: "paco_1_million", name: "1 Million", brand: "Paco Rabanne", inspiration: "Original", tags: ["sweet", "spicy", "loud", "club"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 1 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 4, intimate: 2 }, sprayInstructions: "2 sprays MAX. Nuclear.", description: "Sweet, spicy bubblegum. Designed for loud parties.", wearCount: 0, userNotes: "" },
+            { id: "blomb_27", name: "No. 27", brand: "BLOMB", inspiration: "Original", tags: ["woody", "tobacco", "coconut", "unique"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 0, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 3 }, sprayInstructions: "3 sprays (chest + wrists).", description: "Unique woody-tobacco with a coconut twist.", wearCount: 0, userNotes: "" },
+            { id: "phantom_noir", name: "Phantom Noir", brand: "Montagne", inspiration: "Black Phantom?", tags: ["coffee", "boozy", "chocolate", "dark", "suspense"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "2 sprays (chest). Heavy.", description: "Coffee, booze, and sugar. Dark and mysterious.", wearCount: 0, userNotes: "" },
+            { id: "brooklyn_jazz", name: "Brooklyn Jazz", brand: "Montagne", inspiration: "Maison Margiela Jazz Club", tags: ["boozy", "tobacco", "rum", "smooth"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -2, summer_rainy: 0, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "3 sprays (neck + scarf).", description: "Boozy rum and tobacco. Captures the vibe of a dim jazz bar.", wearCount: 0, userNotes: "" },
+            { id: "maison_du_soir", name: "Maison du Soir", brand: "Montagne", inspiration: "By the Fireplace", tags: ["smoke", "vanilla", "chestnut", "cozy"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 5, date_night: 3, intimate: 5 }, sprayInstructions: "2 sprays (chest). Smoky.", description: "Chestnut and vanilla smoke. The ultimate 'Cozy' scent.", wearCount: 0, userNotes: "" },
+            { id: "cubicle_men", name: "Cubicle for Men", brand: "Montagne", inspiration: "Fragrance One Office", tags: ["ambroxan", "fresh", "safe", "power"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 0, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 3, casual: 4, date_night: 2, intimate: 1 }, sprayInstructions: "3-4 sprays. Long lasting.", description: "Clean, soapy, and projecting. Perfect Office scent.", wearCount: 0, userNotes: "" },
+            { id: "gentle_silver", name: "Gentle Silver", brand: "Montagne", inspiration: "Gentle Fluidity Silver", tags: ["gin", "juniper", "fresh", "crisp"], weatherAffinity: { winter_sunny: 1, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 4, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "3-4 sprays (neck).", description: "Crisp juniper. Smells like a cold Gin & Tonic.", wearCount: 0, userNotes: "" },
+            { id: "vanille_absolute", name: "Vanille Absolute", brand: "Montagne", inspiration: "Nishane Ani?", tags: ["vanilla", "spicy", "ginger", "green"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "2-3 sprays. Strong vanilla.", description: "Spicy ginger and rich vanilla.", wearCount: 0, userNotes: "" },
+            { id: "eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 1, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "3 sprays (behind ears).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 0, userNotes: "" }
+        ];
+
+        const COMBOS_DB = [
+            { id: "combo_executive", name: "The Executive Suite", parts: ["creed_aventus", "dossier_ambery_saffron"], tags: ["date_night", "power", "complex"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "Smoky birch meets airy saffron sweetness. A massive compliment magnet.", instructions: "Spray Aventus on chest (Base), Saffron on neck (Air).", wearCount: 0, userNotes: "" },
+            { id: "combo_cherry_lounge", name: "Cherry Lounge", parts: ["lost_cherry", "brooklyn_jazz"], tags: ["boozy", "gourmand", "suspense"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco darkens the cherry almond profile. Very sexy.", instructions: "Brooklyn Jazz on chest first. Lost Cherry on pulse points.", wearCount: 0, userNotes: "" },
+            { id: "combo_gin_juice", name: "Gin & Juice", parts: ["gentle_silver", "creed_aventus"], tags: ["fresh", "fruity", "energy"], situationRatings: { office: 4, gym: 4, casual: 5, date_night: 3, intimate: 2 }, description: "Juniper berry and pineapple. An explosion of freshness.", instructions: "Layer equally on neck.", wearCount: 0, userNotes: "" },
+            { id: "combo_smoked_vanilla", name: "Smoked Vanilla", parts: ["maison_du_soir", "vanille_absolute"], tags: ["cozy", "winter", "gourmand"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Chestnut smoke mixed with spicy ginger vanilla. Ultimate cozy mode.", instructions: "Maison du Soir on chest. Vanille Absolute on wrists.", wearCount: 0, userNotes: "" },
+            { id: "combo_island_noir", name: "Island Noir", parts: ["creed_aventus", "blomb_27"], tags: ["summer", "night", "unique"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Pineapple meets Coconut and Tobacco. A dark, smoky Piña Colada vibe.", instructions: "BLOMB on chest. Aventus on neck.", wearCount: 0, userNotes: "" },
+            { id: "combo_spiced_cherry", name: "Spiced Cherry", parts: ["lost_cherry", "vanille_absolute"], tags: ["gourmand", "winter", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Ginger and Green Vanilla cut the sweetness of the Cherry. Sophisticated gourmand.", instructions: "Vanille Absolute first, top with Lost Cherry.", wearCount: 0, userNotes: "" },
+            { id: "combo_clean_cut", name: "The Clean Cut", parts: ["cubicle_men", "gentle_silver"], tags: ["office", "fresh", "clean"], situationRatings: { office: 5, gym: 5, casual: 3, date_night: 1, intimate: 1 }, description: "Ambroxan power meets Juniper freshness. The ultimate 'clean' scent profile.", instructions: "One spray of each on opposite sides of neck.", wearCount: 0, userNotes: "" },
+            { id: "combo_midnight_tea", name: "Midnight Tea", parts: ["eau_noir", "brooklyn_jazz"], tags: ["dark", "boozy", "suspense"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 5, intimate: 4 }, description: "Black tea and Fig mixed with Rum and Tobacco. Dark, moody, and intellectual.", instructions: "Brooklyn Jazz on chest. Eau Noir behind ears.", wearCount: 0, userNotes: "" }
+        ];
+
+        const DEFAULT_TIMELINE = [
+            { id: "t1", name: "Torino 2021", month: "Feb", year: 2026, description: "Spring transitional scent. Aromatic, minty, fresh.", active: true },
+            { id: "t2", name: "Buko Intense", month: "May", year: 2026, description: "Summer fresh anchor. Coconut lime vacation vibes.", active: true },
+            { id: "t3", name: "Afternoon Dive", month: "Jun", year: 2026, description: "Dedicated summer work scent if needed.", active: true },
+            { id: "t4", name: "Mystique Oud", month: "Sep", year: 2026, description: "Oud/Intimate scent for fall/winter dates.", active: true }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            initUI();
+            initScout();
+            lucide.createIcons();
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS && !window.navigator.standalone) setTimeout(() => document.getElementById('install-prompt').classList.remove('translate-y-full'), 2000);
+        });
+
+        function loadData() {
+            const raw = localStorage.getItem(APP_ID);
+            if (raw) {
+                state.data = JSON.parse(raw);
+                if (!state.data.futurePlan) state.data.futurePlan = [];
+                if (!state.data.combos || state.data.combos.length < 8) state.data.combos = JSON.parse(JSON.stringify(COMBOS_DB));
+                
+                // Force Updates
+                const pn = state.data.fragrances.find(f => f.id === 'phantom_noir');
+                if(pn && pn.brand === "Unknown") pn.brand = "Montagne";
+                
+                const bj = state.data.fragrances.find(f => f.id === 'brooklyn_jazz');
+                if(bj) {
+                    if(bj.brand === "Unknown") bj.brand = "Montagne";
+                    if(bj.inspiration === "Jazz Club?") bj.inspiration = "Maison Margiela Jazz Club";
+                }
+
+            } else {
+                state.data = { fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), combos: JSON.parse(JSON.stringify(COMBOS_DB)), history: [], futurePlan: JSON.parse(JSON.stringify(DEFAULT_TIMELINE)) };
+                saveData();
+            }
+            document.getElementById('backup-area').value = JSON.stringify(state.data);
+        }
+
+        function saveData() {
+            localStorage.setItem(APP_ID, JSON.stringify(state.data));
+            document.getElementById('backup-area').value = JSON.stringify(state.data);
+        }
+
+        function initUI() { updateContextUI(); showCollection(); }
+
+        function initScout() {
+            const date = new Date();
+            const weekNum = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 604800000);
+            currentScout = SCOUT_DB[weekNum % SCOUT_DB.length];
+            document.getElementById('week-label').innerText = `Week ${weekNum}`;
+            document.getElementById('scout-name').innerText = currentScout.name;
+            document.getElementById('scout-reason').innerText = currentScout.reason;
+        }
+
+        function addScoutToPlan() {
+            state.data.futurePlan.push({ id: 'plan_' + Date.now(), name: currentScout.name, month: "Next", year: new Date().getFullYear(), description: currentScout.reason });
+            saveData(); renderTimeline(); showToast('Added to Plan');
+        }
+
+        // --- SMART ADD LOGIC ---
+        function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); document.getElementById('sa-results').classList.add('hidden'); tempSmartObj = null; }
+        function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); document.getElementById('sa-text').value = ''; document.getElementById('sa-name').value = ''; document.getElementById('sa-brand').value = ''; }
+
+        function analyzeText() {
+            const text = document.getElementById('sa-text').value.toLowerCase();
+            const name = document.getElementById('sa-name').value;
+            const brand = document.getElementById('sa-brand').value;
+            if(!text) return alert("Paste text first");
+
+            let tags = [];
+            let affinity = { winter_sunny: 0, winter_rainy: 0, summer_sunny: 0, summer_rainy: 0, spring: 0, fall: 0 };
+            let ratings = { office: 2, gym: 1, casual: 3, date_night: 2, intimate: 2 };
+
+            if (KEYWORDS.winter.some(k => text.includes(k))) { tags.push('winter', 'cozy'); affinity.winter_sunny += 2; affinity.winter_rainy += 2; affinity.summer_sunny -= 3; ratings.date_night += 2; ratings.intimate += 2; ratings.gym = 0; }
+            if (KEYWORDS.summer.some(k => text.includes(k))) { tags.push('fresh', 'citrus'); affinity.summer_sunny += 2; affinity.summer_rainy += 1; affinity.winter_sunny -= 1; ratings.gym += 3; ratings.office += 2; ratings.date_night -= 1; }
+            if (KEYWORDS.fall.some(k => text.includes(k))) { tags.push('woody', 'spicy'); affinity.fall += 2; affinity.spring += 1; ratings.casual += 2; ratings.office += 1; }
+            if (KEYWORDS.office.some(k => text.includes(k))) { tags.push('clean', 'safe'); ratings.office += 3; ratings.gym += 1; }
+            if(text.includes('dark') || text.includes('mysterious') || text.includes('incense')) { tags.push('suspense'); ratings.date_night += 1; }
+
+            let comboSuggestion = "None detected";
+            if(tags.includes('fresh')) comboSuggestion = "Try layering with Aventus/Gentle Silver for depth.";
+            if(tags.includes('winter')) comboSuggestion = "Try layering with Vanille Absolute for sweetness.";
+
+            const resultsDiv = document.getElementById('sa-results'); resultsDiv.classList.remove('hidden');
+            document.getElementById('sa-tags').innerHTML = tags.map(t => `<span class="bg-teal-900 text-teal-300 text-[10px] px-2 py-1 rounded-full">${t}</span>`).join('');
+            document.getElementById('sa-combo').innerText = comboSuggestion;
+
+            tempSmartObj = { id: 'custom_' + Date.now(), name: name, brand: brand, inspiration: "Imported", tags: tags, weatherAffinity: affinity, situationRatings: ratings, sprayInstructions: "Standard application (3-4 sprays)", description: "Smart-Added: " + text.substring(0, 50) + "...", wearCount: 0, userNotes: comboSuggestion };
+        }
+
+        function saveSmartAdd() { 
+            if(!tempSmartObj) return alert("Please click 'Analyze' first.");
+            tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance";
+            tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House";
+            state.data.fragrances.push(tempSmartObj); saveData(); closeSmartAdd(); showCollection(); showToast('Fragrance Added'); 
+        }
+
+        // --- STANDARD LOGIC ---
+        function setContext(type, value) {
+            state.context[type] = value;
+            const sus = document.getElementById('suspense-section');
+            if (state.context.situation === 'date_night' || state.context.situation === 'intimate') sus.classList.remove('hidden');
+            else { sus.classList.add('hidden'); state.context.suspense = false; document.getElementById('suspense-toggle').checked = false; }
+            updateContextUI();
+        }
+
+        function toggleSuspense() { state.context.suspense = document.getElementById('suspense-toggle').checked; }
+
+        function updateContextUI() {
+            document.querySelectorAll('.ctx-btn').forEach(btn => {
+                const group = btn.dataset.group; const val = btn.dataset.val;
+                if (state.context[group] === val) { btn.classList.add('btn-active'); btn.classList.remove('glass-panel'); const icon = btn.querySelector('svg'); if(icon) { icon.classList.remove('text-teal-300', 'text-yellow-400', 'text-blue-400'); icon.classList.add('text-white'); } }
+                else { btn.classList.remove('btn-active'); btn.classList.add('glass-panel'); const icon = btn.querySelector('svg'); if(icon) { icon.classList.remove('text-white'); if(group === 'situation') icon.classList.add('text-teal-300'); if(val === 'sunny') icon.classList.add('text-yellow-400'); if(val === 'rainy') icon.classList.add('text-blue-400'); } }
+            });
+        }
+
+        function calculateScore(item, isCombo = false) {
+            const ctx = state.context; let score = 0;
+            const sitScore = item.situationRatings[ctx.situation] || 0; if (sitScore < 2) return -100; score += sitScore * 2;
+            if (!isCombo) {
+                let weatherKey = `${ctx.season}_${ctx.weather}`;
+                if (item.weatherAffinity[weatherKey] === undefined) { if (ctx.season === 'fall' && ctx.weather === 'sunny') weatherKey = 'fall'; else if (ctx.season === 'spring' && ctx.weather === 'sunny') weatherKey = 'spring'; }
+                score += (item.weatherAffinity[weatherKey] || 0) * 1.5;
+            } else score += 1;
+            if (item.wearCount === 0) score += 3; else if (item.wearCount > 5) score -= 2;
+            if (ctx.suspense) { if (item.tags.includes('suspense')) score += 3; if (item.tags.includes('fresh')) score -= 4; }
+            return score;
+        }
+
+        function generateRecommendations() {
+            const container = document.getElementById('results-container'); container.innerHTML = '';
+            const scoredSingles = state.data.fragrances.map(f => ({ ...f, score: calculateScore(f, false), type: 'single' }));
+            const scoredCombos = state.data.combos.map(c => ({ ...c, score: calculateScore(c, true), type: 'combo' }));
+            const results = [...scoredSingles, ...scoredCombos].filter(f => f.score > -20).sort((a, b) => b.score - a.score);
+
+            if (results.length === 0) container.innerHTML = `<div class="p-6 text-center text-gray-400">No suitable fragrances found.</div>`;
+            else {
+                container.appendChild(createTierHeader("🏆 The Signature"));
+                const top = results[0];
+                container.appendChild(top.type === 'single' ? createFragranceCard(top, true) : createComboCard(top, true));
+                const midTier = results.slice(1, 3);
+                if (midTier.length > 0) { container.appendChild(createTierHeader("🥈 Solid Rotation")); midTier.forEach(f => container.appendChild(f.type === 'single' ? createFragranceCard(f, false) : createComboCard(f, false))); }
+                const lowTier = results.slice(3, 6); 
+                if (lowTier.length > 0) { container.appendChild(createTierHeader("🥉 Playable Options")); lowTier.forEach(f => container.appendChild(f.type === 'single' ? createFragranceCard(f, false) : createComboCard(f, false))); }
+            }
+            switchView('results');
+            document.getElementById('main-content').scrollTop = 0;
+            lucide.createIcons();
+        }
+
+        function createTierHeader(text) { const div = document.createElement('div'); div.className = 'tier-header'; div.innerText = text; return div; }
+        
+        function createFragranceCard(f, isTop) {
+            const div = document.createElement('div');
+            const bgClass = isTop ? 'bg-gradient-to-br from-charcoal-800 to-teal-900/20 border-teal-500/50' : 'glass-panel border-white/5';
+            const wearColor = f.wearCount > 4 ? 'text-red-400' : (f.wearCount === 0 ? 'text-green-400' : 'text-gray-400');
+            div.className = `${bgClass} p-5 rounded-2xl border relative transition-all`;
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <span class="text-[10px] font-bold tracking-widest text-teal-400 uppercase">${f.brand}</span>
+                        <h3 class="text-xl font-bold text-white leading-tight">${f.name}</h3>
+                        <p class="text-xs text-teal-300 italic mt-0.5">${f.inspiration}</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-1"><button onclick="openNote('${f.id}')" class="text-gray-400 hover:text-white"><i data-lucide="sticky-note" class="w-4 h-4 ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button></div>
+                </div>
+                <div class="bg-black/20 p-3 rounded-lg my-3 border border-white/5"><p class="text-sm text-gray-200 leading-relaxed">"${f.description}"</p></div>
+                <div class="flex items-center gap-2 mb-4"><i data-lucide="spray-can" class="w-3 h-3 text-gray-400"></i><span class="text-xs text-gray-400 font-mono">${f.sprayInstructions}</span></div>
+                <div class="flex justify-between items-center pt-3 border-t border-white/5">
+                    <span class="text-xs font-mono ${wearColor}">Wears: ${f.wearCount}</span>
+                    <button onclick="logWear('${f.id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Wear <i data-lucide="plus" class="w-3 h-3"></i></button>
+                </div>`;
+            return div;
+        }
+
+        function createComboCard(c, isTop) {
+            const div = document.createElement('div');
+            const bgClass = isTop ? 'bg-gradient-to-br from-purple-900/30 to-teal-900/30 border-teal-500/50' : 'combo-gradient border-teal-500/20';
+            const partNames = c.parts.map(pid => { const f = state.data.fragrances.find(x => x.id === pid); return f ? f.name : pid; }).join(' + ');
+            div.className = `${bgClass} p-5 rounded-2xl border relative transition-all`;
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div><span class="text-[10px] font-bold tracking-widest text-teal-300 uppercase">LAYER COMBO</span><h3 class="text-xl font-bold text-white leading-tight">${c.name}</h3><p class="text-xs text-gray-300 mt-1">${partNames}</p></div>
+                    <div class="flex flex-col items-end gap-1"><button onclick="openNote('${c.id}')" class="text-gray-400 hover:text-white"><i data-lucide="sticky-note" class="w-4 h-4 ${c.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button></div>
+                </div>
+                <div class="bg-black/20 p-3 rounded-lg my-3 border border-white/5"><p class="text-sm text-gray-200 leading-relaxed">"${c.description}"</p><div class="mt-2 pt-2 border-t border-white/10 flex items-start gap-2"><i data-lucide="layers" class="w-3 h-3 text-teal-300 mt-1"></i><p class="text-xs text-teal-100 font-mono">${c.instructions}</p></div></div>
+                <div class="flex justify-between items-center pt-3 border-t border-white/5"><span class="text-xs font-mono text-gray-400">Combo Wears: ${c.wearCount}</span><button onclick="logComboWear('${c.id}')" class="bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Pair <i data-lucide="plus-circle" class="w-3 h-3"></i></button></div>`;
+            return div;
+        }
+
+        function logWear(id) {
+             const idx = state.data.fragrances.findIndex(f => f.id === id);
+             if (idx > -1) { state.data.fragrances[idx].wearCount++; state.data.history.push({ id, type:'single', date: new Date().toISOString(), context: { ...state.context } }); saveData(); showToast('Wear Logged'); setTimeout(() => switchView('selector'), 1000); }
+        }
+        function logComboWear(id) {
+             const comboIdx = state.data.combos.findIndex(c => c.id === id);
+             if (comboIdx > -1) { 
+                 const combo = state.data.combos[comboIdx]; combo.wearCount++;
+                 combo.parts.forEach(pid => { const fIdx = state.data.fragrances.findIndex(f => f.id === pid); if(fIdx > -1) state.data.fragrances[fIdx].wearCount++; });
+                 state.data.history.push({ id, type:'combo', date: new Date().toISOString(), context: { ...state.context } }); saveData(); showToast('Pair Logged'); setTimeout(() => switchView('selector'), 1000); 
+            }
+        }
+
+        // --- HISTORY LOGIC ---
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '';
+            
+            const sortedHistory = [...state.data.history].sort((a,b) => new Date(b.date) - new Date(a.date));
+            
+            if(sortedHistory.length === 0) {
+                list.innerHTML = `<div class="text-center text-gray-500 mt-10">No wear history yet.</div>`;
+                return;
+            }
+
+            sortedHistory.forEach((log, index) => {
+                const realIndex = state.data.history.indexOf(log);
+                let name = "Unknown Item";
+                let brand = "";
+                
+                if (log.type === 'single') {
+                    const f = state.data.fragrances.find(x => x.id === log.id);
+                    if(f) { name = f.name; brand = f.brand; }
+                } else {
+                    const c = state.data.combos.find(x => x.id === log.id);
+                    if(c) { name = c.name; brand = "Combo"; }
+                }
+
+                const dateObj = new Date(log.date);
+                const dateStr = dateObj.toLocaleDateString();
+                const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                const div = document.createElement('div');
+                div.className = "glass-panel p-4 rounded-xl border border-white/5 flex justify-between items-center";
+                div.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] text-gray-400 font-mono">${dateStr} • ${timeStr}</span>
+                            <span class="text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300 uppercase">${log.context.situation}</span>
+                        </div>
+                        <h4 class="font-bold text-white text-sm">${name}</h4>
+                        <p class="text-[10px] text-teal-400 uppercase tracking-wider">${brand}</p>
+                    </div>
+                    <button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+                list.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function openHistoryEdit(index) {
+            editingHistoryIndex = index;
+            const log = state.data.history[index];
+            const modal = document.getElementById('history-edit-modal');
+            const dateInput = document.getElementById('hist-edit-date');
+            const select = document.getElementById('hist-edit-fragrance');
+
+            const d = new Date(log.date);
+            const isoString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+            dateInput.value = isoString;
+
+            select.innerHTML = '';
+            const optGroupFrag = document.createElement('optgroup');
+            optGroupFrag.label = "Fragrances";
+            state.data.fragrances.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.text = f.name;
+                if(f.id === log.id) opt.selected = true;
+                optGroupFrag.appendChild(opt);
+            });
+            select.appendChild(optGroupFrag);
+            
+            const optGroupCombo = document.createElement('optgroup');
+            optGroupCombo.label = "Combos";
+            state.data.combos.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.text = c.name + " (Combo)";
+                if(c.id === log.id) opt.selected = true;
+                optGroupCombo.appendChild(opt);
+            });
+            select.appendChild(optGroupCombo);
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeHistoryEdit() {
+            document.getElementById('history-edit-modal').classList.add('hidden');
+            editingHistoryIndex = null;
+        }
+
+        function saveHistoryEdit() {
+            if (editingHistoryIndex === null) return;
+            
+            const log = state.data.history[editingHistoryIndex];
+            const newDate = document.getElementById('hist-edit-date').value;
+            const newId = document.getElementById('hist-edit-fragrance').value;
+            const oldId = log.id;
+
+            log.date = new Date(newDate).toISOString();
+
+            if (newId !== oldId) {
+                changeWearCount(oldId, -1);
+                changeWearCount(newId, 1);
+                log.id = newId;
+                const isCombo = state.data.combos.some(c => c.id === newId);
+                log.type = isCombo ? 'combo' : 'single';
+            }
+
+            saveData();
+            closeHistoryEdit();
+            renderHistory();
+            showCollection(); 
+            showToast('Log Updated');
+        }
+
+        function deleteHistoryEntry() {
+            if (editingHistoryIndex === null) return;
+            if(!confirm("Delete this log entry?")) return;
+
+            const log = state.data.history[editingHistoryIndex];
+            changeWearCount(log.id, -1);
+            state.data.history.splice(editingHistoryIndex, 1);
+            
+            saveData();
+            closeHistoryEdit();
+            renderHistory();
+            showCollection();
+            showToast('Entry Deleted');
+        }
+
+        function changeWearCount(id, delta) {
+            const fIdx = state.data.fragrances.findIndex(f => f.id === id);
+            if (fIdx > -1) {
+                state.data.fragrances[fIdx].wearCount += delta;
+                if(state.data.fragrances[fIdx].wearCount < 0) state.data.fragrances[fIdx].wearCount = 0;
+                return;
+            }
+            const cIdx = state.data.combos.findIndex(c => c.id === id);
+            if (cIdx > -1) {
+                const combo = state.data.combos[cIdx];
+                combo.wearCount += delta;
+                if(combo.wearCount < 0) combo.wearCount = 0;
+                combo.parts.forEach(pid => {
+                    const partIdx = state.data.fragrances.findIndex(f => f.id === pid);
+                    if(partIdx > -1) {
+                        state.data.fragrances[partIdx].wearCount += delta;
+                        if(state.data.fragrances[partIdx].wearCount < 0) state.data.fragrances[partIdx].wearCount = 0;
+                    }
+                });
+            }
+        }
+
+        // --- RENDER TIMELINE & COLLECTION ---
+        function renderTimeline() {
+            const container = document.getElementById('timeline-list'); container.innerHTML = '';
+            const sorted = state.data.futurePlan.sort((a, b) => { if (a.year !== b.year) return a.year - b.year; const ma = MONTH_MAP[a.month] || 99; const mb = MONTH_MAP[b.month] || 99; return ma - mb; });
+            sorted.forEach((item, index) => {
+                const div = document.createElement('div'); div.className = 'relative z-10 mb-8 pl-8'; const isNext = index === 0;
+                div.innerHTML = `<div class="absolute left-1 top-2 w-3 h-3 ${isNext ? 'bg-teal-500' : 'bg-gray-600'} rounded-full border-4 border-charcoal-700"></div><div class="flex justify-between items-center"><span class="text-xs font-mono ${isNext ? 'text-teal-400' : 'text-gray-400'} uppercase tracking-widest">${item.month} ${item.year}</span><button onclick="deletePlan('${item.id}')" class="text-gray-600 hover:text-red-500"><i data-lucide="trash-2" class="w-3 h-3"></i></button></div><div class="glass-panel p-4 mt-2 rounded-xl border border-white/5 ${!isNext ? 'opacity-80' : ''}"><h3 class="font-bold text-lg">${item.name}</h3><p class="text-sm text-gray-400">${item.description}</p></div>`;
+                container.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+        
+        function showCollection() {
+            const list = document.getElementById('collection-list'); list.innerHTML = '';
+            state.data.fragrances.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
+                const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5 flex justify-between items-center`;
+                div.innerHTML = `<div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3><p class="text-[10px] text-gray-400">Wears: ${f.wearCount}</p></div><div class="flex items-center gap-3"><button onclick="openNote('${f.id}')" class="text-gray-400"><i data-lucide="sticky-note" class="w-4 h-4 ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button><button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 px-2 py-1">Reset</button></div>`;
+                list.appendChild(div);
+            });
+        }
+        function resetWear(id) { const idx = state.data.fragrances.findIndex(f => f.id === id); if (idx > -1) { state.data.fragrances[idx].wearCount = 0; saveData(); showCollection(); } }
+
+        function switchView(viewName) {
+            document.getElementById('view-selector').classList.add('hidden'); document.getElementById('view-results').classList.add('hidden'); 
+            document.getElementById('view-collection').classList.add('hidden'); document.getElementById('view-timeline').classList.add('hidden');
+            document.getElementById('view-history').classList.add('hidden');
+
+            document.getElementById(`view-${viewName === 'results' ? 'results' : viewName}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-teal-500'));
+            const navMap = { 'selector': 0, 'collection': 1, 'history': 2, 'timeline': 3 };
+            const navIndex = navMap[viewName] !== undefined ? navMap[viewName] : 0;
+            if (document.querySelectorAll('.nav-btn')[navIndex]) document.querySelectorAll('.nav-btn')[navIndex].classList.add('text-teal-500');
+
+            if (viewName === 'collection') showCollection(); 
+            if (viewName === 'timeline') renderTimeline();
+            if (viewName === 'history') renderHistory();
+            
+            document.getElementById('main-content').scrollTop = 0;
+        }
+
+        // --- TOAST FIX (Global Timeout) ---
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            
+            toast.querySelector('span').innerText = msg;
+            toast.classList.remove('translate-y-[-150%]'); // Show
+            
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-[-150%]'); // Hide
+            }, 2000);
+        }
+
+        function dismissInstallPrompt() { document.getElementById('install-prompt').classList.add('translate-y-full'); }
+        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
+        function copyData() { const data = document.getElementById('backup-area'); data.select(); document.execCommand('copy'); alert('Copied!'); }
+        function toggleRestoreMode() { document.getElementById('restore-section').classList.toggle('hidden'); }
+        function restoreData() { try { const parsed = JSON.parse(document.getElementById('restore-area').value); state.data = parsed; saveData(); location.reload(); } catch (e) { alert('Invalid JSON'); } }
+        
+        function openPlanModal() { document.getElementById('plan-modal').classList.remove('hidden'); }
+        function closePlanModal() { document.getElementById('plan-modal').classList.add('hidden'); document.getElementById('plan-name').value = ''; document.getElementById('plan-desc').value = ''; }
+        function savePlan() { const name = document.getElementById('plan-name').value; const desc = document.getElementById('plan-desc').value; if (!name) return alert("Enter name"); state.data.futurePlan.push({ id: 'plan_' + Date.now(), name, month: "Next", year: new Date().getFullYear(), description: desc }); saveData(); closePlanModal(); renderTimeline(); showToast('Plan Added'); }
+        function deletePlan(id) { if(confirm("Remove?")) { state.data.futurePlan = state.data.futurePlan.filter(p => p.id !== id); saveData(); renderTimeline(); }}
+        function openNote(id) { currentNoteId = id; let item = state.data.fragrances.find(f => f.id === id); if (!item) item = state.data.combos.find(c => c.id === id); document.getElementById('note-input').value = item.userNotes || ""; document.getElementById('notes-modal').classList.remove('hidden'); }
+        function closeNotesModal() { document.getElementById('notes-modal').classList.add('hidden'); currentNoteId = null; }
+        function saveNote() { if (!currentNoteId) return; const text = document.getElementById('note-input').value; let item = state.data.fragrances.find(f => f.id === currentNoteId); if (!item) item = state.data.combos.find(c => c.id === currentNoteId); if (item) { item.userNotes = text; saveData(); showToast('Note Saved'); closeNotesModal(); if(!document.getElementById('view-results').classList.contains('hidden')) generateRecommendations(); if(!document.getElementById('view-collection').classList.contains('hidden')) showCollection(); } }
     </script>
 </body>
 </html>
