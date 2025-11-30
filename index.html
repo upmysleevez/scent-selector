@@ -245,18 +245,23 @@
                         </div>
                         <div class="flex items-center gap-2 mb-2">
                             <span class="bg-teal-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">Weekly Scout</span>
-                            <span class="text-[10px] text-teal-300" id="week-label">Week 48</span>
+                            <span class="text-[10px] text-teal-300" id="week-label">Nov Week 4</span>
                         </div>
                         <h3 class="font-bold text-xl text-white mb-1" id="scout-name">Loading...</h3>
                         <p class="text-xs text-gray-300 mb-3" id="scout-reason">Analyzing your collection gaps...</p>
+                        
                         <div class="flex flex-col gap-1">
-                            <span class="text-[9px] text-teal-400 uppercase font-bold tracking-wider">Target: Montagne Parfums ($40-$50)</span>
-                            <button onclick="addScoutToPlan()" class="text-xs font-bold text-white flex items-center gap-1 mt-2 hover:text-teal-300">
-                                Add to Plan <i data-lucide="arrow-right" class="w-3 h-3"></i>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-[9px] bg-white/10 text-white px-2 py-0.5 rounded uppercase font-bold tracking-wider" id="scout-season-badge">Summer</span>
+                                <span class="text-[9px] text-teal-400 uppercase font-bold tracking-wider">Montagne ($40)</span>
+                            </div>
+                            <button onclick="openScoutModal()" class="w-full bg-teal-500/20 hover:bg-teal-500/40 border border-teal-500/50 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-2 transition-colors">
+                                Add to Plan <i data-lucide="plus-circle" class="w-3 h-3"></i>
                             </button>
                         </div>
                     </div>
                 </div>
+
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Acquisition Plan</h2>
                     <button onclick="openPlanModal()" class="bg-teal-500 p-2 rounded-full shadow-lg active:scale-90 transition-transform">
@@ -293,6 +298,49 @@
                 <span class="text-[10px] font-medium">Future</span>
             </button>
         </nav>
+    </div>
+
+    <!-- SCOUT ADD MODAL -->
+    <div id="scout-modal" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
+            <h3 class="text-xl font-bold mb-2">Smart Schedule</h3>
+            <p class="text-sm text-gray-400 mb-6">Based on the season, we recommend acquiring <span id="scout-modal-name" class="text-white font-bold">Fragrance</span> in:</p>
+            
+            <button onclick="confirmScoutAdd(true)" class="w-full bg-teal-600 hover:bg-teal-500 text-white p-4 rounded-xl mb-3 flex items-center justify-between group">
+                <div class="text-left">
+                    <span class="block text-xs text-teal-200 uppercase tracking-wider font-bold">Recommended</span>
+                    <span id="scout-suggested-date" class="text-lg font-bold">May 2026</span>
+                </div>
+                <i data-lucide="check-circle" class="w-6 h-6 text-teal-300 group-hover:text-white"></i>
+            </button>
+
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-white/10"></div>
+                </div>
+                <div class="relative flex justify-center text-xs uppercase">
+                    <span class="bg-charcoal-800 px-2 text-gray-500">Or</span>
+                </div>
+            </div>
+
+            <button onclick="toggleScoutCustom()" class="w-full text-gray-400 text-sm font-bold py-4 hover:text-white flex items-center justify-center gap-2">
+                Choose My Own Date <i data-lucide="chevron-down" class="w-4 h-4"></i>
+            </button>
+
+            <div id="scout-custom-inputs" class="hidden space-y-3 pt-2">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="scout-month" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none">
+                        <option value="Jan">January</option><option value="Feb">February</option><option value="Mar">March</option><option value="Apr">April</option><option value="May">May</option><option value="Jun">June</option><option value="Jul">July</option><option value="Aug">August</option><option value="Sep">September</option><option value="Oct">October</option><option value="Nov">November</option><option value="Dec">December</option>
+                    </select>
+                    <select id="scout-year" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none">
+                        <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
+                    </select>
+                </div>
+                <button onclick="confirmScoutAdd(false)" class="w-full bg-white/10 hover:bg-white/20 text-white p-3 rounded-xl text-sm font-bold">Add Custom Date</button>
+            </div>
+            
+            <button onclick="closeScoutModal()" class="absolute top-4 right-4 p-2 text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
     </div>
 
     <!-- HISTORY EDIT MODAL -->
@@ -383,13 +431,13 @@
         </div>
     </div>
 
-    <!-- TOAST - FIXED (Hidden by default, fixed top margin) -->
-    <div id="toast" class="hidden fixed top-20 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 z-[100] transition-transform duration-300">
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]">
         <i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span>
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v15_toast_patch"; 
+        const APP_ID = "scentApp_db_v18_final_label"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
 
         let state = {
@@ -398,13 +446,13 @@
         };
 
         const SCOUT_DB = [
-            { name: "Tygr Cologne", reason: "Montagne's clone of Bvlgari Tygar ($370). Perfect high-heat Ambroxan bomb under $50." },
-            { name: "Elysian Cologne", reason: "Montagne's clone of Roja Elysium ($300+). A crisp Vetiver-Citrus blend for the Office." },
-            { name: "Chilly Pacific", reason: "Montagne's clone of LV Pacific Chill ($320). A playful Mint/Lemon profile for Summer." },
-            { name: "Malay Aklan", reason: "Montagne's clone of Millésime Impérial. A salty marine melon scent for high humidity." },
-            { name: "Afternoon Dive", reason: "Montagne's clone of LV Afternoon Swim. Pure mandarin orange freshness." },
-            { name: "Ambre Musc", reason: "Montagne's clone of YSL Tuxedo. A sophisticated patchouli/amber for Date Night." },
-            { name: "Parfum de Cerise", reason: "Montagne's clone of Lost Cherry. Good backup if you want to save your Tom Ford." }
+            { name: "Tygr Cologne", season: "Summer", reason: "Montagne's clone of Bvlgari Tygar ($370). Perfect high-heat Ambroxan bomb." },
+            { name: "Elysian Cologne", season: "Spring", reason: "Montagne's clone of Roja Elysium ($300+). A crisp Vetiver-Citrus blend." },
+            { name: "Chilly Pacific", season: "Summer", reason: "Montagne's clone of LV Pacific Chill ($320). Mint/Lemon profile." },
+            { name: "Malay Aklan", season: "Summer", reason: "Montagne's clone of Millésime Impérial. Salty marine melon." },
+            { name: "Afternoon Dive", season: "Summer", reason: "Montagne's clone of LV Afternoon Swim. Pure mandarin freshness." },
+            { name: "Ambre Musc", season: "Winter", reason: "Montagne's clone of YSL Tuxedo. Sophisticated patchouli/amber." },
+            { name: "Parfum de Cerise", season: "Winter", reason: "Montagne's clone of Lost Cherry. Good backup to save your Tom Ford." }
         ];
 
         const KEYWORDS = {
@@ -418,8 +466,9 @@
         let tempSmartObj = null; 
         let currentNoteId = null; 
         let currentScout = null;
+        let suggestedScoutDate = null; 
         let editingHistoryIndex = null; 
-        let toastTimeout;
+        let toastTimeout = null;
 
         // --- DEFAULTS ---
         const CUSTOM_DB = [
@@ -472,7 +521,6 @@
                 if (!state.data.futurePlan) state.data.futurePlan = [];
                 if (!state.data.combos || state.data.combos.length < 8) state.data.combos = JSON.parse(JSON.stringify(COMBOS_DB));
                 
-                // Force Updates
                 const pn = state.data.fragrances.find(f => f.id === 'phantom_noir');
                 if(pn && pn.brand === "Unknown") pn.brand = "Montagne";
                 
@@ -498,19 +546,70 @@
 
         function initScout() {
             const date = new Date();
-            const weekNum = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 604800000);
-            currentScout = SCOUT_DB[weekNum % SCOUT_DB.length];
-            document.getElementById('week-label').innerText = `Week ${weekNum}`;
+            // Week of Year Logic
+            const weekNumYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 604800000);
+            
+            // Month + Week of Month Logic
+            const month = date.toLocaleString('default', { month: 'short' }); // e.g. "Nov"
+            const weekOfMonth = Math.ceil(date.getDate() / 7);
+            
+            currentScout = SCOUT_DB[weekNumYear % SCOUT_DB.length];
+            
+            document.getElementById('week-label').innerText = `${month} Week ${weekOfMonth}`;
             document.getElementById('scout-name').innerText = currentScout.name;
             document.getElementById('scout-reason').innerText = currentScout.reason;
+            document.getElementById('scout-season-badge').innerText = currentScout.season;
+            
+            suggestedScoutDate = getSmartDate(currentScout.season);
+            document.getElementById('scout-suggested-date').innerText = `${suggestedScoutDate.month} ${suggestedScoutDate.year}`;
+            document.getElementById('scout-modal-name').innerText = currentScout.name;
         }
 
-        function addScoutToPlan() {
-            state.data.futurePlan.push({ id: 'plan_' + Date.now(), name: currentScout.name, month: "Next", year: new Date().getFullYear(), description: currentScout.reason });
-            saveData(); renderTimeline(); showToast('Added to Plan');
+        function getSmartDate(targetSeason) {
+            const now = new Date();
+            let year = now.getFullYear();
+            let targetMonthIdx = 0; 
+
+            switch(targetSeason) {
+                case 'Summer': targetMonthIdx = 4; break; 
+                case 'Spring': targetMonthIdx = 2; break; 
+                case 'Fall': targetMonthIdx = 8; break; 
+                case 'Winter': targetMonthIdx = 10; break; 
+            }
+
+            if (now.getMonth() > targetMonthIdx) year++;
+            
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return { month: months[targetMonthIdx], year: year };
         }
 
-        // --- SMART ADD LOGIC ---
+        function openScoutModal() { document.getElementById('scout-modal').classList.remove('hidden'); document.getElementById('scout-custom-inputs').classList.add('hidden'); }
+        function closeScoutModal() { document.getElementById('scout-modal').classList.add('hidden'); }
+        function toggleScoutCustom() { document.getElementById('scout-custom-inputs').classList.remove('hidden'); }
+        
+        function confirmScoutAdd(useSuggested) {
+            let m, y;
+            if(useSuggested) {
+                m = suggestedScoutDate.month;
+                y = suggestedScoutDate.year;
+            } else {
+                m = document.getElementById('scout-month').value;
+                y = document.getElementById('scout-year').value;
+            }
+            
+            state.data.futurePlan.push({ 
+                id: 'plan_' + Date.now(), 
+                name: currentScout.name, 
+                month: m, 
+                year: y, 
+                description: currentScout.reason 
+            });
+            saveData(); 
+            renderTimeline(); 
+            closeScoutModal();
+            showToast('Added to Plan');
+        }
+
         function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); document.getElementById('sa-results').classList.add('hidden'); tempSmartObj = null; }
         function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); document.getElementById('sa-text').value = ''; document.getElementById('sa-name').value = ''; document.getElementById('sa-brand').value = ''; }
 
@@ -548,7 +647,6 @@
             state.data.fragrances.push(tempSmartObj); saveData(); closeSmartAdd(); showCollection(); showToast('Fragrance Added'); 
         }
 
-        // --- STANDARD LOGIC ---
         function setContext(type, value) {
             state.context[type] = value;
             const sus = document.getElementById('suspense-section');
@@ -848,20 +946,17 @@
             document.getElementById('main-content').scrollTop = 0;
         }
 
-        // --- TOAST FIX (Global Timeout) ---
+        // --- DOUBLE-LOCK TOAST FIX ---
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            if (toastTimeout) clearTimeout(toastTimeout);
-            toast.classList.remove('hidden'); // Ensure removing hidden class
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+                toastTimeout = null;
+            }
             toast.querySelector('span').innerText = msg;
-            
-            // Force reflow
-            void toast.offsetWidth;
-
-            toast.classList.remove('translate-y-[-150%]'); // Slide down
-            
+            toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
             toastTimeout = setTimeout(() => {
-                toast.classList.add('translate-y-[-150%]'); // Slide up
+                toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible');
             }, 2000);
         }
 
