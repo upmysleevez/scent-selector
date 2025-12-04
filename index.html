@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ScentSelector">
     <meta name="theme-color" content="#1F2121">
-    <title>Fragrance Sommelier</title>a
+    <title>Fragrance Sommelier</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -410,7 +410,7 @@
             <textarea id="backup-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" readonly></textarea>
             <button onclick="copyData()" class="w-full bg-teal-500 py-2 rounded-lg text-xs font-bold mb-2">Copy</button>
             <textarea id="restore-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" placeholder="Paste JSON"></textarea>
-            <button onclick="restoreData()" class="w-full bg-red-600 py-2 rounded-lg text-xs font-bold">Restore</button>
+            <button onclick="restoreData()" class="w-full bg-red-600 py-2 rounded-lg text-xs font-bold">Restore (Smart Merge)</button>
         </div>
     </div>
     
@@ -437,7 +437,7 @@
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v23_10_hour_protocol"; 
+        const APP_ID = "scentApp_db_v24_smart_merge"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
 
         let state = {
@@ -470,7 +470,7 @@
         let editingHistoryIndex = null; 
         let toastTimeout = null;
 
-        // --- UPDATED DB WITH 10-HOUR PROTOCOL ---
+        // --- DEFAULTS WITH HIGH PROJECTION PROTOCOLS ---
         const CUSTOM_DB = [
             { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "" },
             { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "" },
@@ -521,8 +521,7 @@
             if (isIOS && !window.navigator.standalone) setTimeout(() => document.getElementById('install-prompt').classList.remove('translate-y-full'), 2000);
         });
 
-        // SAFETY: Re-run icon creation periodically to catch dynamic updates if they missed
-        // Force icons to render every 500ms for first 5 seconds
+        // SAFETY: Re-run icon creation periodically
         let iconInterval = setInterval(() => {
              if (window.lucide) lucide.createIcons();
         }, 500);
@@ -535,6 +534,7 @@
                 if (!state.data.futurePlan) state.data.futurePlan = [];
                 if (!state.data.combos || state.data.combos.length < 8) state.data.combos = JSON.parse(JSON.stringify(COMBOS_DB));
                 
+                // Ensure Phantom/Jazz updates persist if coming from older version
                 const pn = state.data.fragrances.find(f => f.id === 'phantom_noir');
                 if(pn && pn.brand === "Unknown") pn.brand = "Montagne";
                 
@@ -556,15 +556,66 @@
             document.getElementById('backup-area').value = JSON.stringify(state.data);
         }
 
+        // --- RESTORE DATA (SMART MERGE) ---
+        function restoreData() {
+            try {
+                const backup = JSON.parse(document.getElementById('restore-area').value);
+
+                // 1. Start with Fresh App Data (High Projection Instructions)
+                const freshState = {
+                    fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)),
+                    combos: JSON.parse(JSON.stringify(COMBOS_DB)),
+                    history: [],
+                    futurePlan: []
+                };
+
+                // 2. Merge User Dynamic Data (Wear Counts, Notes) into Fresh Data
+                if (backup.fragrances) {
+                    backup.fragrances.forEach(oldF => {
+                        const newF = freshState.fragrances.find(f => f.id === oldF.id);
+                        if (newF) {
+                            // Keep NEW instructions, take OLD stats
+                            newF.wearCount = oldF.wearCount || 0;
+                            newF.userNotes = oldF.userNotes || "";
+                        } else {
+                            // It's a custom added fragrance (Smart Add), keep it all
+                            freshState.fragrances.push(oldF);
+                        }
+                    });
+                }
+
+                if (backup.combos) {
+                     backup.combos.forEach(oldC => {
+                        const newC = freshState.combos.find(c => c.id === oldC.id);
+                        if (newC) {
+                            newC.wearCount = oldC.wearCount || 0;
+                            newC.userNotes = oldC.userNotes || "";
+                        } else {
+                            freshState.combos.push(oldC);
+                        }
+                    });
+                }
+
+                // 3. Restore History and Plans directly
+                freshState.history = backup.history || [];
+                freshState.futurePlan = backup.futurePlan || [];
+
+                // 4. Save and Reload
+                state.data = freshState;
+                saveData();
+                location.reload();
+
+            } catch (e) {
+                alert('Invalid JSON or Data Structure');
+            }
+        }
+
         function initUI() { updateContextUI(); showCollection(); }
 
         function initScout() {
             const date = new Date();
-            // Week of Year Logic
             const weekNumYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 604800000);
-            
-            // Month + Week of Month Logic
-            const month = date.toLocaleString('default', { month: 'short' }); // e.g. "Nov"
+            const month = date.toLocaleString('default', { month: 'short' });
             const weekOfMonth = Math.ceil(date.getDate() / 7);
             
             currentScout = SCOUT_DB[weekNumYear % SCOUT_DB.length];
@@ -710,7 +761,6 @@
             }
             switchView('results');
             document.getElementById('main-content').scrollTop = 0;
-            // Force redraw of icons after generating HTML
             if (window.lucide) lucide.createIcons();
         }
 
@@ -814,7 +864,6 @@
                 list.appendChild(div);
             });
             
-            // Force redraw of icons after generating HTML
             if (window.lucide) lucide.createIcons();
         }
 
@@ -931,7 +980,6 @@
                 div.innerHTML = `<div class="absolute left-1 top-2 w-3 h-3 ${isNext ? 'bg-teal-500' : 'bg-gray-600'} rounded-full border-4 border-charcoal-700"></div><div class="flex justify-between items-center"><span class="text-xs font-mono ${isNext ? 'text-teal-400' : 'text-gray-400'} uppercase tracking-widest">${item.month} ${item.year}</span><button onclick="deletePlan('${item.id}')" class="text-gray-600 hover:text-red-500"><i data-lucide="trash-2" class="w-3 h-3"></i></button></div><div class="glass-panel p-4 mt-2 rounded-xl border border-white/5 ${!isNext ? 'opacity-80' : ''}"><h3 class="font-bold text-lg">${item.name}</h3><p class="text-sm text-gray-400">${item.description}</p></div>`;
                 container.appendChild(div);
             });
-            // Force redraw of icons after generating HTML
             if (window.lucide) lucide.createIcons();
         }
         
@@ -942,7 +990,6 @@
                 div.innerHTML = `<div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3><p class="text-[10px] text-gray-400">Wears: ${f.wearCount}</p></div><div class="flex items-center gap-3"><button onclick="openNote('${f.id}')" class="text-gray-400"><i data-lucide="sticky-note" class="w-4 h-4 ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button><button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 px-2 py-1">Reset</button></div>`;
                 list.appendChild(div);
             });
-            // Force redraw of icons after generating HTML
             if (window.lucide) lucide.createIcons();
         }
         function resetWear(id) { const idx = state.data.fragrances.findIndex(f => f.id === id); if (idx > -1) { state.data.fragrances[idx].wearCount = 0; saveData(); showCollection(); } }
@@ -969,20 +1016,12 @@
         // --- DOUBLE-LOCK TOAST FIX ---
         function showToast(msg) {
             const toast = document.getElementById('toast');
-            
-            // 1. Reset everything first
             if (toastTimeout) {
                 clearTimeout(toastTimeout);
                 toastTimeout = null;
             }
-            
-            // 2. Set content
             toast.querySelector('span').innerText = msg;
-            
-            // 3. Force hidden state off
             toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
-            
-            // 4. Set new timer
             toastTimeout = setTimeout(() => {
                 toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible');
             }, 2000);
@@ -992,7 +1031,48 @@
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function copyData() { const data = document.getElementById('backup-area'); data.select(); document.execCommand('copy'); alert('Copied!'); }
         function toggleRestoreMode() { document.getElementById('restore-section').classList.toggle('hidden'); }
-        function restoreData() { try { const parsed = JSON.parse(document.getElementById('restore-area').value); state.data = parsed; saveData(); location.reload(); } catch (e) { alert('Invalid JSON'); } }
+        
+        // --- SMART MERGE RESTORE (UPDATED) ---
+        function restoreData() {
+            try {
+                const backup = JSON.parse(document.getElementById('restore-area').value);
+                const freshState = {
+                    fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)),
+                    combos: JSON.parse(JSON.stringify(COMBOS_DB)),
+                    history: [],
+                    futurePlan: []
+                };
+                if (backup.fragrances) {
+                    backup.fragrances.forEach(oldF => {
+                        const newF = freshState.fragrances.find(f => f.id === oldF.id);
+                        if (newF) {
+                            newF.wearCount = oldF.wearCount || 0;
+                            newF.userNotes = oldF.userNotes || "";
+                        } else {
+                            freshState.fragrances.push(oldF);
+                        }
+                    });
+                }
+                if (backup.combos) {
+                     backup.combos.forEach(oldC => {
+                        const newC = freshState.combos.find(c => c.id === oldC.id);
+                        if (newC) {
+                            newC.wearCount = oldC.wearCount || 0;
+                            newC.userNotes = oldC.userNotes || "";
+                        } else {
+                            freshState.combos.push(oldC);
+                        }
+                    });
+                }
+                freshState.history = backup.history || [];
+                freshState.futurePlan = backup.futurePlan || [];
+                state.data = freshState;
+                saveData();
+                location.reload();
+            } catch (e) {
+                alert('Invalid JSON');
+            }
+        }
         
         function openPlanModal() { document.getElementById('plan-modal').classList.remove('hidden'); }
         function closePlanModal() { document.getElementById('plan-modal').classList.add('hidden'); document.getElementById('plan-name').value = ''; document.getElementById('plan-desc').value = ''; }
