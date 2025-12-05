@@ -108,33 +108,20 @@
 </head>
 <body class="h-screen w-screen flex flex-col overflow-hidden text-gray-100 selection:bg-teal-500 selection:text-white">
 
-    <!-- INSTALL PROMPT -->
-    <div id="install-prompt" class="hidden fixed bottom-0 left-0 right-0 z-50 p-4 safe-bottom bg-teal-500 text-white shadow-2xl rounded-t-2xl transform transition-transform duration-300 translate-y-full">
-        <div class="flex items-start justify-between">
-            <div>
-                <h3 class="font-bold text-lg">Prevent Data Loss</h3>
-                <p class="text-sm opacity-90 mt-1 pr-4">Safari deletes data after 7 days. Tap <span class="font-bold">Share</span> <i data-lucide="share" class="inline w-4 h-4"></i> then <span class="font-bold">Add to Home Screen</span>.</p>
-            </div>
-            <button onclick="dismissInstallPrompt()" class="p-2 bg-white/20 rounded-full"><i data-lucide="x" class="w-5 h-5"></i></button>
+    <!-- HEADER (Fixed to prevent blocking) -->
+    <header class="fixed top-0 w-full safe-top px-6 pt-4 pb-4 flex justify-between items-center z-50 bg-charcoal-700/95 backdrop-blur-xl border-b border-white/5 shadow-lg">
+        <div>
+            <h1 class="text-[10px] font-bold uppercase tracking-widest text-teal-300">ScentSelector</h1>
+            <p class="text-xl font-semibold text-white tracking-tight" id="header-title">Daily Ritual</p>
         </div>
-    </div>
+        <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+            <i data-lucide="settings" class="w-6 h-6 text-gray-400"></i>
+        </button>
+    </header>
 
-    <!-- MAIN APP -->
+    <!-- MAIN CONTENT AREA (Added pt-24 to clear fixed header) -->
     <div id="app-container" class="flex-1 flex flex-col relative h-full">
-        
-        <!-- HEADER -->
-        <header class="safe-top px-6 pt-4 pb-2 flex justify-between items-center z-10 bg-charcoal-700/90 backdrop-blur-md sticky top-0 border-b border-white/5">
-            <div>
-                <h1 class="text-xs font-bold uppercase tracking-widest text-teal-300">ScentSelector</h1>
-                <p class="text-xl font-semibold text-white tracking-tight" id="header-title">Daily Ritual</p>
-            </div>
-            <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-white/10 transition-colors">
-                <i data-lucide="settings" class="w-6 h-6 text-gray-400"></i>
-            </button>
-        </header>
-
-        <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pb-48" id="main-content">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-28 pb-48" id="main-content">
             
             <!-- VIEW 1: SELECTOR -->
             <div id="view-selector" class="space-y-6 max-w-md mx-auto fade-enter-active">
@@ -437,7 +424,7 @@
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v26_pairing_only"; 
+        const APP_ID = "scentApp_db_v27_fixed_layout"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
 
         let state = {
@@ -470,7 +457,7 @@
         let editingHistoryIndex = null; 
         let toastTimeout = null;
 
-        // --- DEFAULTS WITH RATING FIELDS ---
+        // --- DEFAULTS ---
         const CUSTOM_DB = [
             { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
             { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
@@ -688,7 +675,7 @@
         }
         function saveSmartAdd() { if(!tempSmartObj) return alert("Please click 'Analyze' first."); tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; state.data.fragrances.push(tempSmartObj); saveData(); closeSmartAdd(); showCollection(); showToast('Fragrance Added'); }
 
-        // --- COLLECTION VIEW (UPDATED FOR PAIRING TOGGLE) ---
+        // --- COLLECTION VIEW (UPDATED FOR RANKING) ---
         function showCollection() {
             const list = document.getElementById('collection-list'); list.innerHTML = '';
             state.data.fragrances.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
@@ -708,7 +695,7 @@
                     <div class="flex justify-between items-start mb-2">
                         <div>
                             <span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span>
-                            <h3 class="font-bold text-sm text-white">${f.name}</h3>
+                            <h3 class="text-bold text-sm text-white">${f.name}</h3>
                         </div>
                         <div class="flex items-center gap-2">
                              <button onclick="togglePairingOnly('${f.id}')" class="${pairingClass} transition-colors" title="Toggle Pairing Only Mode"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
@@ -839,6 +826,7 @@
             }
         }
 
+        // --- HISTORY LOGIC ---
         function renderHistory() {
             const list = document.getElementById('history-list');
             list.innerHTML = '';
@@ -887,7 +875,7 @@
             
             if (window.lucide) lucide.createIcons();
         }
-        
+
         function openHistoryEdit(index) {
             editingHistoryIndex = index;
             const log = state.data.history[index];
