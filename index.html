@@ -424,7 +424,7 @@
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v27_fixed_layout"; 
+        const APP_ID = "scentApp_db_v28_force_sync"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
 
         let state = {
@@ -432,6 +432,7 @@
             data: { fragrances: [], combos: [], history: [], futurePlan: [] }
         };
 
+        // Enhanced SCOUT_DB with tags for matching logic
         const SCOUT_DB = [
             { name: "Tygr Cologne", season: "Summer", tags: ["fresh", "citrus", "ambroxan"], reason: "Based on your love for Fresh/Citrus profiles (like Aventus/Gentle Silver)." },
             { name: "Elysian Cologne", season: "Spring", tags: ["fresh", "vetiver", "office"], reason: "A sophisticated freshie similar to Aventus but with more Vetiver." },
@@ -457,7 +458,7 @@
         let editingHistoryIndex = null; 
         let toastTimeout = null;
 
-        // --- DEFAULTS ---
+        // --- HIGH PROJECTION / 10-HOUR PROTOCOL DEFINITIONS ---
         const CUSTOM_DB = [
             { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
             { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
@@ -507,24 +508,28 @@
         function loadData() {
             const raw = localStorage.getItem(APP_ID);
             if (raw) {
-                state.data = JSON.parse(raw);
-                if (!state.data.futurePlan) state.data.futurePlan = [];
-                if (!state.data.combos || state.data.combos.length < 8) state.data.combos = JSON.parse(JSON.stringify(COMBOS_DB));
+                let savedData = JSON.parse(raw);
                 
-                // Migration: Add pairingOnly default
-                state.data.fragrances.forEach(f => {
-                    if(f.pairingOnly === undefined) f.pairingOnly = false;
-                    if(f.userRating === undefined) f.userRating = 0;
+                // FORCE SYNC: Overwrite instructions with new code
+                savedData.fragrances = savedData.fragrances.map(savedF => {
+                    const codeF = CUSTOM_DB.find(cf => cf.id === savedF.id);
+                    if (codeF) {
+                        return {
+                            ...codeF, // NEW instructions/metadata
+                            wearCount: savedF.wearCount || 0, // PRESERVE stats
+                            userNotes: savedF.userNotes || "",
+                            userRating: savedF.userRating || 0,
+                            pairingOnly: savedF.pairingOnly || false
+                        };
+                    }
+                    return savedF;
                 });
                 
-                const pn = state.data.fragrances.find(f => f.id === 'phantom_noir');
-                if(pn && pn.brand === "Unknown") pn.brand = "Montagne";
-                
-                const bj = state.data.fragrances.find(f => f.id === 'brooklyn_jazz');
-                if(bj) {
-                    if(bj.brand === "Unknown") bj.brand = "Montagne";
-                    if(bj.inspiration === "Jazz Club?") bj.inspiration = "Maison Margiela Jazz Club";
-                }
+                state.data = savedData;
+                // Ensure new arrays exist
+                if (!state.data.futurePlan) state.data.futurePlan = [];
+                if (!state.data.combos || state.data.combos.length < 8) state.data.combos = JSON.parse(JSON.stringify(COMBOS_DB));
+
             } else {
                 state.data = { fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), combos: JSON.parse(JSON.stringify(COMBOS_DB)), history: [], futurePlan: JSON.parse(JSON.stringify(DEFAULT_TIMELINE)) };
                 saveData();
@@ -551,10 +556,11 @@
                     backup.fragrances.forEach(oldF => {
                         const newF = freshState.fragrances.find(f => f.id === oldF.id);
                         if (newF) {
+                            // PRESERVE USER DATA, OVERWRITE TECH SPECS
                             newF.wearCount = oldF.wearCount || 0;
                             newF.userNotes = oldF.userNotes || "";
                             newF.userRating = oldF.userRating || 0;
-                            newF.pairingOnly = oldF.pairingOnly || false; // Restore setting
+                            newF.pairingOnly = oldF.pairingOnly || false;
                         } else {
                             freshState.fragrances.push(oldF);
                         }
@@ -581,8 +587,8 @@
             }
         }
 
+        // ... (UI, Logic, Scoring functions remain unchanged) ...
         function initUI() { updateContextUI(); showCollection(); }
-
         function initScout() {
             const date = new Date();
             const weekNumYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 604800000);
@@ -635,7 +641,6 @@
         function savePlan() { const name = document.getElementById('plan-name').value; const desc = document.getElementById('plan-desc').value; if (!name) return alert("Enter name"); state.data.futurePlan.push({ id: 'plan_' + Date.now(), name, month: "Next", year: new Date().getFullYear(), description: desc }); saveData(); closePlanModal(); renderTimeline(); showToast('Plan Added'); }
         function deletePlan(id) { if(confirm("Remove?")) { state.data.futurePlan = state.data.futurePlan.filter(p => p.id !== id); saveData(); renderTimeline(); }}
         
-        // --- RATING & TOGGLE LOGIC ---
         function setRating(id, rating) {
             const f = state.data.fragrances.find(i => i.id === id);
             if(f) {
@@ -675,38 +680,26 @@
         }
         function saveSmartAdd() { if(!tempSmartObj) return alert("Please click 'Analyze' first."); tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; state.data.fragrances.push(tempSmartObj); saveData(); closeSmartAdd(); showCollection(); showToast('Fragrance Added'); }
 
-        // --- COLLECTION VIEW (UPDATED FOR RANKING) ---
         function showCollection() {
             const list = document.getElementById('collection-list'); list.innerHTML = '';
             state.data.fragrances.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
                 const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5`;
-                
-                // Star generation
                 let starsHtml = '';
                 for(let i=1; i<=5; i++) {
                     const fillClass = i <= (f.userRating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600';
                     starsHtml += `<button onclick="setRating('${f.id}', ${i})" class="focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star ${fillClass} transition-colors"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>`;
                 }
-                
-                // Pairing Button Color
                 const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300';
-
                 div.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span>
-                            <h3 class="text-bold text-sm text-white">${f.name}</h3>
-                        </div>
+                        <div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3></div>
                         <div class="flex items-center gap-2">
                              <button onclick="togglePairingOnly('${f.id}')" class="${pairingClass} transition-colors" title="Toggle Pairing Only Mode"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
                              <button onclick="openNote('${f.id}')" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button>
                              <button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 px-2 py-1">Reset</button>
                         </div>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-1">${starsHtml}</div>
-                        <p class="text-[10px] text-gray-400">Wears: ${f.wearCount}</p>
-                    </div>
+                    <div class="flex justify-between items-center"><div class="flex gap-1">${starsHtml}</div><p class="text-[10px] text-gray-400">Wears: ${f.wearCount}</p></div>
                 `;
                 list.appendChild(div);
             });
@@ -735,9 +728,7 @@
             const ctx = state.context; let score = 0;
             const sitScore = item.situationRatings[ctx.situation] || 0; if (sitScore < 2) return -100; score += sitScore * 2;
             if (!isCombo) {
-                // FILTER OUT PAIRING ONLY
                 if(item.pairingOnly) return -999;
-
                 let weatherKey = `${ctx.season}_${ctx.weather}`;
                 if (item.weatherAffinity[weatherKey] === undefined) { if (ctx.season === 'fall' && ctx.weather === 'sunny') weatherKey = 'fall'; else if (ctx.season === 'spring' && ctx.weather === 'sunny') weatherKey = 'spring'; }
                 score += (item.weatherAffinity[weatherKey] || 0) * 1.5;
@@ -749,14 +740,9 @@
 
         function generateRecommendations() {
             const container = document.getElementById('results-container'); container.innerHTML = '';
-            
-            // Filtered in calculateScore via negative score
             const scoredSingles = state.data.fragrances.map(f => ({ ...f, score: calculateScore(f, false), type: 'single' }));
             const scoredCombos = state.data.combos.map(c => ({ ...c, score: calculateScore(c, true), type: 'combo' }));
-            
-            const results = [...scoredSingles, ...scoredCombos]
-                .filter(f => f.score > -20)
-                .sort((a, b) => b.score - a.score);
+            const results = [...scoredSingles, ...scoredCombos].filter(f => f.score > -20).sort((a, b) => b.score - a.score);
 
             if (results.length === 0) container.innerHTML = `<div class="p-6 text-center text-gray-400">No suitable fragrances found.</div>`;
             else {
@@ -782,19 +768,12 @@
             div.className = `${bgClass} p-5 rounded-2xl border relative transition-all`;
             div.innerHTML = `
                 <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <span class="text-[10px] font-bold tracking-widest text-teal-400 uppercase">${f.brand}</span>
-                        <h3 class="text-xl font-bold text-white leading-tight">${f.name}</h3>
-                        <p class="text-xs text-teal-300 italic mt-0.5">${f.inspiration}</p>
-                    </div>
+                    <div><span class="text-[10px] font-bold tracking-widest text-teal-400 uppercase">${f.brand}</span><h3 class="text-xl font-bold text-white leading-tight">${f.name}</h3><p class="text-xs text-teal-300 italic mt-0.5">${f.inspiration}</p></div>
                     <div class="flex flex-col items-end gap-1"><button onclick="openNote('${f.id}')" class="text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button></div>
                 </div>
                 <div class="bg-black/20 p-3 rounded-lg my-3 border border-white/5"><p class="text-sm text-gray-200 leading-relaxed">"${f.description}"</p></div>
                 <div class="flex items-center gap-2 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spray-can text-gray-400"><path d="M3 3h.01"/><path d="M7 5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4l-5 3-5-3V5z"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="text-xs text-gray-400 font-mono">${f.sprayInstructions}</span></div>
-                <div class="flex justify-between items-center pt-3 border-t border-white/5">
-                    <span class="text-xs font-mono ${wearColor}">Wears: ${f.wearCount}</span>
-                    <button onclick="logWear('${f.id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Wear <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
-                </div>`;
+                <div class="flex justify-between items-center pt-3 border-t border-white/5"><span class="text-xs font-mono ${wearColor}">Wears: ${f.wearCount}</span><button onclick="logWear('${f.id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Wear <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></div>`;
             return div;
         }
 
@@ -826,161 +805,51 @@
             }
         }
 
-        // --- HISTORY LOGIC ---
         function renderHistory() {
-            const list = document.getElementById('history-list');
-            list.innerHTML = '';
-            
+            const list = document.getElementById('history-list'); list.innerHTML = '';
             const sortedHistory = [...state.data.history].sort((a,b) => new Date(b.date) - new Date(a.date));
-            
-            if(sortedHistory.length === 0) {
-                list.innerHTML = `<div class="text-center text-gray-500 mt-10">No wear history yet.</div>`;
-                return;
-            }
-
+            if(sortedHistory.length === 0) { list.innerHTML = `<div class="text-center text-gray-500 mt-10">No wear history yet.</div>`; return; }
             sortedHistory.forEach((log, index) => {
                 const realIndex = state.data.history.indexOf(log);
-                let name = "Unknown Item";
-                let brand = "";
-                
-                if (log.type === 'single') {
-                    const f = state.data.fragrances.find(x => x.id === log.id);
-                    if(f) { name = f.name; brand = f.brand; }
-                } else {
-                    const c = state.data.combos.find(x => x.id === log.id);
-                    if(c) { name = c.name; brand = "Combo"; }
-                }
-
-                const dateObj = new Date(log.date);
-                const dateStr = dateObj.toLocaleDateString();
-                const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-                const div = document.createElement('div');
-                div.className = "glass-panel p-4 rounded-xl border border-white/5 flex justify-between items-center";
-                div.innerHTML = `
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] text-gray-400 font-mono">${dateStr} • ${timeStr}</span>
-                            <span class="text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300 uppercase">${log.context.situation}</span>
-                        </div>
-                        <h4 class="font-bold text-white text-sm">${name}</h4>
-                        <p class="text-[10px] text-teal-400 uppercase tracking-wider">${brand}</p>
-                    </div>
-                    <button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-                    </button>
-                `;
+                let name = "Unknown Item"; let brand = "";
+                if (log.type === 'single') { const f = state.data.fragrances.find(x => x.id === log.id); if(f) { name = f.name; brand = f.brand; } } else { const c = state.data.combos.find(x => x.id === log.id); if(c) { name = c.name; brand = "Combo"; } }
+                const dateObj = new Date(log.date); const dateStr = dateObj.toLocaleDateString(); const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const div = document.createElement('div'); div.className = "glass-panel p-4 rounded-xl border border-white/5 flex justify-between items-center";
+                div.innerHTML = `<div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] text-gray-400 font-mono">${dateStr} • ${timeStr}</span><span class="text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300 uppercase">${log.context.situation}</span></div><h4 class="font-bold text-white text-sm">${name}</h4><p class="text-[10px] text-teal-400 uppercase tracking-wider">${brand}</p></div><button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>`;
                 list.appendChild(div);
             });
-            
             if (window.lucide) lucide.createIcons();
         }
-
+        
         function openHistoryEdit(index) {
             editingHistoryIndex = index;
             const log = state.data.history[index];
             const modal = document.getElementById('history-edit-modal');
             const dateInput = document.getElementById('hist-edit-date');
             const select = document.getElementById('hist-edit-fragrance');
-
-            const d = new Date(log.date);
-            const isoString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
-            dateInput.value = isoString;
-
+            const d = new Date(log.date); const isoString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); dateInput.value = isoString;
             select.innerHTML = '';
-            const optGroupFrag = document.createElement('optgroup');
-            optGroupFrag.label = "Fragrances";
-            state.data.fragrances.forEach(f => {
-                const opt = document.createElement('option');
-                opt.value = f.id;
-                opt.text = f.name;
-                if(f.id === log.id) opt.selected = true;
-                optGroupFrag.appendChild(opt);
-            });
+            const optGroupFrag = document.createElement('optgroup'); optGroupFrag.label = "Fragrances";
+            state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; if(f.id === log.id) opt.selected = true; optGroupFrag.appendChild(opt); });
             select.appendChild(optGroupFrag);
-            
-            const optGroupCombo = document.createElement('optgroup');
-            optGroupCombo.label = "Combos";
-            state.data.combos.forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.text = c.name + " (Combo)";
-                if(c.id === log.id) opt.selected = true;
-                optGroupCombo.appendChild(opt);
-            });
+            const optGroupCombo = document.createElement('optgroup'); optGroupCombo.label = "Combos";
+            state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; if(c.id === log.id) opt.selected = true; optGroupCombo.appendChild(opt); });
             select.appendChild(optGroupCombo);
-
             modal.classList.remove('hidden');
         }
-
-        function closeHistoryEdit() {
-            document.getElementById('history-edit-modal').classList.add('hidden');
-            editingHistoryIndex = null;
-        }
-
+        function closeHistoryEdit() { document.getElementById('history-edit-modal').classList.add('hidden'); editingHistoryIndex = null; }
         function saveHistoryEdit() {
             if (editingHistoryIndex === null) return;
-            
-            const log = state.data.history[editingHistoryIndex];
-            const newDate = document.getElementById('hist-edit-date').value;
-            const newId = document.getElementById('hist-edit-fragrance').value;
-            const oldId = log.id;
-
+            const log = state.data.history[editingHistoryIndex]; const newDate = document.getElementById('hist-edit-date').value; const newId = document.getElementById('hist-edit-fragrance').value; const oldId = log.id;
             log.date = new Date(newDate).toISOString();
-
-            if (newId !== oldId) {
-                changeWearCount(oldId, -1);
-                changeWearCount(newId, 1);
-                log.id = newId;
-                const isCombo = state.data.combos.some(c => c.id === newId);
-                log.type = isCombo ? 'combo' : 'single';
-            }
-
-            saveData();
-            closeHistoryEdit();
-            renderHistory();
-            showCollection(); 
-            showToast('Log Updated');
+            if (newId !== oldId) { changeWearCount(oldId, -1); changeWearCount(newId, 1); log.id = newId; const isCombo = state.data.combos.some(c => c.id === newId); log.type = isCombo ? 'combo' : 'single'; }
+            saveData(); closeHistoryEdit(); renderHistory(); showCollection(); showToast('Log Updated');
         }
-
-        function deleteHistoryEntry() {
-            if (editingHistoryIndex === null) return;
-            if(!confirm("Delete this log entry?")) return;
-
-            const log = state.data.history[editingHistoryIndex];
-            changeWearCount(log.id, -1);
-            state.data.history.splice(editingHistoryIndex, 1);
-            
-            saveData();
-            closeHistoryEdit();
-            renderHistory();
-            showCollection();
-            showToast('Entry Deleted');
-        }
-
+        function deleteHistoryEntry() { if (editingHistoryIndex === null) return; if(!confirm("Delete this log entry?")) return; const log = state.data.history[editingHistoryIndex]; changeWearCount(log.id, -1); state.data.history.splice(editingHistoryIndex, 1); saveData(); closeHistoryEdit(); renderHistory(); showCollection(); showToast('Entry Deleted'); }
         function changeWearCount(id, delta) {
-            const fIdx = state.data.fragrances.findIndex(f => f.id === id);
-            if (fIdx > -1) {
-                state.data.fragrances[fIdx].wearCount += delta;
-                if(state.data.fragrances[fIdx].wearCount < 0) state.data.fragrances[fIdx].wearCount = 0;
-                return;
-            }
-            const cIdx = state.data.combos.findIndex(c => c.id === id);
-            if (cIdx > -1) {
-                const combo = state.data.combos[cIdx];
-                combo.wearCount += delta;
-                if(combo.wearCount < 0) combo.wearCount = 0;
-                combo.parts.forEach(pid => {
-                    const partIdx = state.data.fragrances.findIndex(f => f.id === pid);
-                    if(partIdx > -1) {
-                        state.data.fragrances[partIdx].wearCount += delta;
-                        if(state.data.fragrances[partIdx].wearCount < 0) state.data.fragrances[partIdx].wearCount = 0;
-                    }
-                });
-            }
+            const fIdx = state.data.fragrances.findIndex(f => f.id === id); if (fIdx > -1) { state.data.fragrances[fIdx].wearCount += delta; if(state.data.fragrances[fIdx].wearCount < 0) state.data.fragrances[fIdx].wearCount = 0; return; }
+            const cIdx = state.data.combos.findIndex(c => c.id === id); if (cIdx > -1) { const combo = state.data.combos[cIdx]; combo.wearCount += delta; if(combo.wearCount < 0) combo.wearCount = 0; combo.parts.forEach(pid => { const partIdx = state.data.fragrances.findIndex(f => f.id === pid); if(partIdx > -1) { state.data.fragrances[partIdx].wearCount += delta; if(state.data.fragrances[partIdx].wearCount < 0) state.data.fragrances[partIdx].wearCount = 0; } }); }
         }
-
-        // --- RENDER TIMELINE & COLLECTION ---
         function renderTimeline() {
             const container = document.getElementById('timeline-list'); container.innerHTML = '';
             const sorted = state.data.futurePlan.sort((a, b) => { if (a.year !== b.year) return a.year - b.year; const ma = MONTH_MAP[a.month] || 99; const mb = MONTH_MAP[b.month] || 99; return ma - mb; });
@@ -991,48 +860,25 @@
             });
             if (window.lucide) lucide.createIcons();
         }
-        
-        function resetWear(id) { const idx = state.data.fragrances.findIndex(f => f.id === id); if (idx > -1) { state.data.fragrances[idx].wearCount = 0; saveData(); showCollection(); } }
-
         function switchView(viewName) {
-            document.getElementById('view-selector').classList.add('hidden'); document.getElementById('view-results').classList.add('hidden'); 
-            document.getElementById('view-collection').classList.add('hidden'); document.getElementById('view-timeline').classList.add('hidden');
-            document.getElementById('view-history').classList.add('hidden');
-
+            document.getElementById('view-selector').classList.add('hidden'); document.getElementById('view-results').classList.add('hidden'); document.getElementById('view-collection').classList.add('hidden'); document.getElementById('view-timeline').classList.add('hidden'); document.getElementById('view-history').classList.add('hidden');
             document.getElementById(`view-${viewName === 'results' ? 'results' : viewName}`).classList.remove('hidden');
-            
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-teal-500'));
             const navMap = { 'selector': 0, 'collection': 1, 'history': 2, 'timeline': 3 };
             const navIndex = navMap[viewName] !== undefined ? navMap[viewName] : 0;
             if (document.querySelectorAll('.nav-btn')[navIndex]) document.querySelectorAll('.nav-btn')[navIndex].classList.add('text-teal-500');
-
-            if (viewName === 'collection') showCollection(); 
-            if (viewName === 'timeline') renderTimeline();
-            if (viewName === 'history') renderHistory();
-            
+            if (viewName === 'collection') showCollection(); if (viewName === 'timeline') renderTimeline(); if (viewName === 'history') renderHistory();
             document.getElementById('main-content').scrollTop = 0;
         }
-
-        // --- DOUBLE-LOCK TOAST FIX ---
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            if (toastTimeout) {
-                clearTimeout(toastTimeout);
-                toastTimeout = null;
-            }
-            toast.querySelector('span').innerText = msg;
-            toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
-            toastTimeout = setTimeout(() => {
-                toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible');
-            }, 2000);
+            const toast = document.getElementById('toast'); if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
+            toast.querySelector('span').innerText = msg; toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
+            toastTimeout = setTimeout(() => { toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible'); }, 2000);
         }
-
         function dismissInstallPrompt() { document.getElementById('install-prompt').classList.add('translate-y-full'); }
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function copyData() { const data = document.getElementById('backup-area'); data.select(); document.execCommand('copy'); alert('Copied!'); }
         function toggleRestoreMode() { document.getElementById('restore-section').classList.toggle('hidden'); }
-        function restoreData() { try { const parsed = JSON.parse(document.getElementById('restore-area').value); state.data = parsed; saveData(); location.reload(); } catch (e) { alert('Invalid JSON'); } }
-        
         function openPlanModal() { document.getElementById('plan-modal').classList.remove('hidden'); }
         function closePlanModal() { document.getElementById('plan-modal').classList.add('hidden'); document.getElementById('plan-name').value = ''; document.getElementById('plan-desc').value = ''; }
         function savePlan() { const name = document.getElementById('plan-name').value; const desc = document.getElementById('plan-desc').value; if (!name) return alert("Enter name"); state.data.futurePlan.push({ id: 'plan_' + Date.now(), name, month: "Next", year: new Date().getFullYear(), description: desc }); saveData(); closePlanModal(); renderTimeline(); showToast('Plan Added'); }
@@ -1043,3 +889,5 @@
     </script>
 </body>
 </html>
+
+
