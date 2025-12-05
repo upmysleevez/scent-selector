@@ -133,7 +133,7 @@
             </button>
         </header>
 
-        <!-- MAIN CONTENT AREA (Increased Padding Bottom for Scroll fix) -->
+        <!-- MAIN CONTENT AREA -->
         <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pb-48" id="main-content">
             
             <!-- VIEW 1: SELECTOR -->
@@ -437,7 +437,7 @@
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v25_ranking_system"; 
+        const APP_ID = "scentApp_db_v26_pairing_only"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
 
         let state = {
@@ -445,7 +445,6 @@
             data: { fragrances: [], combos: [], history: [], futurePlan: [] }
         };
 
-        // Enhanced SCOUT_DB with tags for matching logic
         const SCOUT_DB = [
             { name: "Tygr Cologne", season: "Summer", tags: ["fresh", "citrus", "ambroxan"], reason: "Based on your love for Fresh/Citrus profiles (like Aventus/Gentle Silver)." },
             { name: "Elysian Cologne", season: "Spring", tags: ["fresh", "vetiver", "office"], reason: "A sophisticated freshie similar to Aventus but with more Vetiver." },
@@ -473,19 +472,19 @@
 
         // --- DEFAULTS WITH RATING FIELDS ---
         const CUSTOM_DB = [
-            { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "creed_aventus", name: "Aventus", brand: "Creed", inspiration: "Original", tags: ["fresh", "smoky", "fruity", "king", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 4, intimate: 3 }, sprayInstructions: "6-7 sprays (3 on neck, 4 on shirt).", description: "Smoky pineapple and birch. The ultimate confidence booster.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "victory_man", name: "Victory Man", brand: "XXIV", inspiration: "Unknown/Fresh", tags: ["fresh", "citrus", "cedar", "gym"], weatherAffinity: { winter_sunny: -1, winter_rainy: -2, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 0 }, situationRatings: { office: 4, gym: 5, casual: 4, date_night: 1, intimate: 1 }, sprayInstructions: "8 sprays (Heavy on shirt/gym clothes).", description: "Bergamot and Cedarwood bomb. Clean, sharp, and energizing.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "paco_1_million", name: "1 Million", brand: "Paco Rabanne", inspiration: "Original", tags: ["sweet", "spicy", "loud", "club"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 1 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 4, intimate: 2 }, sprayInstructions: "4-5 sprays (Chest and Neck).", description: "Sweet, spicy bubblegum. Designed for loud parties.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "blomb_27", name: "No. 27", brand: "BLOMB", inspiration: "Original", tags: ["woody", "tobacco", "coconut", "unique"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 0, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 3 }, sprayInstructions: "6 sprays (Shirt Front/Back).", description: "Unique woody-tobacco with a coconut twist.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "phantom_noir", name: "Phantom Noir", brand: "Montagne", inspiration: "Black Phantom?", tags: ["coffee", "boozy", "chocolate", "dark", "suspense"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "5-6 sprays (Jacket/Scarf heavy).", description: "Coffee, booze, and sugar. Dark and mysterious.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "brooklyn_jazz", name: "Brooklyn Jazz", brand: "Montagne", inspiration: "Maison Margiela Jazz Club", tags: ["boozy", "tobacco", "rum", "smooth"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -2, summer_rainy: 0, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Collar, Chest, Wrists).", description: "Boozy rum and tobacco. Captures the vibe of a dim jazz bar.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "maison_du_soir", name: "Maison du Soir", brand: "Montagne", inspiration: "By the Fireplace", tags: ["smoke", "vanilla", "chestnut", "cozy"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 5, date_night: 3, intimate: 5 }, sprayInstructions: "5 sprays (Sweater/Chest).", description: "Chestnut and vanilla smoke. The ultimate 'Cozy' scent.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "cubicle_men", name: "Cubicle for Men", brand: "Montagne", inspiration: "Fragrance One Office", tags: ["ambroxan", "fresh", "safe", "power"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 0, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 3, casual: 4, date_night: 2, intimate: 1 }, sprayInstructions: "8-10 sprays (Full coverage on shirt).", description: "Clean, soapy, and projecting. Perfect Office scent.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "gentle_silver", name: "Gentle Silver", brand: "Montagne", inspiration: "Gentle Fluidity Silver", tags: ["gin", "juniper", "fresh", "crisp"], weatherAffinity: { winter_sunny: 1, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 4, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (Saturate shirt front).", description: "Crisp juniper. Smells like a cold Gin & Tonic.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "vanille_absolute", name: "Vanille Absolute", brand: "Montagne", inspiration: "Nishane Ani?", tags: ["vanilla", "spicy", "ginger", "green"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "5-6 sprays (Neck + Clothes).", description: "Spicy ginger and rich vanilla.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 1, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Behind Ears + Collar).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 0, userNotes: "", userRating: 0 }
+            { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "creed_aventus", name: "Aventus", brand: "Creed", inspiration: "Original", tags: ["fresh", "smoky", "fruity", "king", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 4, intimate: 3 }, sprayInstructions: "6-7 sprays (3 on neck, 4 on shirt).", description: "Smoky pineapple and birch. The ultimate confidence booster.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "victory_man", name: "Victory Man", brand: "XXIV", inspiration: "Unknown/Fresh", tags: ["fresh", "citrus", "cedar", "gym"], weatherAffinity: { winter_sunny: -1, winter_rainy: -2, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 0 }, situationRatings: { office: 4, gym: 5, casual: 4, date_night: 1, intimate: 1 }, sprayInstructions: "8 sprays (Heavy on shirt/gym clothes).", description: "Bergamot and Cedarwood bomb. Clean, sharp, and energizing.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "paco_1_million", name: "1 Million", brand: "Paco Rabanne", inspiration: "Original", tags: ["sweet", "spicy", "loud", "club"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 1 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 4, intimate: 2 }, sprayInstructions: "4-5 sprays (Chest and Neck).", description: "Sweet, spicy bubblegum. Designed for loud parties.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "blomb_27", name: "No. 27", brand: "BLOMB", inspiration: "Original", tags: ["woody", "tobacco", "coconut", "unique"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 0, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 3 }, sprayInstructions: "6 sprays (Shirt Front/Back).", description: "Unique woody-tobacco with a coconut twist.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "phantom_noir", name: "Phantom Noir", brand: "Montagne", inspiration: "Black Phantom?", tags: ["coffee", "boozy", "chocolate", "dark", "suspense"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "5-6 sprays (Jacket/Scarf heavy).", description: "Coffee, booze, and sugar. Dark and mysterious.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "brooklyn_jazz", name: "Brooklyn Jazz", brand: "Montagne", inspiration: "Maison Margiela Jazz Club", tags: ["boozy", "tobacco", "rum", "smooth"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -2, summer_rainy: 0, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Collar, Chest, Wrists).", description: "Boozy rum and tobacco. Captures the vibe of a dim jazz bar.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "maison_du_soir", name: "Maison du Soir", brand: "Montagne", inspiration: "By the Fireplace", tags: ["smoke", "vanilla", "chestnut", "cozy"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 5, date_night: 3, intimate: 5 }, sprayInstructions: "5 sprays (Sweater/Chest).", description: "Chestnut and vanilla smoke. The ultimate 'Cozy' scent.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "cubicle_men", name: "Cubicle for Men", brand: "Montagne", inspiration: "Fragrance One Office", tags: ["ambroxan", "fresh", "safe", "power"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 0, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 3, casual: 4, date_night: 2, intimate: 1 }, sprayInstructions: "8-10 sprays (Full coverage on shirt).", description: "Clean, soapy, and projecting. Perfect Office scent.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "gentle_silver", name: "Gentle Silver", brand: "Montagne", inspiration: "Gentle Fluidity Silver", tags: ["gin", "juniper", "fresh", "crisp"], weatherAffinity: { winter_sunny: 1, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 4, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (Saturate shirt front).", description: "Crisp juniper. Smells like a cold Gin & Tonic.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "vanille_absolute", name: "Vanille Absolute", brand: "Montagne", inspiration: "Nishane Ani?", tags: ["vanilla", "spicy", "ginger", "green"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "5-6 sprays (Neck + Clothes).", description: "Spicy ginger and rich vanilla.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 1, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Behind Ears + Collar).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false }
         ];
 
         const COMBOS_DB = [
@@ -525,8 +524,11 @@
                 if (!state.data.futurePlan) state.data.futurePlan = [];
                 if (!state.data.combos || state.data.combos.length < 8) state.data.combos = JSON.parse(JSON.stringify(COMBOS_DB));
                 
-                // Add default ratings if missing
-                state.data.fragrances.forEach(f => { if(f.userRating === undefined) f.userRating = 0; });
+                // Migration: Add pairingOnly default
+                state.data.fragrances.forEach(f => {
+                    if(f.pairingOnly === undefined) f.pairingOnly = false;
+                    if(f.userRating === undefined) f.userRating = 0;
+                });
                 
                 const pn = state.data.fragrances.find(f => f.id === 'phantom_noir');
                 if(pn && pn.brand === "Unknown") pn.brand = "Montagne";
@@ -548,16 +550,58 @@
             document.getElementById('backup-area').value = JSON.stringify(state.data);
         }
 
+        // --- RESTORE DATA (SMART MERGE) ---
+        function restoreData() {
+            try {
+                const backup = JSON.parse(document.getElementById('restore-area').value);
+                const freshState = {
+                    fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)),
+                    combos: JSON.parse(JSON.stringify(COMBOS_DB)),
+                    history: [],
+                    futurePlan: []
+                };
+                if (backup.fragrances) {
+                    backup.fragrances.forEach(oldF => {
+                        const newF = freshState.fragrances.find(f => f.id === oldF.id);
+                        if (newF) {
+                            newF.wearCount = oldF.wearCount || 0;
+                            newF.userNotes = oldF.userNotes || "";
+                            newF.userRating = oldF.userRating || 0;
+                            newF.pairingOnly = oldF.pairingOnly || false; // Restore setting
+                        } else {
+                            freshState.fragrances.push(oldF);
+                        }
+                    });
+                }
+                if (backup.combos) {
+                     backup.combos.forEach(oldC => {
+                        const newC = freshState.combos.find(c => c.id === oldC.id);
+                        if (newC) {
+                            newC.wearCount = oldC.wearCount || 0;
+                            newC.userNotes = oldC.userNotes || "";
+                        } else {
+                            freshState.combos.push(oldC);
+                        }
+                    });
+                }
+                freshState.history = backup.history || [];
+                freshState.futurePlan = backup.futurePlan || [];
+                state.data = freshState;
+                saveData();
+                location.reload();
+            } catch (e) {
+                alert('Invalid JSON');
+            }
+        }
+
         function initUI() { updateContextUI(); showCollection(); }
 
-        // --- SMART SCOUT LOGIC (TAILORED) ---
         function initScout() {
             const date = new Date();
             const weekNumYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 604800000);
             const month = date.toLocaleString('default', { month: 'short' });
             const weekOfMonth = Math.ceil(date.getDate() / 7);
             
-            // 1. Analyze User Ratings (4+ Stars)
             const lovedTags = new Set();
             state.data.fragrances.forEach(f => {
                 if(f.userRating >= 4) {
@@ -565,13 +609,9 @@
                 }
             });
 
-            // 2. Filter Scout DB
             let candidates = SCOUT_DB.filter(s => s.tags.some(t => lovedTags.has(t)));
-            
-            // 3. Fallback if no ratings or no matches
             if(candidates.length === 0) candidates = SCOUT_DB;
 
-            // 4. Rotate based on week
             currentScout = candidates[weekNumYear % candidates.length];
             
             document.getElementById('week-label').innerText = `${month} Week ${weekOfMonth}`;
@@ -584,7 +624,6 @@
             document.getElementById('scout-modal-name').innerText = currentScout.name;
         }
 
-        // ... (Standard helper functions omitted for brevity, same as previous) ...
         function getSmartDate(targetSeason) {
             const now = new Date();
             let year = now.getFullYear();
@@ -595,7 +634,6 @@
             return { month: months[targetMonthIdx], year: year };
         }
 
-        // ... (Modals, Context, etc - Standard) ...
         function openScoutModal() { document.getElementById('scout-modal').classList.remove('hidden'); document.getElementById('scout-custom-inputs').classList.add('hidden'); }
         function closeScoutModal() { document.getElementById('scout-modal').classList.add('hidden'); }
         function toggleScoutCustom() { document.getElementById('scout-custom-inputs').classList.remove('hidden'); }
@@ -610,14 +648,24 @@
         function savePlan() { const name = document.getElementById('plan-name').value; const desc = document.getElementById('plan-desc').value; if (!name) return alert("Enter name"); state.data.futurePlan.push({ id: 'plan_' + Date.now(), name, month: "Next", year: new Date().getFullYear(), description: desc }); saveData(); closePlanModal(); renderTimeline(); showToast('Plan Added'); }
         function deletePlan(id) { if(confirm("Remove?")) { state.data.futurePlan = state.data.futurePlan.filter(p => p.id !== id); saveData(); renderTimeline(); }}
         
-        // --- RATING LOGIC ---
+        // --- RATING & TOGGLE LOGIC ---
         function setRating(id, rating) {
             const f = state.data.fragrances.find(i => i.id === id);
             if(f) {
                 f.userRating = rating;
                 saveData();
-                showCollection(); // Re-render to show stars
-                initScout(); // Re-calc scout based on new rating
+                showCollection(); 
+                initScout();
+            }
+        }
+
+        function togglePairingOnly(id) {
+            const f = state.data.fragrances.find(i => i.id === id);
+            if(f) {
+                f.pairingOnly = !f.pairingOnly;
+                saveData();
+                showCollection();
+                showToast(f.pairingOnly ? "Set to Pairing Only" : "Set to Solo + Pairing");
             }
         }
 
@@ -636,11 +684,11 @@
             if(text.includes('dark') || text.includes('mysterious') || text.includes('incense')) { tags.push('suspense'); ratings.date_night += 1; }
             let comboSuggestion = "None detected"; if(tags.includes('fresh')) comboSuggestion = "Try layering with Aventus/Gentle Silver for depth."; if(tags.includes('winter')) comboSuggestion = "Try layering with Vanille Absolute for sweetness.";
             const resultsDiv = document.getElementById('sa-results'); resultsDiv.classList.remove('hidden'); document.getElementById('sa-tags').innerHTML = tags.map(t => `<span class="bg-teal-900 text-teal-300 text-[10px] px-2 py-1 rounded-full">${t}</span>`).join(''); document.getElementById('sa-combo').innerText = comboSuggestion;
-            tempSmartObj = { id: 'custom_' + Date.now(), name: name, brand: brand, inspiration: "Imported", tags: tags, weatherAffinity: affinity, situationRatings: ratings, sprayInstructions: "4-5 sprays (Clothes/Neck)", description: "Smart-Added: " + text.substring(0, 50) + "...", wearCount: 0, userNotes: comboSuggestion, userRating: 0 };
+            tempSmartObj = { id: 'custom_' + Date.now(), name: name, brand: brand, inspiration: "Imported", tags: tags, weatherAffinity: affinity, situationRatings: ratings, sprayInstructions: "4-5 sprays (Clothes/Neck)", description: "Smart-Added: " + text.substring(0, 50) + "...", wearCount: 0, userNotes: comboSuggestion, userRating: 0, pairingOnly: false };
         }
         function saveSmartAdd() { if(!tempSmartObj) return alert("Please click 'Analyze' first."); tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; state.data.fragrances.push(tempSmartObj); saveData(); closeSmartAdd(); showCollection(); showToast('Fragrance Added'); }
 
-        // --- COLLECTION VIEW (UPDATED FOR RANKING) ---
+        // --- COLLECTION VIEW (UPDATED FOR PAIRING TOGGLE) ---
         function showCollection() {
             const list = document.getElementById('collection-list'); list.innerHTML = '';
             state.data.fragrances.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
@@ -652,6 +700,9 @@
                     const fillClass = i <= (f.userRating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600';
                     starsHtml += `<button onclick="setRating('${f.id}', ${i})" class="focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star ${fillClass} transition-colors"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>`;
                 }
+                
+                // Pairing Button Color
+                const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300';
 
                 div.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
@@ -660,6 +711,7 @@
                             <h3 class="font-bold text-sm text-white">${f.name}</h3>
                         </div>
                         <div class="flex items-center gap-2">
+                             <button onclick="togglePairingOnly('${f.id}')" class="${pairingClass} transition-colors" title="Toggle Pairing Only Mode"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
                              <button onclick="openNote('${f.id}')" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button>
                              <button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 px-2 py-1">Reset</button>
                         </div>
@@ -671,9 +723,9 @@
                 `;
                 list.appendChild(div);
             });
+            if(window.lucide) lucide.createIcons();
         }
 
-        // ... (Rest of functions: setContext, calculateScore, generateRecommendations, renderHistory, etc. remain the same) ...
         function setContext(type, value) {
             state.context[type] = value;
             const sus = document.getElementById('suspense-section');
@@ -696,6 +748,9 @@
             const ctx = state.context; let score = 0;
             const sitScore = item.situationRatings[ctx.situation] || 0; if (sitScore < 2) return -100; score += sitScore * 2;
             if (!isCombo) {
+                // FILTER OUT PAIRING ONLY
+                if(item.pairingOnly) return -999;
+
                 let weatherKey = `${ctx.season}_${ctx.weather}`;
                 if (item.weatherAffinity[weatherKey] === undefined) { if (ctx.season === 'fall' && ctx.weather === 'sunny') weatherKey = 'fall'; else if (ctx.season === 'spring' && ctx.weather === 'sunny') weatherKey = 'spring'; }
                 score += (item.weatherAffinity[weatherKey] || 0) * 1.5;
@@ -707,9 +762,14 @@
 
         function generateRecommendations() {
             const container = document.getElementById('results-container'); container.innerHTML = '';
+            
+            // Filtered in calculateScore via negative score
             const scoredSingles = state.data.fragrances.map(f => ({ ...f, score: calculateScore(f, false), type: 'single' }));
             const scoredCombos = state.data.combos.map(c => ({ ...c, score: calculateScore(c, true), type: 'combo' }));
-            const results = [...scoredSingles, ...scoredCombos].filter(f => f.score > -20).sort((a, b) => b.score - a.score);
+            
+            const results = [...scoredSingles, ...scoredCombos]
+                .filter(f => f.score > -20)
+                .sort((a, b) => b.score - a.score);
 
             if (results.length === 0) container.innerHTML = `<div class="p-6 text-center text-gray-400">No suitable fragrances found.</div>`;
             else {
