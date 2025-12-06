@@ -27,7 +27,6 @@
 
         /* Safe Areas */
         .safe-top { padding-top: env(safe-area-inset-top); }
-        /* safe-bottom handled via padding in footer */
         
         /* Utility */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -46,6 +45,15 @@
             color: white;
             border-color: #208D8D;
         }
+
+        /* Tier Badge Styles */
+        .tier-btn { font-family: monospace; transition: all 0.2s; }
+        .tier-s { color: #fbbf24; border-color: #fbbf24; }
+        .tier-a { color: #f87171; border-color: #f87171; }
+        .tier-b { color: #60a5fa; border-color: #60a5fa; }
+        .tier-c { color: #34d399; border-color: #34d399; }
+        .tier-d { color: #9ca3af; border-color: #9ca3af; }
+        .tier-active { background-color: #208D8D; color: white !important; border-color: #208D8D !important; font-weight: bold; transform: scale(1.1); }
         
         /* Timeline Connector Line */
         .timeline-line::before {
@@ -71,25 +79,10 @@
             background: linear-gradient(135deg, rgba(38,40,40,0.9) 0%, rgba(32,141,141,0.2) 100%);
         }
         
-        /* Tier Headers */
         .tier-header {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 700;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: #9ca3af;
+            display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #9ca3af;
         }
-        .tier-header::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: rgba(255,255,255,0.1);
-        }
+        .tier-header::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
     </style>
 
     <script>
@@ -108,7 +101,7 @@
 </head>
 <body class="h-screen w-screen flex flex-col overflow-hidden text-gray-100 selection:bg-teal-500 selection:text-white">
 
-    <!-- HEADER (Fixed to prevent blocking) -->
+    <!-- HEADER -->
     <header class="fixed top-0 w-full safe-top px-6 pt-4 pb-4 flex justify-between items-center z-50 bg-charcoal-700/95 backdrop-blur-xl border-b border-white/5 shadow-lg">
         <div>
             <h1 class="text-[10px] font-bold uppercase tracking-widest text-teal-300">ScentSelector</h1>
@@ -119,7 +112,7 @@
         </button>
     </header>
 
-    <!-- MAIN CONTENT AREA (Added pt-24 to clear fixed header) -->
+    <!-- MAIN CONTENT AREA -->
     <div id="app-container" class="flex-1 flex flex-col relative h-full">
         <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-28 pb-48" id="main-content">
             
@@ -217,36 +210,25 @@
                 <div class="flex justify-between items-center mb-4">
                      <h2 class="text-2xl font-bold">My Collection</h2>
                      <button onclick="openSmartAdd()" class="bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 shadow-lg">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Smart Add
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add
                      </button>
                 </div>
+                
+                <!-- Toggle Switch -->
+                <div class="flex p-1 bg-black/40 rounded-xl mb-4 border border-white/5">
+                    <button onclick="setCollectionMode('bottles')" id="tab-bottles" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white">Full Bottles</button>
+                    <button onclick="setCollectionMode('decants')" id="tab-decants" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Decants</button>
+                </div>
+
                 <div id="collection-list" class="space-y-3"></div>
             </div>
 
             <!-- VIEW 4: TIMELINE / FUTURE -->
             <div id="view-timeline" class="hidden space-y-4 max-w-md mx-auto relative">
-                <div class="bg-gradient-to-r from-teal-900/40 to-charcoal-800 p-1 rounded-2xl mb-6 border border-teal-500/30">
-                    <div class="glass-panel rounded-xl p-5 relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-3 opacity-10">
-                            <i data-lucide="radar" class="w-24 h-24"></i>
-                        </div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-teal-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">Weekly Scout</span>
-                            <span class="text-[10px] text-teal-300" id="week-label">Nov Week 4</span>
-                        </div>
-                        <h3 class="font-bold text-xl text-white mb-1" id="scout-name">Loading...</h3>
-                        <p class="text-xs text-gray-300 mb-3" id="scout-reason">Analyzing your collection gaps...</p>
-                        
-                        <div class="flex flex-col gap-1">
-                            <div class="flex items-center gap-2 mb-2">
-                                <span class="text-[9px] bg-white/10 text-white px-2 py-0.5 rounded uppercase font-bold tracking-wider" id="scout-season-badge">Summer</span>
-                                <span class="text-[9px] text-teal-400 uppercase font-bold tracking-wider">Montagne ($40)</span>
-                            </div>
-                            <button onclick="openScoutModal()" class="w-full bg-teal-500/20 hover:bg-teal-500/40 border border-teal-500/50 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-2 transition-colors">
-                                Add to Plan <i data-lucide="plus-circle" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    </div>
+                
+                <!-- Dual Scout Container -->
+                <div id="scout-container" class="space-y-4 mb-6">
+                    <!-- Javascript will inject 2 cards here -->
                 </div>
 
                 <div class="flex justify-between items-center mb-4">
@@ -287,45 +269,23 @@
         </nav>
     </div>
 
-    <!-- SCOUT ADD MODAL (NEW) -->
+    <!-- SCOUT ADD MODAL -->
     <div id="scout-modal" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
             <h3 class="text-xl font-bold mb-2">Smart Schedule</h3>
             <p class="text-sm text-gray-400 mb-6">Based on your taste & season, we recommend: <span id="scout-modal-name" class="text-white font-bold">Fragrance</span></p>
-            
             <button onclick="confirmScoutAdd(true)" class="w-full bg-teal-600 hover:bg-teal-500 text-white p-4 rounded-xl mb-3 flex items-center justify-between group">
-                <div class="text-left">
-                    <span class="block text-xs text-teal-200 uppercase tracking-wider font-bold">Recommended</span>
-                    <span id="scout-suggested-date" class="text-lg font-bold">May 2026</span>
-                </div>
-                <i data-lucide="check-circle" class="w-6 h-6 text-teal-300 group-hover:text-white"></i>
+                <div class="text-left"><span class="block text-xs text-teal-200 uppercase tracking-wider font-bold">Recommended</span><span id="scout-suggested-date" class="text-lg font-bold">May 2026</span></div><i data-lucide="check-circle" class="w-6 h-6 text-teal-300 group-hover:text-white"></i>
             </button>
-
-            <div class="relative">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-white/10"></div>
-                </div>
-                <div class="relative flex justify-center text-xs uppercase">
-                    <span class="bg-charcoal-800 px-2 text-gray-500">Or</span>
-                </div>
-            </div>
-
-            <button onclick="toggleScoutCustom()" class="w-full text-gray-400 text-sm font-bold py-4 hover:text-white flex items-center justify-center gap-2">
-                Choose My Own Date <i data-lucide="chevron-down" class="w-4 h-4"></i>
-            </button>
-
+            <div class="relative"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div><div class="relative flex justify-center text-xs uppercase"><span class="bg-charcoal-800 px-2 text-gray-500">Or</span></div></div>
+            <button onclick="toggleScoutCustom()" class="w-full text-gray-400 text-sm font-bold py-4 hover:text-white flex items-center justify-center gap-2">Choose My Own Date <i data-lucide="chevron-down" class="w-4 h-4"></i></button>
             <div id="scout-custom-inputs" class="hidden space-y-3 pt-2">
                 <div class="grid grid-cols-2 gap-3">
-                    <select id="scout-month" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none">
-                        <option value="Jan">January</option><option value="Feb">February</option><option value="Mar">March</option><option value="Apr">April</option><option value="May">May</option><option value="Jun">June</option><option value="Jul">July</option><option value="Aug">August</option><option value="Sep">September</option><option value="Oct">October</option><option value="Nov">November</option><option value="Dec">December</option>
-                    </select>
-                    <select id="scout-year" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none">
-                        <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
-                    </select>
+                    <select id="scout-month" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none"><option value="Jan">January</option><option value="Feb">February</option><option value="Mar">March</option><option value="Apr">April</option><option value="May">May</option><option value="Jun">June</option><option value="Jul">July</option><option value="Aug">August</option><option value="Sep">September</option><option value="Oct">October</option><option value="Nov">November</option><option value="Dec">December</option></select>
+                    <select id="scout-year" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none"><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option></select>
                 </div>
                 <button onclick="confirmScoutAdd(false)" class="w-full bg-white/10 hover:bg-white/20 text-white p-3 rounded-xl text-sm font-bold">Add Custom Date</button>
             </div>
-            
             <button onclick="closeScoutModal()" class="absolute top-4 right-4 p-2 text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
     </div>
@@ -335,20 +295,9 @@
         <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
             <h3 class="text-xl font-bold mb-4">Edit Log</h3>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label>
-                    <input type="datetime-local" id="hist-edit-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label>
-                    <select id="hist-edit-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none">
-                        <!-- Populated by JS -->
-                    </select>
-                </div>
-                <div class="flex gap-2 pt-2">
-                    <button onclick="closeHistoryEdit()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button>
-                    <button onclick="saveHistoryEdit()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Update Log</button>
-                </div>
+                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="hist-edit-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div>
+                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label><select id="hist-edit-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div>
+                <div class="flex gap-2 pt-2"><button onclick="closeHistoryEdit()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveHistoryEdit()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Update Log</button></div>
                 <button onclick="deleteHistoryEntry()" class="w-full text-red-400 text-xs font-bold py-2 mt-2 hover:text-red-300">Delete Entry</button>
             </div>
         </div>
@@ -357,40 +306,22 @@
     <!-- SMART ADD MODAL -->
     <div id="smart-add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all h-[80vh] flex flex-col">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">Smart Add</h3>
-                <button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Smart Add</h3><button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <div class="space-y-4 overflow-y-auto no-scrollbar flex-1">
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label>
-                    <input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name">
-                    <input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House">
-                </div>
+                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label><input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name"><input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House"></div>
+                <div class="flex items-center gap-2 mt-2"><input type="checkbox" id="sa-is-decant" class="w-4 h-4 rounded border-gray-600 text-teal-500 focus:ring-teal-500"><label for="sa-is-decant" class="text-sm font-bold text-gray-300">Save as Decant/Sample</label></div>
                 <div class="bg-teal-900/20 p-4 rounded-xl border border-teal-500/20">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i>
-                        <label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label>
-                    </div>
+                    <div class="flex items-center gap-2 mb-2"><i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i><label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label></div>
                     <textarea id="sa-text" class="w-full bg-black/40 text-xs text-gray-300 p-3 rounded-lg border border-white/10 h-32 focus:outline-none focus:border-teal-500" placeholder="Paste notes/description..."></textarea>
                     <button onclick="analyzeText()" class="w-full mt-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-2 rounded-lg">Analyze & Auto-Fill</button>
                 </div>
-                <div id="sa-results" class="hidden space-y-3">
-                    <div class="p-3 bg-white/5 rounded-lg">
-                        <h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4>
-                        <div id="sa-tags" class="flex flex-wrap gap-1"></div>
-                    </div>
-                     <div class="p-3 bg-white/5 rounded-lg">
-                        <h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4>
-                        <p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p>
-                    </div>
-                </div>
+                <div id="sa-results" class="hidden space-y-3"><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4><div id="sa-tags" class="flex flex-wrap gap-1"></div></div><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4><p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p></div></div>
             </div>
             <button onclick="saveSmartAdd()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Save to Collection</button>
         </div>
     </div>
 
-    <!-- SETTINGS / PLAN / NOTES MODALS -->
+    <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
             <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">Data</h3><button onclick="toggleSettings()" class="p-2"><i data-lucide="x" class="w-4 h-4"></i></button></div>
@@ -424,23 +355,31 @@
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v28_force_sync"; 
+        const APP_ID = "scentApp_db_v31_scout_label_fix"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
+        const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
         let state = {
             context: { season: 'fall', weather: 'sunny', situation: 'office', suspense: false },
-            data: { fragrances: [], combos: [], history: [], futurePlan: [] }
+            data: { fragrances: [], decants: [], combos: [], history: [], futurePlan: [] },
+            ui: { collectionMode: 'bottles' }
         };
 
-        // Enhanced SCOUT_DB with tags for matching logic
+        // SCOUT DB (Montagne Focus)
         const SCOUT_DB = [
-            { name: "Tygr Cologne", season: "Summer", tags: ["fresh", "citrus", "ambroxan"], reason: "Based on your love for Fresh/Citrus profiles (like Aventus/Gentle Silver)." },
-            { name: "Elysian Cologne", season: "Spring", tags: ["fresh", "vetiver", "office"], reason: "A sophisticated freshie similar to Aventus but with more Vetiver." },
-            { name: "Chilly Pacific", season: "Summer", tags: ["fresh", "mint", "lemon"], reason: "Playful and cooling. Great if you enjoy crisp scents." },
-            { name: "Malay Aklan", season: "Summer", tags: ["marine", "melon", "salty"], reason: "A distinct Marine profile to expand your high-heat rotation." },
-            { name: "Afternoon Dive", season: "Summer", tags: ["fresh", "orange", "simple"], reason: "Pure photorealistic orange. Simple, effective, high quality." },
-            { name: "Ambre Musc", season: "Winter", tags: ["date_night", "spicy", "amber"], reason: "If you like Maison du Soir/Phantom Noir, this is a smoother Tuxedo vibe." },
-            { name: "Parfum de Cerise", season: "Winter", tags: ["gourmand", "cherry", "sweet"], reason: "A highly rated clone of Lost Cherry to save your Tom Ford juice." }
+            { name: "Tygr Cologne", season: "Summer", tags: ["fresh", "citrus", "ambroxan"], reason: "Based on your love for Fresh/Citrus profiles." },
+            { name: "Elysian Cologne", season: "Spring", tags: ["fresh", "vetiver", "office"], reason: "A sophisticated freshie similar to Aventus." },
+            { name: "Chilly Pacific", season: "Summer", tags: ["fresh", "mint", "lemon"], reason: "Playful and cooling mint profile." },
+            { name: "Malay Aklan", season: "Summer", tags: ["marine", "melon", "salty"], reason: "A distinct Marine profile." },
+            { name: "Afternoon Dive", season: "Summer", tags: ["fresh", "orange", "simple"], reason: "Pure photorealistic orange." },
+            { name: "Ambre Musc", season: "Winter", tags: ["date_night", "spicy", "amber"], reason: "Sophisticated patchouli/amber profile." },
+            { name: "Parfum de Cerise", season: "Winter", tags: ["gourmand", "cherry", "sweet"], reason: "A highly rated clone of Lost Cherry." },
+            { name: "Tobacco Noir", season: "Winter", tags: ["tobacco", "vanilla", "sweet"], reason: "Rich tobacco vanilla blend." },
+            { name: "Cognac D'Ange", season: "Winter", tags: ["boozy", "sweet", "gourmand"], reason: "Warm boozy gourmand." },
+            { name: "Pineapple Frais", season: "Summer", tags: ["fresh", "fruity", "pineapple"], reason: "Lighter Aventus style." },
+            { name: "Torino 2021", season: "Summer", tags: ["green", "mint", "fresh"], reason: "Herbal minty fresh." },
+            { name: "Imaginary", season: "Spring", tags: ["tea", "fresh", "clean"], reason: "Clean tea scent." },
+            { name: "Japanese Plum", season: "Winter", tags: ["fruity", "dark", "spicy"], reason: "Dark fruity spicy." }
         ];
 
         const KEYWORDS = {
@@ -453,12 +392,11 @@
 
         let tempSmartObj = null; 
         let currentNoteId = null; 
-        let currentScout = null;
-        let suggestedScoutDate = null; 
+        let scoutRecommendations = [];
         let editingHistoryIndex = null; 
         let toastTimeout = null;
 
-        // --- HIGH PROJECTION / 10-HOUR PROTOCOL DEFINITIONS ---
+        // --- DEFAULTS ---
         const CUSTOM_DB = [
             { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
             { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
@@ -509,29 +447,26 @@
             const raw = localStorage.getItem(APP_ID);
             if (raw) {
                 let savedData = JSON.parse(raw);
-                
-                // FORCE SYNC: Overwrite instructions with new code
+                if(!savedData.decants) savedData.decants = [];
                 savedData.fragrances = savedData.fragrances.map(savedF => {
                     const codeF = CUSTOM_DB.find(cf => cf.id === savedF.id);
                     if (codeF) {
                         return {
-                            ...codeF, // NEW instructions/metadata
-                            wearCount: savedF.wearCount || 0, // PRESERVE stats
+                            ...codeF, 
+                            wearCount: savedF.wearCount || 0, 
                             userNotes: savedF.userNotes || "",
-                            userRating: savedF.userRating || 0,
+                            userRating: savedF.userRating || '-',
                             pairingOnly: savedF.pairingOnly || false
                         };
                     }
                     return savedF;
                 });
-                
                 state.data = savedData;
-                // Ensure new arrays exist
                 if (!state.data.futurePlan) state.data.futurePlan = [];
                 if (!state.data.combos || state.data.combos.length < 8) state.data.combos = JSON.parse(JSON.stringify(COMBOS_DB));
 
             } else {
-                state.data = { fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), combos: JSON.parse(JSON.stringify(COMBOS_DB)), history: [], futurePlan: JSON.parse(JSON.stringify(DEFAULT_TIMELINE)) };
+                state.data = { fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), decants: [], combos: JSON.parse(JSON.stringify(COMBOS_DB)), history: [], futurePlan: JSON.parse(JSON.stringify(DEFAULT_TIMELINE)) };
                 saveData();
             }
             document.getElementById('backup-area').value = JSON.stringify(state.data);
@@ -542,12 +477,12 @@
             document.getElementById('backup-area').value = JSON.stringify(state.data);
         }
 
-        // --- RESTORE DATA (SMART MERGE) ---
         function restoreData() {
             try {
                 const backup = JSON.parse(document.getElementById('restore-area').value);
                 const freshState = {
                     fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)),
+                    decants: backup.decants || [],
                     combos: JSON.parse(JSON.stringify(COMBOS_DB)),
                     history: [],
                     futurePlan: []
@@ -556,11 +491,10 @@
                     backup.fragrances.forEach(oldF => {
                         const newF = freshState.fragrances.find(f => f.id === oldF.id);
                         if (newF) {
-                            // PRESERVE USER DATA, OVERWRITE TECH SPECS
                             newF.wearCount = oldF.wearCount || 0;
                             newF.userNotes = oldF.userNotes || "";
                             newF.userRating = oldF.userRating || 0;
-                            newF.pairingOnly = oldF.pairingOnly || false;
+                            newF.pairingOnly = oldF.pairingOnly || false; 
                         } else {
                             freshState.fragrances.push(oldF);
                         }
@@ -587,8 +521,8 @@
             }
         }
 
-        // ... (UI, Logic, Scoring functions remain unchanged) ...
         function initUI() { updateContextUI(); showCollection(); }
+
         function initScout() {
             const date = new Date();
             const weekNumYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 604800000);
@@ -596,25 +530,68 @@
             const weekOfMonth = Math.ceil(date.getDate() / 7);
             
             const lovedTags = new Set();
+            const hatedTags = new Set();
+
             state.data.fragrances.forEach(f => {
-                if(f.userRating >= 4) {
-                    f.tags.forEach(t => lovedTags.add(t));
-                }
+                if (['S', 'A'].includes(f.userRating)) f.tags.forEach(t => lovedTags.add(t));
+                if (f.wearCount > 4) f.tags.forEach(t => lovedTags.add(t));
+            });
+            state.data.decants.forEach(d => {
+                if (d.rating === 'like') d.tags.forEach(t => lovedTags.add(t));
+                if (d.rating === 'dislike') d.tags.forEach(t => hatedTags.add(t));
             });
 
-            let candidates = SCOUT_DB.filter(s => s.tags.some(t => lovedTags.has(t)));
-            if(candidates.length === 0) candidates = SCOUT_DB;
+            let candidates = SCOUT_DB.map(scout => {
+                let score = 0;
+                scout.tags.forEach(t => {
+                    if (lovedTags.has(t)) score += 2;
+                    if (hatedTags.has(t)) score -= 5;
+                });
+                return { ...scout, score };
+            }).sort((a,b) => b.score - a.score);
 
-            currentScout = candidates[weekNumYear % candidates.length];
+            const scoutA = candidates[weekNumYear % Math.max(1, Math.min(3, candidates.length))]; 
+            let scoutB = candidates.find(c => c.name !== scoutA.name && c.season !== scoutA.season);
+            if (!scoutB) scoutB = candidates.find(c => c.name !== scoutA.name);
+
+            scoutRecommendations = [
+                { item: scoutA, date: getSmartDate(scoutA.season) },
+                { item: scoutB, date: getSmartDate(scoutB.season) }
+            ];
             
-            document.getElementById('week-label').innerText = `${month} Week ${weekOfMonth}`;
-            document.getElementById('scout-name').innerText = currentScout.name;
-            document.getElementById('scout-reason').innerText = currentScout.reason;
-            document.getElementById('scout-season-badge').innerText = currentScout.season;
+            renderScouts(month, weekOfMonth); // Pass label data directly to render
+        }
+
+        function renderScouts(month, weekOfMonth) {
+            const container = document.getElementById('scout-container');
+            container.innerHTML = '';
             
-            suggestedScoutDate = getSmartDate(currentScout.season);
-            document.getElementById('scout-suggested-date').innerText = `${suggestedScoutDate.month} ${suggestedScoutDate.year}`;
-            document.getElementById('scout-modal-name').innerText = currentScout.name;
+            scoutRecommendations.forEach((rec, index) => {
+                const isPrimary = index === 0;
+                const div = document.createElement('div');
+                div.className = `glass-panel rounded-xl p-4 relative overflow-hidden ${isPrimary ? 'border-teal-500/30' : 'border-white/5 opacity-90'}`;
+                
+                // Only Primary gets the Week Label logic visually, or both can have context
+                const labelHtml = isPrimary ? `<span class="text-[10px] text-teal-300 font-mono block mb-1">${month} Week ${weekOfMonth}</span>` : '';
+
+                div.innerHTML = `
+                    <div class="absolute top-0 right-0 p-3 opacity-10"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${isPrimary ? 'star' : 'sparkles'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                    <div class="relative z-10">
+                        ${labelHtml}
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[9px] bg-white/10 text-white px-2 py-0.5 rounded uppercase font-bold tracking-wider">${rec.item.season}</span>
+                            <span class="text-[9px] text-teal-400 uppercase font-bold tracking-wider">Montagne ($40)</span>
+                        </div>
+                        <h3 class="font-bold text-lg text-white mb-1">${rec.item.name}</h3>
+                        <p class="text-xs text-gray-300 mb-3 leading-relaxed">${rec.item.reason}</p>
+                        <button onclick="openScoutModal(${index})" class="w-full bg-teal-500/20 hover:bg-teal-500/40 border border-teal-500/50 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-2 transition-colors">
+                            Add to Plan <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+            if(window.lucide) lucide.createIcons();
         }
 
         function getSmartDate(targetSeason) {
@@ -627,7 +604,15 @@
             return { month: months[targetMonthIdx], year: year };
         }
 
-        function openScoutModal() { document.getElementById('scout-modal').classList.remove('hidden'); document.getElementById('scout-custom-inputs').classList.add('hidden'); }
+        function openScoutModal(index) { 
+            currentScout = scoutRecommendations[index].item;
+            suggestedScoutDate = scoutRecommendations[index].date;
+            document.getElementById('scout-modal-name').innerText = currentScout.name;
+            document.getElementById('scout-suggested-date').innerText = `${suggestedScoutDate.month} ${suggestedScoutDate.year}`;
+            document.getElementById('scout-modal').classList.remove('hidden'); 
+            document.getElementById('scout-custom-inputs').classList.add('hidden'); 
+        }
+        
         function closeScoutModal() { document.getElementById('scout-modal').classList.add('hidden'); }
         function toggleScoutCustom() { document.getElementById('scout-custom-inputs').classList.remove('hidden'); }
         function confirmScoutAdd(useSuggested) {
@@ -641,28 +626,18 @@
         function savePlan() { const name = document.getElementById('plan-name').value; const desc = document.getElementById('plan-desc').value; if (!name) return alert("Enter name"); state.data.futurePlan.push({ id: 'plan_' + Date.now(), name, month: "Next", year: new Date().getFullYear(), description: desc }); saveData(); closePlanModal(); renderTimeline(); showToast('Plan Added'); }
         function deletePlan(id) { if(confirm("Remove?")) { state.data.futurePlan = state.data.futurePlan.filter(p => p.id !== id); saveData(); renderTimeline(); }}
         
-        function setRating(id, rating) {
+        function setRating(id, tier) {
             const f = state.data.fragrances.find(i => i.id === id);
-            if(f) {
-                f.userRating = rating;
-                saveData();
-                showCollection(); 
-                initScout();
-            }
+            if(f) { f.userRating = tier; saveData(); showCollection(); initScout(); }
         }
 
         function togglePairingOnly(id) {
             const f = state.data.fragrances.find(i => i.id === id);
-            if(f) {
-                f.pairingOnly = !f.pairingOnly;
-                saveData();
-                showCollection();
-                showToast(f.pairingOnly ? "Set to Pairing Only" : "Set to Solo + Pairing");
-            }
+            if(f) { f.pairingOnly = !f.pairingOnly; saveData(); showCollection(); showToast(f.pairingOnly ? "Set to Pairing Only" : "Set to Solo + Pairing"); }
         }
 
         function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); document.getElementById('sa-results').classList.add('hidden'); tempSmartObj = null; }
-        function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); document.getElementById('sa-text').value = ''; document.getElementById('sa-name').value = ''; document.getElementById('sa-brand').value = ''; }
+        function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); document.getElementById('sa-text').value = ''; document.getElementById('sa-name').value = ''; document.getElementById('sa-brand').value = ''; document.getElementById('sa-is-decant').checked = false; }
         function analyzeText() {
             const text = document.getElementById('sa-text').value.toLowerCase();
             const name = document.getElementById('sa-name').value;
@@ -678,32 +653,97 @@
             const resultsDiv = document.getElementById('sa-results'); resultsDiv.classList.remove('hidden'); document.getElementById('sa-tags').innerHTML = tags.map(t => `<span class="bg-teal-900 text-teal-300 text-[10px] px-2 py-1 rounded-full">${t}</span>`).join(''); document.getElementById('sa-combo').innerText = comboSuggestion;
             tempSmartObj = { id: 'custom_' + Date.now(), name: name, brand: brand, inspiration: "Imported", tags: tags, weatherAffinity: affinity, situationRatings: ratings, sprayInstructions: "4-5 sprays (Clothes/Neck)", description: "Smart-Added: " + text.substring(0, 50) + "...", wearCount: 0, userNotes: comboSuggestion, userRating: 0, pairingOnly: false };
         }
-        function saveSmartAdd() { if(!tempSmartObj) return alert("Please click 'Analyze' first."); tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; state.data.fragrances.push(tempSmartObj); saveData(); closeSmartAdd(); showCollection(); showToast('Fragrance Added'); }
+        function saveSmartAdd() { 
+            if(!tempSmartObj) return alert("Please click 'Analyze' first."); 
+            tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; 
+            tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; 
+            const isDecant = document.getElementById('sa-is-decant').checked;
+            
+            if(isDecant) {
+                state.data.decants.push({
+                    id: tempSmartObj.id,
+                    name: tempSmartObj.name,
+                    brand: tempSmartObj.brand,
+                    tags: tempSmartObj.tags,
+                    description: tempSmartObj.description,
+                    rating: null
+                });
+                showToast('Decant Added');
+            } else {
+                state.data.fragrances.push(tempSmartObj); 
+                showToast('Bottle Added');
+            }
+            saveData(); closeSmartAdd(); showCollection(); initScout();
+        }
+
+        function setCollectionMode(mode) {
+            state.ui.collectionMode = mode;
+            document.getElementById('tab-bottles').className = mode === 'bottles' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
+            document.getElementById('tab-decants').className = mode === 'decants' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
+            showCollection();
+        }
 
         function showCollection() {
             const list = document.getElementById('collection-list'); list.innerHTML = '';
-            state.data.fragrances.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
-                const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5`;
-                let starsHtml = '';
-                for(let i=1; i<=5; i++) {
-                    const fillClass = i <= (f.userRating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600';
-                    starsHtml += `<button onclick="setRating('${f.id}', ${i})" class="focus:outline-none"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star ${fillClass} transition-colors"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>`;
-                }
-                const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300';
-                div.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3></div>
-                        <div class="flex items-center gap-2">
-                             <button onclick="togglePairingOnly('${f.id}')" class="${pairingClass} transition-colors" title="Toggle Pairing Only Mode"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
-                             <button onclick="openNote('${f.id}')" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button>
-                             <button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 px-2 py-1">Reset</button>
+            
+            if (state.ui.collectionMode === 'bottles') {
+                state.data.fragrances.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
+                    const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5`;
+                    let tiersHtml = '';
+                    TIERS.forEach(tier => {
+                        const isActive = f.userRating === tier;
+                        const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`;
+                        tiersHtml += `<button onclick="setRating('${f.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`;
+                    });
+                    const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3></div>
+                            <div class="flex items-center gap-3">
+                                 <button onclick="togglePairingOnly('${f.id}')" class="${pairingClass} transition-colors" title="Toggle Pairing Only Mode"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
+                                 <button onclick="openNote('${f.id}')" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button>
+                                 <button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 px-2 py-1">Reset</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex justify-between items-center"><div class="flex gap-1">${starsHtml}</div><p class="text-[10px] text-gray-400">Wears: ${f.wearCount}</p></div>
-                `;
-                list.appendChild(div);
-            });
+                        <div class="flex justify-between items-center"><div class="flex gap-1">${tiersHtml}</div><p class="text-[10px] text-gray-400 font-mono mt-1">Wears: ${f.wearCount}</p></div>`;
+                    list.appendChild(div);
+                });
+            } else {
+                if(state.data.decants.length === 0) list.innerHTML = `<div class="text-center text-gray-500 p-4">No decants yet. Use Smart Add to add one.</div>`;
+                state.data.decants.forEach((d, idx) => {
+                    const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5`;
+                    const likeClass = d.rating === 'like' ? 'bg-teal-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-teal-500/20';
+                    const dislikeClass = d.rating === 'dislike' ? 'bg-red-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-red-500/20';
+                    
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${d.brand}</span><h3 class="font-bold text-sm text-white">${d.name}</h3></div>
+                            <button onclick="deleteDecant(${idx})" class="text-gray-600 hover:text-red-500"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="rateDecant(${idx}, 'like')" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 ${likeClass}"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-thumbs-up"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg> Keep</button>
+                            <button onclick="rateDecant(${idx}, 'dislike')" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 ${dislikeClass}"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-thumbs-down"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z"/></svg> Discard</button>
+                        </div>`;
+                    list.appendChild(div);
+                });
+            }
             if(window.lucide) lucide.createIcons();
+        }
+
+        function rateDecant(idx, rating) {
+            state.data.decants[idx].rating = rating;
+            saveData();
+            showCollection();
+            initScout(); // Re-run scout with new preference
+            showToast(rating === 'like' ? 'Saved Preference' : 'Noted Dislike');
+        }
+
+        function deleteDecant(idx) {
+            if(confirm('Remove this decant?')) {
+                state.data.decants.splice(idx, 1);
+                saveData();
+                showCollection();
+            }
         }
 
         function setContext(type, value) {
@@ -727,13 +767,29 @@
         function calculateScore(item, isCombo = false) {
             const ctx = state.context; let score = 0;
             const sitScore = item.situationRatings[ctx.situation] || 0; if (sitScore < 2) return -100; score += sitScore * 2;
+            
             if (!isCombo) {
                 if(item.pairingOnly) return -999;
+                
+                // TIER BONUSES
+                if (item.userRating === 'S') score += 5.0;
+                else if (item.userRating === 'A') score += 3.0;
+                else if (item.userRating === 'B') score += 1.0;
+
                 let weatherKey = `${ctx.season}_${ctx.weather}`;
                 if (item.weatherAffinity[weatherKey] === undefined) { if (ctx.season === 'fall' && ctx.weather === 'sunny') weatherKey = 'fall'; else if (ctx.season === 'spring' && ctx.weather === 'sunny') weatherKey = 'spring'; }
                 score += (item.weatherAffinity[weatherKey] || 0) * 1.5;
+                
+                // ROTATION PENALTY (Relaxed for S and A)
+                let limit = 5;
+                if (item.userRating === 'S') limit = 12;
+                else if (item.userRating === 'A') limit = 8;
+
+                if (item.wearCount === 0) score += 3; 
+                else if (item.wearCount > limit) score -= 2;
+
             } else score += 1;
-            if (item.wearCount === 0) score += 3; else if (item.wearCount > 5) score -= 2;
+
             if (ctx.suspense) { if (item.tags.includes('suspense')) score += 3; if (item.tags.includes('fresh')) score -= 4; }
             return score;
         }
@@ -768,12 +824,19 @@
             div.className = `${bgClass} p-5 rounded-2xl border relative transition-all`;
             div.innerHTML = `
                 <div class="flex justify-between items-start mb-2">
-                    <div><span class="text-[10px] font-bold tracking-widest text-teal-400 uppercase">${f.brand}</span><h3 class="text-xl font-bold text-white leading-tight">${f.name}</h3><p class="text-xs text-teal-300 italic mt-0.5">${f.inspiration}</p></div>
+                    <div>
+                        <span class="text-[10px] font-bold tracking-widest text-teal-400 uppercase">${f.brand}</span>
+                        <h3 class="text-xl font-bold text-white leading-tight">${f.name}</h3>
+                        <p class="text-xs text-teal-300 italic mt-0.5">${f.inspiration}</p>
+                    </div>
                     <div class="flex flex-col items-end gap-1"><button onclick="openNote('${f.id}')" class="text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button></div>
                 </div>
                 <div class="bg-black/20 p-3 rounded-lg my-3 border border-white/5"><p class="text-sm text-gray-200 leading-relaxed">"${f.description}"</p></div>
                 <div class="flex items-center gap-2 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spray-can text-gray-400"><path d="M3 3h.01"/><path d="M7 5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4l-5 3-5-3V5z"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="text-xs text-gray-400 font-mono">${f.sprayInstructions}</span></div>
-                <div class="flex justify-between items-center pt-3 border-t border-white/5"><span class="text-xs font-mono ${wearColor}">Wears: ${f.wearCount}</span><button onclick="logWear('${f.id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Wear <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></div>`;
+                <div class="flex justify-between items-center pt-3 border-t border-white/5">
+                    <span class="text-xs font-mono ${wearColor}">Wears: ${f.wearCount}</span>
+                    <button onclick="logWear('${f.id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Wear <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+                </div>`;
             return div;
         }
 
@@ -879,6 +942,8 @@
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function copyData() { const data = document.getElementById('backup-area'); data.select(); document.execCommand('copy'); alert('Copied!'); }
         function toggleRestoreMode() { document.getElementById('restore-section').classList.toggle('hidden'); }
+        function restoreData() { try { const parsed = JSON.parse(document.getElementById('restore-area').value); state.data = parsed; saveData(); location.reload(); } catch (e) { alert('Invalid JSON'); } }
+        
         function openPlanModal() { document.getElementById('plan-modal').classList.remove('hidden'); }
         function closePlanModal() { document.getElementById('plan-modal').classList.add('hidden'); document.getElementById('plan-name').value = ''; document.getElementById('plan-desc').value = ''; }
         function savePlan() { const name = document.getElementById('plan-name').value; const desc = document.getElementById('plan-desc').value; if (!name) return alert("Enter name"); state.data.futurePlan.push({ id: 'plan_' + Date.now(), name, month: "Next", year: new Date().getFullYear(), description: desc }); saveData(); closePlanModal(); renderTimeline(); showToast('Plan Added'); }
@@ -889,3 +954,5 @@
     </script>
 </body>
 </html>
+
+
