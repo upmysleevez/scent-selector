@@ -114,7 +114,7 @@
 
     <!-- MAIN CONTENT AREA -->
     <div id="app-container" class="flex-1 flex flex-col relative h-full">
-        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-28 pb-48" id="main-content">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-36 pb-48" id="main-content">
             
             <!-- VIEW 1: SELECTOR -->
             <div id="view-selector" class="space-y-6 max-w-md mx-auto fade-enter-active">
@@ -378,12 +378,12 @@
     </div>
 
     <!-- TOAST -->
-    <div id="toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]">
+    <div id="toast" class="fixed top-32 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]">
         <i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span>
     </div>
 
     <script>
-        const APP_ID = "scentApp_db_v38_missed_logs"; 
+        const APP_ID = "scentApp_db_v41_all_restored"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
         const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
@@ -443,26 +443,26 @@
         ];
 
         const COMBOS_DB = [
-            { id: "combo_executive", name: "The Executive Suite", parts: ["creed_aventus", "dossier_ambery_saffron"], tags: ["date_night", "power", "complex"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "Smoky birch meets airy saffron sweetness. A massive compliment magnet.", instructions: "Aventus (4x) on shirt chest. Saffron (3x) on neck skin.", wearCount: 0, userNotes: "" },
-            { id: "combo_cherry_lounge", name: "Cherry Lounge", parts: ["lost_cherry", "brooklyn_jazz"], tags: ["boozy", "gourmand", "suspense"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco darkens the cherry almond profile. Very sexy.", instructions: "Brooklyn Jazz (4x) on clothes. Lost Cherry (3x) on pulse points.", wearCount: 0, userNotes: "" },
-            { id: "combo_gin_juice", name: "Gin & Juice", parts: ["gentle_silver", "creed_aventus"], tags: ["fresh", "fruity", "energy"], situationRatings: { office: 4, gym: 4, casual: 5, date_night: 3, intimate: 2 }, description: "Juniper berry and pineapple. An explosion of freshness.", instructions: "4 sprays each on opposite shirt shoulders.", wearCount: 0, userNotes: "" },
-            { id: "combo_smoked_vanilla", name: "Smoked Vanilla", parts: ["maison_du_soir", "vanille_absolute"], tags: ["cozy", "winter", "gourmand"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Chestnut smoke mixed with spicy ginger vanilla. Ultimate cozy mode.", instructions: "Maison (3x) on shirt/sweater. Vanille (3x) on wrists/neck.", wearCount: 0, userNotes: "" },
-            { id: "combo_island_noir", name: "Island Noir", parts: ["creed_aventus", "blomb_27"], tags: ["summer", "night", "unique"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Pineapple meets Coconut and Tobacco. A dark, smoky Piña Colada vibe.", instructions: "BLOMB (4x) on shirt. Aventus (3x) on neck.", wearCount: 0, userNotes: "" },
-            { id: "combo_spiced_cherry", name: "Spiced Cherry", parts: ["lost_cherry", "vanille_absolute"], tags: ["gourmand", "winter", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Ginger and Green Vanilla cut the sweetness of the Cherry. Sophisticated gourmand.", instructions: "Vanille (3x) first, top with Lost Cherry (3x).", wearCount: 0, userNotes: "" },
-            { id: "combo_clean_cut", name: "The Clean Cut", parts: ["cubicle_men", "gentle_silver"], tags: ["office", "fresh", "clean"], situationRatings: { office: 5, gym: 5, casual: 3, date_night: 1, intimate: 1 }, description: "Ambroxan power meets Juniper freshness. The ultimate 'clean' scent profile.", instructions: "3 sprays of each on opposite shirt shoulders.", wearCount: 0, userNotes: "" },
-            { id: "combo_midnight_tea", name: "Midnight Tea", parts: ["eau_noir", "brooklyn_jazz"], tags: ["dark", "boozy", "suspense"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 5, intimate: 4 }, description: "Black tea and Fig mixed with Rum and Tobacco. Dark, moody, and intellectual.", instructions: "Brooklyn Jazz (4x) on clothes. Eau Noir (3x) behind ears.", wearCount: 0, userNotes: "" },
-            { id: "combo_smoked_jazz", name: "Smoked Jazz", parts: ["fleurit_sainte_fumee", "brooklyn_jazz"], tags: ["boozy", "incense", "dark"], situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco meets holy incense. A speakeasy vibe.", instructions: "Jazz Club on neck (projection), Sainte Fumée on chest (base).", wearCount: 0, userNotes: "" },
-            { id: "combo_winter_hearth", name: "Winter Hearth", parts: ["fleurit_sainte_fumee", "maison_du_soir"], tags: ["cozy", "smoke", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 3, intimate: 5 }, description: "Chestnut fire and church incense. Maximum winter coziness.", instructions: "Maison on sweater, Sainte Fumée on skin.", wearCount: 0, userNotes: "" },
-            { id: "combo_holy_clean", name: "Holy Clean", parts: ["fleurit_sainte_fumee", "gentle_silver"], tags: ["unique", "contrast", "casual"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 2 }, description: "Clean gin meets dark incense. An interesting, artistic contrast.", instructions: "Gentle Silver on shirt (clean), Sainte Fumée on wrists.", wearCount: 0, userNotes: "" },
-            { id: "combo_sacred_vanilla", name: "Sacred Vanilla", parts: ["fleurit_sainte_fumee", "vanille_absolute"], tags: ["gourmand", "sensual", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Vanilla sweetness balanced by dark resins. Sensual and mysterious.", instructions: "Vanille as base, Sainte Fumée to cut sweetness.", wearCount: 0, userNotes: "" },
-            { id: "combo_paradigm_shift", name: "Paradigm Shift", parts: ["prada_paradigme", "cubicle_men"], tags: ["office", "clean", "professional"], situationRatings: { office: 5, gym: 1, casual: 3, date_night: 2, intimate: 1 }, description: "The ultimate clean professional. Soapy floral meets ambroxan power.", instructions: "Cubicle on shirt (power), Paradigme on skin (refinement).", wearCount: 0, userNotes: "" },
-            { id: "combo_holy_saffron", name: "Holy Saffron", parts: ["fleurit_sainte_fumee", "dossier_ambery_saffron"], tags: ["date_night", "unique", "sweet"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Burnt sugar and airy saffron mixed with deep church incense.", instructions: "Sainte Fumée chest, Saffron neck.", wearCount: 0, userNotes: "" },
-            { id: "combo_vanilla_smoke_2", name: "Vanilla Smoke", parts: ["maison_du_soir", "vanille_absolute"], tags: ["winter", "cozy", "sweet"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 3, intimate: 5 }, description: "Ultimate winter sweater combo. Vanilla, chestnut, and ginger.", instructions: "Layer both on sweater.", wearCount: 0, userNotes: "" },
-            { id: "combo_holy_gin", name: "Holy Gin", parts: ["gentle_silver", "fleurit_sainte_fumee"], tags: ["unique", "fresh", "dark"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Fresh Juniper vs Dark Incense. High contrast, very artistic.", instructions: "Sainte Fumée chest, Gentle Silver neck/wrists.", wearCount: 0, userNotes: "" },
-            { id: "combo_vanilla_latte", name: "Vanilla Latte", parts: ["phantom_noir", "vanille_absolute"], tags: ["gourmand", "sweet", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 5, intimate: 5 }, description: "Coffee/Chocolate layered with Green Vanilla. Rich and delicious.", instructions: "Phantom chest, Vanille neck.", wearCount: 0, userNotes: "" },
-            { id: "combo_london_fog", name: "London Fog", parts: ["eau_noir", "vanille_absolute"], tags: ["tea", "cozy", "relaxing"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Black Tea and Fig softened by Vanilla. Like a warm drink.", instructions: "Eau Noir behind ears, Vanille on collar.", wearCount: 0, userNotes: "" },
-            { id: "combo_office_power", name: "Office Power", parts: ["victory_man", "cubicle_men"], tags: ["office", "fresh", "strong"], situationRatings: { office: 5, gym: 4, casual: 3, date_night: 1, intimate: 1 }, description: "Citrus/Cedar + Ambroxan. Maximum clean projection.", instructions: "Cubicle chest, Victory Man neck.", wearCount: 0, userNotes: "" },
-            { id: "combo_tropical_hearth", name: "Tropical Hearth", parts: ["creed_aventus", "maison_du_soir"], tags: ["smoky", "fruity", "unique"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 4, intimate: 4 }, description: "Smoky Pineapple meets Chestnut Fire. Complex smoke layers.", instructions: "Maison chest, Aventus neck.", wearCount: 0, userNotes: "" }
+            { id: "combo_executive", name: "The Executive Suite", parts: ["creed_aventus", "dossier_ambery_saffron"], tags: ["date_night", "power", "complex"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "Smoky birch meets airy saffron sweetness. A massive compliment magnet.", instructions: "Aventus (4x) on shirt chest. Saffron (3x) on neck skin.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_cherry_lounge", name: "Cherry Lounge", parts: ["lost_cherry", "brooklyn_jazz"], tags: ["boozy", "gourmand", "suspense"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco darkens the cherry almond profile. Very sexy.", instructions: "Brooklyn Jazz (4x) on clothes. Lost Cherry (3x) on pulse points.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_gin_juice", name: "Gin & Juice", parts: ["gentle_silver", "creed_aventus"], tags: ["fresh", "fruity", "energy"], situationRatings: { office: 4, gym: 4, casual: 5, date_night: 3, intimate: 2 }, description: "Juniper berry and pineapple. An explosion of freshness.", instructions: "4 sprays each on opposite shirt shoulders.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_smoked_vanilla", name: "Smoked Vanilla", parts: ["maison_du_soir", "vanille_absolute"], tags: ["cozy", "winter", "gourmand"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Chestnut smoke mixed with spicy ginger vanilla. Ultimate cozy mode.", instructions: "Maison (3x) on shirt/sweater. Vanille (3x) on wrists/neck.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_island_noir", name: "Island Noir", parts: ["creed_aventus", "blomb_27"], tags: ["summer", "night", "unique"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Pineapple meets Coconut and Tobacco. A dark, smoky Piña Colada vibe.", instructions: "BLOMB (4x) on shirt. Aventus (3x) on neck.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_spiced_cherry", name: "Spiced Cherry", parts: ["lost_cherry", "vanille_absolute"], tags: ["gourmand", "winter", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Ginger and Green Vanilla cut the sweetness of the Cherry. Sophisticated gourmand.", instructions: "Vanille (3x) first, top with Lost Cherry (3x).", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_clean_cut", name: "The Clean Cut", parts: ["cubicle_men", "gentle_silver"], tags: ["office", "fresh", "clean"], situationRatings: { office: 5, gym: 5, casual: 3, date_night: 1, intimate: 1 }, description: "Ambroxan power meets Juniper freshness. The ultimate 'clean' scent profile.", instructions: "3 sprays of each on opposite shirt shoulders.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_midnight_tea", name: "Midnight Tea", parts: ["eau_noir", "brooklyn_jazz"], tags: ["dark", "boozy", "suspense"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 5, intimate: 4 }, description: "Black tea and Fig mixed with Rum and Tobacco. Dark, moody, and intellectual.", instructions: "Brooklyn Jazz (4x) on clothes. Eau Noir (3x) behind ears.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_smoked_jazz", name: "Smoked Jazz", parts: ["fleurit_sainte_fumee", "brooklyn_jazz"], tags: ["boozy", "incense", "dark"], situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco meets holy incense. A speakeasy vibe.", instructions: "Jazz Club on neck (projection), Sainte Fumée on chest (base).", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_winter_hearth", name: "Winter Hearth", parts: ["fleurit_sainte_fumee", "maison_du_soir"], tags: ["cozy", "smoke", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 3, intimate: 5 }, description: "Chestnut fire and church incense. Maximum winter coziness.", instructions: "Maison on sweater, Sainte Fumée on skin.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_holy_clean", name: "Holy Clean", parts: ["fleurit_sainte_fumee", "gentle_silver"], tags: ["unique", "contrast", "casual"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 2 }, description: "Clean gin meets dark incense. An interesting, artistic contrast.", instructions: "Gentle Silver on shirt (clean), Sainte Fumée on wrists.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_sacred_vanilla", name: "Sacred Vanilla", parts: ["fleurit_sainte_fumee", "vanille_absolute"], tags: ["gourmand", "sensual", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Vanilla sweetness balanced by dark resins. Sensual and mysterious.", instructions: "Vanille as base, Sainte Fumée to cut sweetness.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_paradigm_shift", name: "Paradigm Shift", parts: ["prada_paradigme", "cubicle_men"], tags: ["office", "clean", "professional"], situationRatings: { office: 5, gym: 1, casual: 3, date_night: 2, intimate: 1 }, description: "The ultimate clean professional. Soapy floral meets ambroxan power.", instructions: "Cubicle on shirt (power), Paradigme on skin (refinement).", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_holy_saffron", name: "Holy Saffron", parts: ["fleurit_sainte_fumee", "dossier_ambery_saffron"], tags: ["date_night", "unique", "sweet"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Burnt sugar and airy saffron mixed with deep church incense.", instructions: "Sainte Fumée chest, Saffron neck.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_vanilla_smoke_2", name: "Vanilla Smoke", parts: ["maison_du_soir", "vanille_absolute"], tags: ["winter", "cozy", "sweet"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 3, intimate: 5 }, description: "Ultimate winter sweater combo. Vanilla, chestnut, and ginger.", instructions: "Layer both on sweater.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_holy_gin", name: "Holy Gin", parts: ["gentle_silver", "fleurit_sainte_fumee"], tags: ["unique", "fresh", "dark"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Fresh Juniper vs Dark Incense. High contrast, very artistic.", instructions: "Sainte Fumée chest, Gentle Silver neck/wrists.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_vanilla_latte", name: "Vanilla Latte", parts: ["phantom_noir", "vanille_absolute"], tags: ["gourmand", "sweet", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 5, intimate: 5 }, description: "Coffee/Chocolate layered with Green Vanilla. Rich and delicious.", instructions: "Phantom chest, Vanille neck.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_london_fog", name: "London Fog", parts: ["eau_noir", "vanille_absolute"], tags: ["tea", "cozy", "relaxing"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Black Tea and Fig softened by Vanilla. Like a warm drink.", instructions: "Eau Noir behind ears, Vanille on collar.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_office_power", name: "Office Power", parts: ["victory_man", "cubicle_men"], tags: ["office", "fresh", "strong"], situationRatings: { office: 5, gym: 4, casual: 3, date_night: 1, intimate: 1 }, description: "Citrus/Cedar + Ambroxan. Maximum clean projection.", instructions: "Cubicle chest, Victory Man neck.", wearCount: 0, userNotes: "", userRating: 0 },
+            { id: "combo_tropical_hearth", name: "Tropical Hearth", parts: ["creed_aventus", "maison_du_soir"], tags: ["smoky", "fruity", "unique"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 4, intimate: 4 }, description: "Smoky Pineapple meets Chestnut Fire. Complex smoke layers.", instructions: "Maison chest, Aventus neck.", wearCount: 0, userNotes: "", userRating: 0 }
         ];
 
         const DEFAULT_TIMELINE = [
@@ -699,6 +699,15 @@
                 saveData();
                 showCollection(); 
                 initScout();
+                return;
+            }
+            // Check combos
+            let c = state.data.combos.find(i => i.id === id);
+            if(c) {
+                c.userRating = tier;
+                saveData();
+                showCollection();
+                // Combos don't drive scout logic yet, but saved for future use
             }
         }
 
@@ -729,6 +738,77 @@
                 showCollection();
                 showToast("Fragrance Deleted");
             }
+        }
+        
+        function openAddLogModal() {
+            const select = document.getElementById('add-log-fragrance');
+            select.innerHTML = '';
+            
+            const fragGroup = document.createElement('optgroup');
+            fragGroup.label = "Fragrances";
+            state.data.fragrances.forEach(f => {
+                const opt = document.createElement('option');
+                opt.value = f.id;
+                opt.text = f.name;
+                fragGroup.appendChild(opt);
+            });
+            select.appendChild(fragGroup);
+            
+            const comboGroup = document.createElement('optgroup');
+            comboGroup.label = "Combos";
+            state.data.combos.forEach(c => {
+                 const opt = document.createElement('option');
+                 opt.value = c.id;
+                 opt.text = c.name + " (Combo)";
+                 comboGroup.appendChild(opt);
+            });
+            select.appendChild(comboGroup);
+            
+             const now = new Date();
+             const isoString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+             document.getElementById('add-log-date').value = isoString;
+
+            document.getElementById('add-log-modal').classList.remove('hidden');
+        }
+        
+        function closeAddLogModal() { document.getElementById('add-log-modal').classList.add('hidden'); }
+        
+        function saveMissedLog() {
+            const dateVal = document.getElementById('add-log-date').value;
+            const idVal = document.getElementById('add-log-fragrance').value;
+            const situationVal = document.getElementById('add-log-situation').value;
+            
+            if(!dateVal || !idVal) return alert("Date and Fragrance required");
+            
+            const isCombo = state.data.combos.some(c => c.id === idVal);
+            
+            if(isCombo) {
+                 const combo = state.data.combos.find(c => c.id === idVal);
+                 if(combo) {
+                     combo.wearCount++;
+                     combo.parts.forEach(pid => {
+                         const fIdx = state.data.fragrances.findIndex(f => f.id === pid);
+                         if(fIdx > -1) state.data.fragrances[fIdx].wearCount++;
+                     });
+                 }
+            } else {
+                 const fIdx = state.data.fragrances.findIndex(f => f.id === idVal);
+                 if(fIdx > -1) state.data.fragrances[fIdx].wearCount++;
+            }
+            
+            state.data.history.push({
+                id: idVal,
+                type: isCombo ? 'combo' : 'single',
+                date: new Date(dateVal).toISOString(),
+                context: { situation: situationVal, season: state.context.season, weather: state.context.weather, suspense: false },
+                feedbackRecorded: false 
+            });
+            
+            saveData();
+            closeAddLogModal();
+            renderHistory();
+            showCollection();
+            showToast('Log Added');
         }
 
         function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); document.getElementById('sa-results').classList.add('hidden'); tempSmartObj = null; }
@@ -779,89 +859,6 @@
             saveData();
             renderTimeline();
         }
-        
-        // --- ADD MISSED LOG ---
-        function openAddLogModal() {
-            // Populate select dropdown
-            const select = document.getElementById('add-log-fragrance');
-            select.innerHTML = '';
-            
-            const fragGroup = document.createElement('optgroup');
-            fragGroup.label = "Fragrances";
-            state.data.fragrances.forEach(f => {
-                const opt = document.createElement('option');
-                opt.value = f.id;
-                opt.text = f.name;
-                fragGroup.appendChild(opt);
-            });
-            select.appendChild(fragGroup);
-            
-            const comboGroup = document.createElement('optgroup');
-            comboGroup.label = "Combos";
-            state.data.combos.forEach(c => {
-                 const opt = document.createElement('option');
-                 opt.value = c.id;
-                 opt.text = c.name + " (Combo)";
-                 comboGroup.appendChild(opt);
-            });
-            select.appendChild(comboGroup);
-            
-            // Set date to now
-             const now = new Date();
-             const isoString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
-             document.getElementById('add-log-date').value = isoString;
-
-            document.getElementById('add-log-modal').classList.remove('hidden');
-        }
-        
-        function closeAddLogModal() {
-            document.getElementById('add-log-modal').classList.add('hidden');
-        }
-        
-        function saveMissedLog() {
-            const dateVal = document.getElementById('add-log-date').value;
-            const idVal = document.getElementById('add-log-fragrance').value;
-            const situationVal = document.getElementById('add-log-situation').value;
-            
-            if(!dateVal || !idVal) return alert("Date and Fragrance required");
-            
-            const isCombo = state.data.combos.some(c => c.id === idVal);
-            
-            // 1. Update Wear Count
-            if(isCombo) {
-                 const combo = state.data.combos.find(c => c.id === idVal);
-                 if(combo) {
-                     combo.wearCount++;
-                     combo.parts.forEach(pid => {
-                         const fIdx = state.data.fragrances.findIndex(f => f.id === pid);
-                         if(fIdx > -1) state.data.fragrances[fIdx].wearCount++;
-                     });
-                 }
-            } else {
-                 const fIdx = state.data.fragrances.findIndex(f => f.id === idVal);
-                 if(fIdx > -1) state.data.fragrances[fIdx].wearCount++;
-            }
-            
-            // 2. Add to History
-            state.data.history.push({
-                id: idVal,
-                type: isCombo ? 'combo' : 'single',
-                date: new Date(dateVal).toISOString(),
-                context: {
-                    situation: situationVal,
-                    season: state.context.season, // Best effort guess
-                    weather: state.context.weather,
-                    suspense: false
-                },
-                feedbackRecorded: false // Allow feedback for missed logs too
-            });
-            
-            saveData();
-            closeAddLogModal();
-            renderHistory();
-            showCollection(); // Update stats
-            showToast('Log Added');
-        }
 
         function setCollectionMode(mode) {
             state.ui.collectionMode = mode;
@@ -877,20 +874,16 @@
             if (state.ui.collectionMode === 'bottles') {
                 state.data.fragrances.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
                     const div = document.createElement('div'); 
-                    // Add opacity if paused
                     div.className = `glass-panel p-4 rounded-xl border border-white/5 ${f.paused ? 'opacity-50' : ''}`;
-                    
                     let tiersHtml = '';
                     TIERS.forEach(tier => {
                         const isActive = f.userRating === tier;
                         const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`;
                         tiersHtml += `<button onclick="setRating('${f.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`;
                     });
-                    
                     const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300';
                     const pauseClass = f.paused ? 'text-yellow-400' : 'text-gray-600 hover:text-white';
                     const pauseIcon = f.paused ? 'play-circle' : 'pause-circle';
-
                     div.innerHTML = `
                         <div class="flex justify-between items-start mb-3">
                             <div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3></div>
