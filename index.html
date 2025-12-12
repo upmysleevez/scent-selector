@@ -12,80 +12,350 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Lucide Icons -->
+    <!-- Lucide Icons (Universal Latest Version) -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif; background-color: #1F2121; color: #F5F5F5; -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
+        /* iOS System Fonts & Base Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif;
+            background-color: #1F2121;
+            color: #F5F5F5;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+
+        /* Safe Areas */
         .safe-top { padding-top: env(safe-area-inset-top); }
-        .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .glass-panel { background: rgba(38, 40, 40, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
-        .btn-active { background-color: #208D8D; color: white; border-color: #208D8D; }
+        
+        /* Utility */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(38, 40, 40, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-active {
+            background-color: #208D8D;
+            color: white;
+            border-color: #208D8D;
+        }
+
+        /* Tier Badge Styles */
         .tier-btn { font-family: monospace; transition: all 0.2s; }
-        .tier-s { color: #fbbf24; border-color: #fbbf24; } .tier-a { color: #f87171; border-color: #f87171; } .tier-b { color: #60a5fa; border-color: #60a5fa; } .tier-c { color: #34d399; border-color: #34d399; } .tier-d { color: #9ca3af; border-color: #9ca3af; }
+        .tier-s { color: #fbbf24; border-color: #fbbf24; }
+        .tier-a { color: #f87171; border-color: #f87171; }
+        .tier-b { color: #60a5fa; border-color: #60a5fa; }
+        .tier-c { color: #34d399; border-color: #34d399; }
+        .tier-d { color: #9ca3af; border-color: #9ca3af; }
         .tier-active { background-color: #208D8D; color: white !important; border-color: #208D8D !important; font-weight: bold; transform: scale(1.1); }
-        .timeline-line::before { content: ''; position: absolute; top: 2rem; bottom: 0; left: 1rem; width: 2px; background: rgba(255,255,255,0.1); z-index: 0; }
-        .input-glass { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); color: white; }
-        .combo-gradient { background: linear-gradient(135deg, rgba(38,40,40,0.9) 0%, rgba(32,141,141,0.2) 100%); }
-        .tier-header { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #9ca3af; }
+        
+        /* Timeline Connector Line */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 2rem;
+            bottom: 0;
+            left: 1rem;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+            z-index: 0;
+        }
+
+        /* Custom Form Inputs */
+        .input-glass {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        /* Combo Card Gradient */
+        .combo-gradient {
+            background: linear-gradient(135deg, rgba(38,40,40,0.9) 0%, rgba(32,141,141,0.2) 100%);
+        }
+        
+        .tier-header {
+            display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #9ca3af;
+        }
         .tier-header::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
     </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: { 50: '#FCFCF9', 100: '#FFFFF5' },
+                        charcoal: { 700: '#1F2121', 800: '#262828' },
+                        teal: { 300: '#32B8C6', 500: '#208D8D' },
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="h-screen w-screen flex flex-col overflow-hidden text-gray-100 selection:bg-teal-500 selection:text-white">
 
+    <!-- HEADER -->
     <header class="fixed top-0 w-full safe-top px-6 pt-4 pb-4 flex justify-between items-center z-50 bg-charcoal-700/95 backdrop-blur-xl border-b border-white/5 shadow-lg">
-        <div><h1 class="text-[10px] font-bold uppercase tracking-widest text-teal-300">ScentSelector</h1><p class="text-xl font-semibold text-white tracking-tight" id="header-title">Daily Ritual</p></div>
-        <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-white/10 transition-colors"><i data-lucide="settings" class="w-6 h-6 text-gray-400"></i></button>
+        <div>
+            <h1 class="text-[10px] font-bold uppercase tracking-widest text-teal-300">ScentSelector</h1>
+            <p class="text-xl font-semibold text-white tracking-tight" id="header-title">Daily Ritual</p>
+        </div>
+        <button onclick="toggleSettings()" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+            <i data-lucide="settings" class="w-6 h-6 text-gray-400"></i>
+        </button>
     </header>
 
+    <!-- MAIN CONTENT AREA -->
     <div id="app-container" class="flex-1 flex flex-col relative h-full">
-        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-36 pb-48" id="main-content">
+        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-28 pb-48" id="main-content">
+            
             <!-- VIEW 1: SELECTOR -->
             <div id="view-selector" class="space-y-6 max-w-md mx-auto fade-enter-active">
-                <section><label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Situation</label><div class="grid grid-cols-2 gap-3"><button onclick="setContext('situation', 'office')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="office"><i data-lucide="briefcase" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Office</span></button><button onclick="setContext('situation', 'gym')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="gym"><i data-lucide="dumbbell" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Gym</span></button><button onclick="setContext('situation', 'date_night')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="date_night"><i data-lucide="wine" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Date Night</span></button><button onclick="setContext('situation', 'casual')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="casual"><i data-lucide="coffee" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Casual</span></button><button onclick="setContext('situation', 'intimate')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all col-span-2" data-group="situation" data-val="intimate"><i data-lucide="flame" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Intimate</span></button></div></section>
-                <section><label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Weather</label><div class="grid grid-cols-2 gap-3"><button onclick="setContext('weather', 'sunny')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="sunny"><i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i><span class="text-sm">Sunny</span></button><button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="rainy"><i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i><span class="text-sm">Rainy/Cold</span></button></div></section>
-                <section><label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Season</label><div class="grid grid-cols-4 gap-2"><button onclick="setContext('season', 'winter')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="winter">Winter</button><button onclick="setContext('season', 'spring')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="spring">Spring</button><button onclick="setContext('season', 'summer')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="summer">Summer</button><button onclick="setContext('season', 'fall')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="fall">Fall</button></div></section>
-                <section id="suspense-section" class="hidden transition-all duration-300"><div class="glass-panel p-4 rounded-xl flex items-center justify-between border-teal-500/30 border"><div class="flex items-center gap-3"><div class="bg-teal-500/20 p-2 rounded-lg"><i data-lucide="ghost" class="w-5 h-5 text-teal-300"></i></div><div><h4 class="text-sm font-semibold text-teal-100">Suspense Mode</h4><p class="text-xs text-gray-400">Prioritize mystery & depth</p></div></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="suspense-toggle" class="sr-only peer" onchange="toggleSuspense()"><div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label></div></section>
-                <button onclick="generateRecommendations()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-900/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4"><i data-lucide="sparkles" class="w-5 h-5"></i><span>Find My Scent</span></button>
+                
+                <!-- Situation -->
+                <section>
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Situation</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="setContext('situation', 'office')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="office">
+                            <i data-lucide="briefcase" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Office</span>
+                        </button>
+                        <button onclick="setContext('situation', 'gym')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="gym">
+                            <i data-lucide="dumbbell" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Gym</span>
+                        </button>
+                        <button onclick="setContext('situation', 'date_night')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="date_night">
+                            <i data-lucide="wine" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Date Night</span>
+                        </button>
+                        <button onclick="setContext('situation', 'casual')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="casual">
+                            <i data-lucide="coffee" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Casual</span>
+                        </button>
+                        <button onclick="setContext('situation', 'intimate')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all col-span-2" data-group="situation" data-val="intimate">
+                            <i data-lucide="flame" class="w-6 h-6 text-teal-300"></i>
+                            <span class="text-sm font-medium">Intimate</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Weather -->
+                <section>
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Weather</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="setContext('weather', 'sunny')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="sunny">
+                            <i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i>
+                            <span class="text-sm">Sunny</span>
+                        </button>
+                        <button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="rainy">
+                            <i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i>
+                            <span class="text-sm">Rainy/Cold</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Season -->
+                <section>
+                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Season</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <button onclick="setContext('season', 'winter')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="winter">Winter</button>
+                        <button onclick="setContext('season', 'spring')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="spring">Spring</button>
+                        <button onclick="setContext('season', 'summer')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="summer">Summer</button>
+                        <button onclick="setContext('season', 'fall')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="fall">Fall</button>
+                    </div>
+                </section>
+
+                <!-- Suspense Toggle -->
+                <section id="suspense-section" class="hidden transition-all duration-300">
+                    <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-teal-500/30 border">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-teal-500/20 p-2 rounded-lg">
+                                <i data-lucide="ghost" class="w-5 h-5 text-teal-300"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-semibold text-teal-100">Suspense Mode</h4>
+                                <p class="text-xs text-gray-400">Prioritize mystery & depth</p>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="suspense-toggle" class="sr-only peer" onchange="toggleSuspense()">
+                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+                        </label>
+                    </div>
+                </section>
+
+                <button onclick="generateRecommendations()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-900/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <span>Find My Scent</span>
+                </button>
             </div>
-            <!-- VIEW 2: RESULTS -->
-            <div id="view-results" class="hidden space-y-4 max-w-md mx-auto"><button onclick="resetView()" class="mb-4 text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Filter</button><div id="results-container" class="space-y-2"></div></div>
+
+            <!-- VIEW 2: RESULTS (TIERED) -->
+            <div id="view-results" class="hidden space-y-4 max-w-md mx-auto">
+                <button onclick="resetView()" class="mb-4 text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Filter
+                </button>
+                <div id="results-container" class="space-y-2"></div>
+            </div>
+
             <!-- VIEW 3: COLLECTION -->
-            <div id="view-collection" class="hidden space-y-4 max-w-md mx-auto relative"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">My Collection</h2><button onclick="openSmartAdd()" class="bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 shadow-lg"><i data-lucide="plus" class="w-4 h-4"></i> Add</button></div><div class="flex p-1 bg-black/40 rounded-xl mb-4 border border-white/5"><button onclick="setCollectionMode('bottles')" id="tab-bottles" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white">Bottles</button><button onclick="setCollectionMode('decants')" id="tab-decants" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Decants</button><button onclick="setCollectionMode('combos')" id="tab-combos" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Combos</button></div><div id="collection-list" class="space-y-3"></div></div>
-            <!-- VIEW 4: TIMELINE -->
-            <div id="view-timeline" class="hidden space-y-4 max-w-md mx-auto relative"><div id="scout-container" class="space-y-4 mb-6"></div><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Acquisition Plan</h2><button onclick="openPlanModal()" class="bg-teal-500 p-2 rounded-full shadow-lg active:scale-90 transition-transform"><i data-lucide="plus" class="w-5 h-5 text-white"></i></button></div><div id="timeline-list" class="relative space-y-0 timeline-line pl-2"></div></div>
+            <div id="view-collection" class="hidden space-y-4 max-w-md mx-auto relative">
+                <div class="flex justify-between items-center mb-4">
+                     <h2 class="text-2xl font-bold">My Collection</h2>
+                     <button onclick="openSmartAdd()" class="bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 shadow-lg">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add
+                     </button>
+                </div>
+                
+                <!-- Toggle Switch -->
+                <div class="flex p-1 bg-black/40 rounded-xl mb-4 border border-white/5">
+                    <button onclick="setCollectionMode('bottles')" id="tab-bottles" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white">Full Bottles</button>
+                    <button onclick="setCollectionMode('decants')" id="tab-decants" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Decants</button>
+                </div>
+
+                <div id="collection-list" class="space-y-3"></div>
+            </div>
+
+            <!-- VIEW 4: TIMELINE / FUTURE -->
+            <div id="view-timeline" class="hidden space-y-4 max-w-md mx-auto relative">
+                
+                <!-- Dual Scout Container -->
+                <div id="scout-container" class="space-y-4 mb-6">
+                    <!-- Javascript will inject 2 cards here -->
+                </div>
+
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Acquisition Plan</h2>
+                    <button onclick="openPlanModal()" class="bg-teal-500 p-2 rounded-full shadow-lg active:scale-90 transition-transform">
+                        <i data-lucide="plus" class="w-5 h-5 text-white"></i>
+                    </button>
+                </div>
+                <div id="timeline-list" class="relative space-y-0 timeline-line pl-2"></div>
+            </div>
+
             <!-- VIEW 5: HISTORY -->
-            <div id="view-history" class="hidden space-y-4 max-w-md mx-auto relative"><div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">Wear Log</h2><button onclick="openAddLogModal()" class="bg-teal-500 p-2 rounded-full shadow-lg active:scale-90 transition-transform text-white"><i data-lucide="plus-square" class="w-5 h-5"></i></button></div><div id="history-list" class="space-y-3"></div></div>
+            <div id="view-history" class="hidden space-y-4 max-w-md mx-auto relative">
+                <h2 class="text-2xl font-bold mb-4">Wear Log</h2>
+                <div id="history-list" class="space-y-3"></div>
+            </div>
+
         </main>
-        
-        <nav class="fixed bottom-0 w-full bg-charcoal-800 border-t border-white/5 flex justify-around items-center px-4 pt-4 z-40" style="padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem);">
-            <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1.5 text-teal-500 active:scale-95 transition-transform"><i data-lucide="search" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Select</span></button>
-            <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform"><i data-lucide="library" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Collect</span></button>
-            <button onclick="switchView('history')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform"><i data-lucide="history" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">History</span></button>
-            <button onclick="switchView('timeline')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform"><i data-lucide="calendar-clock" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Future</span></button>
+
+        <!-- FOOTER NAV -->
+        <nav class="fixed bottom-0 w-full bg-charcoal-800/90 backdrop-blur-lg border-t border-white/5 flex justify-around items-center px-4 pt-4 z-40" style="padding-bottom: calc(env(safe-area-inset-bottom) + 1.5rem);">
+            <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1.5 text-teal-500 active:scale-95 transition-transform">
+                <i data-lucide="search" class="w-8 h-8"></i>
+                <span class="text-xs font-bold tracking-wide">Select</span>
+            </button>
+            <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
+                <i data-lucide="library" class="w-8 h-8"></i>
+                <span class="text-xs font-bold tracking-wide">Collect</span>
+            </button>
+            <button onclick="switchView('history')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
+                <i data-lucide="history" class="w-8 h-8"></i>
+                <span class="text-xs font-bold tracking-wide">History</span>
+            </button>
+            <button onclick="switchView('timeline')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
+                <i data-lucide="calendar-clock" class="w-8 h-8"></i>
+                <span class="text-xs font-bold tracking-wide">Future</span>
+            </button>
         </nav>
     </div>
 
-    <!-- MODALS -->
-    <div id="scout-modal" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><h3 class="text-xl font-bold mb-2">Smart Schedule</h3><p class="text-sm text-gray-400 mb-6">Recommendation: <span id="scout-modal-name" class="text-white font-bold">Fragrance</span></p><button onclick="confirmScoutAdd(true)" class="w-full bg-teal-600 hover:bg-teal-500 text-white p-4 rounded-xl mb-3 flex items-center justify-between group"><div class="text-left"><span class="block text-xs text-teal-200 uppercase tracking-wider font-bold">Recommended</span><span id="scout-suggested-date" class="text-lg font-bold">May 2026</span></div><i data-lucide="check-circle" class="w-6 h-6 text-teal-300 group-hover:text-white"></i></button><div class="relative"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div><div class="relative flex justify-center text-xs uppercase"><span class="bg-charcoal-800 px-2 text-gray-500">Or</span></div></div><button onclick="toggleScoutCustom()" class="w-full text-gray-400 text-sm font-bold py-4 hover:text-white flex items-center justify-center gap-2">Choose My Own Date <i data-lucide="chevron-down" class="w-4 h-4"></i></button><div id="scout-custom-inputs" class="hidden space-y-3 pt-2"><div class="grid grid-cols-2 gap-3"><select id="scout-month" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none"><option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar">Mar</option><option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option><option value="Jul">Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option><option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option></select><select id="scout-year" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none"><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option></select></div><button onclick="confirmScoutAdd(false)" class="w-full bg-white/10 hover:bg-white/20 text-white p-3 rounded-xl text-sm font-bold">Add Custom Date</button></div><button onclick="closeScoutModal()" class="absolute top-4 right-4 p-2 text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button></div></div>
+    <!-- SCOUT ADD MODAL -->
+    <div id="scout-modal" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
+            <h3 class="text-xl font-bold mb-2">Smart Schedule</h3>
+            <p class="text-sm text-gray-400 mb-6">Based on your taste & season, we recommend: <span id="scout-modal-name" class="text-white font-bold">Fragrance</span></p>
+            <button onclick="confirmScoutAdd(true)" class="w-full bg-teal-600 hover:bg-teal-500 text-white p-4 rounded-xl mb-3 flex items-center justify-between group">
+                <div class="text-left"><span class="block text-xs text-teal-200 uppercase tracking-wider font-bold">Recommended</span><span id="scout-suggested-date" class="text-lg font-bold">May 2026</span></div><i data-lucide="check-circle" class="w-6 h-6 text-teal-300 group-hover:text-white"></i>
+            </button>
+            <div class="relative"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div><div class="relative flex justify-center text-xs uppercase"><span class="bg-charcoal-800 px-2 text-gray-500">Or</span></div></div>
+            <button onclick="toggleScoutCustom()" class="w-full text-gray-400 text-sm font-bold py-4 hover:text-white flex items-center justify-center gap-2">Choose My Own Date <i data-lucide="chevron-down" class="w-4 h-4"></i></button>
+            <div id="scout-custom-inputs" class="hidden space-y-3 pt-2">
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="scout-month" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none"><option value="Jan">January</option><option value="Feb">February</option><option value="Mar">March</option><option value="Apr">April</option><option value="May">May</option><option value="Jun">June</option><option value="Jul">July</option><option value="Aug">August</option><option value="Sep">September</option><option value="Oct">October</option><option value="Nov">November</option><option value="Dec">December</option></select>
+                    <select id="scout-year" class="w-full input-glass p-3 rounded-lg text-sm appearance-none bg-none"><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option></select>
+                </div>
+                <button onclick="confirmScoutAdd(false)" class="w-full bg-white/10 hover:bg-white/20 text-white p-3 rounded-xl text-sm font-bold">Add Custom Date</button>
+            </div>
+            <button onclick="closeScoutModal()" class="absolute top-4 right-4 p-2 text-gray-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+    </div>
+
+    <!-- HISTORY EDIT MODAL -->
+    <div id="history-edit-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
+            <h3 class="text-xl font-bold mb-4">Edit Log</h3>
+            <div class="space-y-4">
+                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="hist-edit-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div>
+                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label><select id="hist-edit-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div>
+                <div class="flex gap-2 pt-2"><button onclick="closeHistoryEdit()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveHistoryEdit()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Update Log</button></div>
+                <button onclick="deleteHistoryEntry()" class="w-full text-red-400 text-xs font-bold py-2 mt-2 hover:text-red-300">Delete Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SMART ADD MODAL -->
+    <div id="smart-add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all h-[80vh] flex flex-col">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Smart Add</h3><button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+            <div class="space-y-4 overflow-y-auto no-scrollbar flex-1">
+                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label><input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name"><input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House"></div>
+                <div class="flex items-center gap-2 mt-2"><input type="checkbox" id="sa-is-decant" class="w-4 h-4 rounded border-gray-600 text-teal-500 focus:ring-teal-500"><label for="sa-is-decant" class="text-sm font-bold text-gray-300">Save as Decant/Sample</label></div>
+                <div class="bg-teal-900/20 p-4 rounded-xl border border-teal-500/20">
+                    <div class="flex items-center gap-2 mb-2"><i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i><label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label></div>
+                    <textarea id="sa-text" class="w-full bg-black/40 text-xs text-gray-300 p-3 rounded-lg border border-white/10 h-32 focus:outline-none focus:border-teal-500" placeholder="Paste notes/description..."></textarea>
+                    <button onclick="analyzeText()" class="w-full mt-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-2 rounded-lg">Analyze & Auto-Fill</button>
+                </div>
+                <div id="sa-results" class="hidden space-y-3"><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4><div id="sa-tags" class="flex flex-wrap gap-1"></div></div><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4><p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p></div></div>
+            </div>
+            <button onclick="saveSmartAdd()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Save to Collection</button>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
+            <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">Data</h3><button onclick="toggleSettings()" class="p-2"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+            <textarea id="backup-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" readonly></textarea>
+            <button onclick="copyData()" class="w-full bg-teal-500 py-2 rounded-lg text-xs font-bold mb-2">Copy</button>
+            <textarea id="restore-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" placeholder="Paste JSON"></textarea>
+            <button onclick="restoreData()" class="w-full bg-red-600 py-2 rounded-lg text-xs font-bold">Restore (Smart Merge)</button>
+        </div>
+    </div>
     
-    <div id="history-edit-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><h3 class="text-xl font-bold mb-4">Edit Log</h3><div class="space-y-4"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="hist-edit-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label><select id="hist-edit-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div><div class="flex gap-2 pt-2"><button onclick="closeHistoryEdit()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveHistoryEdit()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Update Log</button></div><button onclick="deleteHistoryEntry()" class="w-full text-red-400 text-xs font-bold py-2 mt-2 hover:text-red-300">Delete Entry</button></div></div></div>
+    <div id="plan-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6">
+            <h3 class="mb-4 font-bold">Add Plan</h3>
+            <input id="plan-name" class="w-full input-glass p-3 mb-2 rounded" placeholder="Name">
+            <input id="plan-desc" class="w-full input-glass p-3 mb-2 rounded" placeholder="Desc">
+            <div class="flex gap-2"><button onclick="closePlanModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="savePlan()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div>
+        </div>
+    </div>
     
-    <div id="smart-add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Smart Add</h3><button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button></div><div class="space-y-4 overflow-y-auto no-scrollbar flex-1"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label><input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name"><input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House"></div><div class="flex items-center gap-2 mt-2"><input type="checkbox" id="sa-is-decant" class="w-4 h-4 rounded border-gray-600 text-teal-500 focus:ring-teal-500"><label for="sa-is-decant" class="text-sm font-bold text-gray-300">Save as Decant/Sample</label></div><div class="bg-teal-900/20 p-4 rounded-xl border border-teal-500/20"><div class="flex items-center gap-2 mb-2"><i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i><label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label></div><textarea id="sa-text" class="w-full bg-black/40 text-xs text-gray-300 p-3 rounded-lg border border-white/10 h-32 focus:outline-none focus:border-teal-500" placeholder="Paste notes/description..."></textarea><button onclick="analyzeText()" class="w-full mt-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-2 rounded-lg">Analyze & Auto-Fill</button></div><div id="sa-results" class="hidden space-y-3"><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4><div id="sa-tags" class="flex flex-wrap gap-1"></div></div><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4><p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p></div></div></div><button onclick="saveSmartAdd()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Save to Collection</button></div></div>
-    
-    <div id="settings-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">Data</h3><button onclick="toggleSettings()" class="p-2"><i data-lucide="x" class="w-4 h-4"></i></button></div><textarea id="backup-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" readonly></textarea><div class="flex gap-2 mb-4"><button onclick="copyData()" class="flex-1 bg-white/10 hover:bg-white/20 py-2 rounded-lg text-xs font-bold">Copy</button><button onclick="hardReset()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg text-xs font-bold">Hard Reset</button></div><textarea id="restore-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" placeholder="Paste JSON"></textarea><button onclick="restoreData()" class="w-full bg-teal-500 hover:bg-teal-400 py-2 rounded-lg text-xs font-bold">Restore (Smart Merge)</button></div></div>
-    
-    <div id="plan-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6"><h3 class="mb-4 font-bold">Add Plan</h3><input id="plan-name" class="w-full input-glass p-3 mb-2 rounded" placeholder="Name"><input id="plan-desc" class="w-full input-glass p-3 mb-2 rounded" placeholder="Desc"><div class="flex gap-2"><button onclick="closePlanModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="savePlan()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div></div></div>
-    
-    <div id="notes-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6"><h3 class="mb-2 font-bold">Notes</h3><textarea id="note-input" class="w-full input-glass p-3 h-32 mb-4 rounded"></textarea><div class="flex gap-2"><button onclick="closeNotesModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="saveNote()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div></div></div>
-    
-    <div id="add-log-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><h3 class="text-xl font-bold mb-4">Log Missed Wear</h3><div class="space-y-4"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="add-log-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance / Combo</label><select id="add-log-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Situation</label><select id="add-log-situation" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"><option value="office">Office</option><option value="gym">Gym</option><option value="date_night">Date Night</option><option value="casual">Casual</option><option value="intimate">Intimate</option></select></div><div class="flex gap-2 pt-2"><button onclick="closeAddLogModal()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveMissedLog()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Save Log</button></div></div></div></div>
+    <div id="notes-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
+        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6">
+            <h3 class="mb-2 font-bold">Notes</h3>
+            <textarea id="note-input" class="w-full input-glass p-3 h-32 mb-4 rounded"></textarea>
+            <div class="flex gap-2"><button onclick="closeNotesModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="saveNote()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div>
+        </div>
+    </div>
 
     <!-- TOAST -->
-    <div id="toast" class="fixed top-32 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]"><i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span></div>
+    <div id="toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]">
+        <i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span>
+    </div>
 
     <script>
-        const APP_ID = "scentApp_db_v47_stable_core"; 
+        const APP_ID = "scentApp_db_v31_scout_label_fix"; 
         const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
         const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
@@ -95,6 +365,7 @@
             ui: { collectionMode: 'bottles' }
         };
 
+        // SCOUT DB (Montagne Focus)
         const SCOUT_DB = [
             { name: "Tygr Cologne", season: "Summer", tags: ["fresh", "citrus", "ambroxan"], reason: "Based on your love for Fresh/Citrus profiles." },
             { name: "Elysian Cologne", season: "Spring", tags: ["fresh", "vetiver", "office"], reason: "A sophisticated freshie similar to Aventus." },
@@ -122,50 +393,35 @@
         let tempSmartObj = null; 
         let currentNoteId = null; 
         let scoutRecommendations = [];
-        let suggestedScoutDate = null; 
         let editingHistoryIndex = null; 
         let toastTimeout = null;
-        let pendingPlanDeletionId = null;
 
+        // --- DEFAULTS ---
         const CUSTOM_DB = [
-            { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "creed_aventus", name: "Aventus", brand: "Creed", inspiration: "Original", tags: ["fresh", "smoky", "fruity", "king", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 4, intimate: 3 }, sprayInstructions: "6-7 sprays (3 on neck, 4 on shirt).", description: "Smoky pineapple and birch. The ultimate confidence booster.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "victory_man", name: "Victory Man", brand: "XXIV", inspiration: "Unknown/Fresh", tags: ["fresh", "citrus", "cedar", "gym"], weatherAffinity: { winter_sunny: -1, winter_rainy: -2, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 0 }, situationRatings: { office: 4, gym: 5, casual: 4, date_night: 1, intimate: 1 }, sprayInstructions: "8 sprays (Heavy on shirt/gym clothes).", description: "Bergamot and Cedarwood bomb. Clean, sharp, and energizing.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "paco_1_million", name: "1 Million", brand: "Paco Rabanne", inspiration: "Original", tags: ["sweet", "spicy", "loud", "club"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 1 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 4, intimate: 2 }, sprayInstructions: "4-5 sprays (Chest and Neck).", description: "Sweet, spicy bubblegum. Designed for loud parties.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "blomb_27", name: "No. 27", brand: "BLOMB", inspiration: "Original", tags: ["woody", "tobacco", "coconut", "unique"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 0, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 3 }, sprayInstructions: "6 sprays (Shirt Front/Back).", description: "Unique woody-tobacco with a coconut twist.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "phantom_noir", name: "Phantom Noir", brand: "Montagne", inspiration: "Black Phantom?", tags: ["coffee", "boozy", "chocolate", "dark", "suspense"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "5-6 sprays (Jacket/Scarf heavy).", description: "Coffee, booze, and sugar. Dark and mysterious.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "brooklyn_jazz", name: "Brooklyn Jazz", brand: "Montagne", inspiration: "Maison Margiela Jazz Club", tags: ["boozy", "tobacco", "rum", "smooth"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -2, summer_rainy: 0, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Collar, Chest, Wrists).", description: "Boozy rum and tobacco. Captures the vibe of a dim jazz bar.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "maison_du_soir", name: "Maison du Soir", brand: "Montagne", inspiration: "By the Fireplace", tags: ["smoke", "vanilla", "chestnut", "cozy"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 5, date_night: 3, intimate: 5 }, sprayInstructions: "5 sprays (Sweater/Chest).", description: "Chestnut and vanilla smoke. The ultimate 'Cozy' scent.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "cubicle_men", name: "Cubicle for Men", brand: "Montagne", inspiration: "Fragrance One Office", tags: ["ambroxan", "fresh", "safe", "power"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 0, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 3, casual: 4, date_night: 2, intimate: 1 }, sprayInstructions: "8-10 sprays (Full coverage on shirt).", description: "Clean, soapy, and projecting. Perfect Office scent.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "gentle_silver", name: "Gentle Silver", brand: "Montagne", inspiration: "Gentle Fluidity Silver", tags: ["gin", "juniper", "fresh", "crisp"], weatherAffinity: { winter_sunny: 1, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 4, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (Saturate shirt front).", description: "Crisp juniper. Smells like a cold Gin & Tonic.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "vanille_absolute", name: "Vanille Absolute", brand: "Montagne", inspiration: "Nishane Ani?", tags: ["vanilla", "spicy", "ginger", "green"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "5-6 sprays (Neck + Clothes).", description: "Spicy ginger and rich vanilla.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 1, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Behind Ears + Collar).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "prada_paradigme", name: "Paradigme", brand: "Prada", inspiration: "Original", tags: ["fresh", "clean", "floral", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 1, spring: 2, fall: 2 }, situationRatings: { office: 5, gym: 1, casual: 5, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (Neck + Shirt).", description: "A modern paradigm of Prada's clean, soapy, and floral style.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' },
-            { id: "fleurit_sainte_fumee", name: "Sainte Fumée", brand: "Fleurit Parfums", inspiration: "Original", tags: ["smoke", "incense", "dark", "intimate"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "4-5 sprays (Chest/Neck).", description: "Holy Smoke. Deep resins and incense for intimate winter nights.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' }
+            { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "creed_aventus", name: "Aventus", brand: "Creed", inspiration: "Original", tags: ["fresh", "smoky", "fruity", "king", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 4, intimate: 3 }, sprayInstructions: "6-7 sprays (3 on neck, 4 on shirt).", description: "Smoky pineapple and birch. The ultimate confidence booster.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "victory_man", name: "Victory Man", brand: "XXIV", inspiration: "Unknown/Fresh", tags: ["fresh", "citrus", "cedar", "gym"], weatherAffinity: { winter_sunny: -1, winter_rainy: -2, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 0 }, situationRatings: { office: 4, gym: 5, casual: 4, date_night: 1, intimate: 1 }, sprayInstructions: "8 sprays (Heavy on shirt/gym clothes).", description: "Bergamot and Cedarwood bomb. Clean, sharp, and energizing.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "paco_1_million", name: "1 Million", brand: "Paco Rabanne", inspiration: "Original", tags: ["sweet", "spicy", "loud", "club"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 1 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 4, intimate: 2 }, sprayInstructions: "4-5 sprays (Chest and Neck).", description: "Sweet, spicy bubblegum. Designed for loud parties.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "blomb_27", name: "No. 27", brand: "BLOMB", inspiration: "Original", tags: ["woody", "tobacco", "coconut", "unique"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 0, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 3 }, sprayInstructions: "6 sprays (Shirt Front/Back).", description: "Unique woody-tobacco with a coconut twist.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "phantom_noir", name: "Phantom Noir", brand: "Montagne", inspiration: "Black Phantom?", tags: ["coffee", "boozy", "chocolate", "dark", "suspense"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "5-6 sprays (Jacket/Scarf heavy).", description: "Coffee, booze, and sugar. Dark and mysterious.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "brooklyn_jazz", name: "Brooklyn Jazz", brand: "Montagne", inspiration: "Maison Margiela Jazz Club", tags: ["boozy", "tobacco", "rum", "smooth"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -2, summer_rainy: 0, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Collar, Chest, Wrists).", description: "Boozy rum and tobacco. Captures the vibe of a dim jazz bar.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "maison_du_soir", name: "Maison du Soir", brand: "Montagne", inspiration: "By the Fireplace", tags: ["smoke", "vanilla", "chestnut", "cozy"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 5, date_night: 3, intimate: 5 }, sprayInstructions: "5 sprays (Sweater/Chest).", description: "Chestnut and vanilla smoke. The ultimate 'Cozy' scent.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "cubicle_men", name: "Cubicle for Men", brand: "Montagne", inspiration: "Fragrance One Office", tags: ["ambroxan", "fresh", "safe", "power"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 0, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 3, casual: 4, date_night: 2, intimate: 1 }, sprayInstructions: "8-10 sprays (Full coverage on shirt).", description: "Clean, soapy, and projecting. Perfect Office scent.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "gentle_silver", name: "Gentle Silver", brand: "Montagne", inspiration: "Gentle Fluidity Silver", tags: ["gin", "juniper", "fresh", "crisp"], weatherAffinity: { winter_sunny: 1, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 4, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (Saturate shirt front).", description: "Crisp juniper. Smells like a cold Gin & Tonic.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "vanille_absolute", name: "Vanille Absolute", brand: "Montagne", inspiration: "Nishane Ani?", tags: ["vanilla", "spicy", "ginger", "green"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "5-6 sprays (Neck + Clothes).", description: "Spicy ginger and rich vanilla.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false },
+            { id: "eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 1, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Behind Ears + Collar).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 0, userNotes: "", userRating: 0, pairingOnly: false }
         ];
 
         const COMBOS_DB = [
-            { id: "combo_executive", name: "The Executive Suite", parts: ["creed_aventus", "dossier_ambery_saffron"], tags: ["date_night", "power", "complex"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "Smoky birch meets airy saffron sweetness. A massive compliment magnet.", instructions: "Aventus (4x) on shirt chest. Saffron (3x) on neck skin.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_cherry_lounge", name: "Cherry Lounge", parts: ["lost_cherry", "brooklyn_jazz"], tags: ["boozy", "gourmand", "suspense"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco darkens the cherry almond profile. Very sexy.", instructions: "Brooklyn Jazz (4x) on clothes. Lost Cherry (3x) on pulse points.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_gin_juice", name: "Gin & Juice", parts: ["gentle_silver", "creed_aventus"], tags: ["fresh", "fruity", "energy"], situationRatings: { office: 4, gym: 4, casual: 5, date_night: 3, intimate: 2 }, description: "Juniper berry and pineapple. An explosion of freshness.", instructions: "4 sprays each on opposite shirt shoulders.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_smoked_vanilla", name: "Smoked Vanilla", parts: ["maison_du_soir", "vanille_absolute"], tags: ["cozy", "winter", "gourmand"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Chestnut smoke mixed with spicy ginger vanilla. Ultimate cozy mode.", instructions: "Maison (3x) on shirt/sweater. Vanille (3x) on wrists/neck.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_island_noir", name: "Island Noir", parts: ["creed_aventus", "blomb_27"], tags: ["summer", "night", "unique"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Pineapple meets Coconut and Tobacco. A dark, smoky Piña Colada vibe.", instructions: "BLOMB (4x) on shirt. Aventus (3x) on neck.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_spiced_cherry", name: "Spiced Cherry", parts: ["lost_cherry", "vanille_absolute"], tags: ["gourmand", "winter", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Ginger and Green Vanilla cut the sweetness of the Cherry. Sophisticated gourmand.", instructions: "Vanille (3x) first, top with Lost Cherry (3x).", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_clean_cut", name: "The Clean Cut", parts: ["cubicle_men", "gentle_silver"], tags: ["office", "fresh", "clean"], situationRatings: { office: 5, gym: 5, casual: 3, date_night: 1, intimate: 1 }, description: "Ambroxan power meets Juniper freshness. The ultimate 'clean' scent profile.", instructions: "3 sprays of each on opposite shirt shoulders.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_midnight_tea", name: "Midnight Tea", parts: ["eau_noir", "brooklyn_jazz"], tags: ["dark", "boozy", "suspense"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 5, intimate: 4 }, description: "Black tea and Fig mixed with Rum and Tobacco. Dark, moody, and intellectual.", instructions: "Brooklyn Jazz (4x) on clothes. Eau Noir (3x) behind ears.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_smoked_jazz", name: "Smoked Jazz", parts: ["fleurit_sainte_fumee", "brooklyn_jazz"], tags: ["boozy", "incense", "dark"], situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco meets holy incense. A speakeasy vibe.", instructions: "Jazz Club on neck (projection), Sainte Fumée on chest (base).", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_winter_hearth", name: "Winter Hearth", parts: ["fleurit_sainte_fumee", "maison_du_soir"], tags: ["cozy", "smoke", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 3, intimate: 5 }, description: "Chestnut fire and church incense. Maximum winter coziness.", instructions: "Maison on sweater, Sainte Fumée on skin.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_holy_clean", name: "Holy Clean", parts: ["fleurit_sainte_fumee", "gentle_silver"], tags: ["unique", "contrast", "casual"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 2 }, description: "Clean gin meets dark incense. An interesting, artistic contrast.", instructions: "Gentle Silver on shirt (clean), Sainte Fumée on wrists.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_sacred_vanilla", name: "Sacred Vanilla", parts: ["fleurit_sainte_fumee", "vanille_absolute"], tags: ["gourmand", "sensual", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Vanilla sweetness balanced by dark resins. Sensual and mysterious.", instructions: "Vanille as base, Sainte Fumée to cut sweetness.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_paradigm_shift", name: "Paradigm Shift", parts: ["prada_paradigme", "cubicle_men"], tags: ["office", "clean", "professional"], situationRatings: { office: 5, gym: 1, casual: 3, date_night: 2, intimate: 1 }, description: "The ultimate clean professional. Soapy floral meets ambroxan power.", instructions: "Cubicle on shirt (power), Paradigme on skin (refinement).", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_holy_saffron", name: "Holy Saffron", parts: ["fleurit_sainte_fumee", "dossier_ambery_saffron"], tags: ["date_night", "unique", "sweet"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Burnt sugar and airy saffron mixed with deep church incense.", instructions: "Sainte Fumée chest, Saffron neck.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_vanilla_smoke_2", name: "Vanilla Smoke", parts: ["maison_du_soir", "vanille_absolute"], tags: ["winter", "cozy", "sweet"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 3, intimate: 5 }, description: "Ultimate winter sweater combo. Vanilla, chestnut, and ginger.", instructions: "Layer both on sweater.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_holy_gin", name: "Holy Gin", parts: ["gentle_silver", "fleurit_sainte_fumee"], tags: ["unique", "fresh", "dark"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Fresh Juniper vs Dark Incense. High contrast, very artistic.", instructions: "Sainte Fumée chest, Gentle Silver neck/wrists.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_vanilla_latte", name: "Vanilla Latte", parts: ["phantom_noir", "vanille_absolute"], tags: ["gourmand", "sweet", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 5, intimate: 5 }, description: "Coffee/Chocolate layered with Green Vanilla. Rich and delicious.", instructions: "Phantom chest, Vanille neck.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_london_fog", name: "London Fog", parts: ["eau_noir", "vanille_absolute"], tags: ["tea", "cozy", "relaxing"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Black Tea and Fig softened by Vanilla. Like a warm drink.", instructions: "Eau Noir behind ears, Vanille on collar.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_office_power", name: "Office Power", parts: ["victory_man", "cubicle_men"], tags: ["office", "fresh", "strong"], situationRatings: { office: 5, gym: 4, casual: 3, date_night: 1, intimate: 1 }, description: "Citrus/Cedar + Ambroxan. Maximum clean projection.", instructions: "Cubicle chest, Victory Man neck.", wearCount: 0, userNotes: "", userRating: 0 },
-            { id: "combo_tropical_hearth", name: "Tropical Hearth", parts: ["creed_aventus", "maison_du_soir"], tags: ["smoky", "fruity", "unique"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 4, intimate: 4 }, description: "Smoky Pineapple meets Chestnut Fire. Complex smoke layers.", instructions: "Maison chest, Aventus neck.", wearCount: 0, userNotes: "", userRating: 0 }
+            { id: "combo_executive", name: "The Executive Suite", parts: ["creed_aventus", "dossier_ambery_saffron"], tags: ["date_night", "power", "complex"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "Smoky birch meets airy saffron sweetness. A massive compliment magnet.", instructions: "Aventus (4x) on shirt chest. Saffron (3x) on neck skin.", wearCount: 0, userNotes: "" },
+            { id: "combo_cherry_lounge", name: "Cherry Lounge", parts: ["lost_cherry", "brooklyn_jazz"], tags: ["boozy", "gourmand", "suspense"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco darkens the cherry almond profile. Very sexy.", instructions: "Brooklyn Jazz (4x) on clothes. Lost Cherry (3x) on pulse points.", wearCount: 0, userNotes: "" },
+            { id: "combo_gin_juice", name: "Gin & Juice", parts: ["gentle_silver", "creed_aventus"], tags: ["fresh", "fruity", "energy"], situationRatings: { office: 4, gym: 4, casual: 5, date_night: 3, intimate: 2 }, description: "Juniper berry and pineapple. An explosion of freshness.", instructions: "4 sprays each on opposite shirt shoulders.", wearCount: 0, userNotes: "" },
+            { id: "combo_smoked_vanilla", name: "Smoked Vanilla", parts: ["maison_du_soir", "vanille_absolute"], tags: ["cozy", "winter", "gourmand"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Chestnut smoke mixed with spicy ginger vanilla. Ultimate cozy mode.", instructions: "Maison (3x) on shirt/sweater. Vanille (3x) on wrists/neck.", wearCount: 0, userNotes: "" },
+            { id: "combo_island_noir", name: "Island Noir", parts: ["creed_aventus", "blomb_27"], tags: ["summer", "night", "unique"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Pineapple meets Coconut and Tobacco. A dark, smoky Piña Colada vibe.", instructions: "BLOMB (4x) on shirt. Aventus (3x) on neck.", wearCount: 0, userNotes: "" },
+            { id: "combo_spiced_cherry", name: "Spiced Cherry", parts: ["lost_cherry", "vanille_absolute"], tags: ["gourmand", "winter", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Ginger and Green Vanilla cut the sweetness of the Cherry. Sophisticated gourmand.", instructions: "Vanille (3x) first, top with Lost Cherry (3x).", wearCount: 0, userNotes: "" },
+            { id: "combo_clean_cut", name: "The Clean Cut", parts: ["cubicle_men", "gentle_silver"], tags: ["office", "fresh", "clean"], situationRatings: { office: 5, gym: 5, casual: 3, date_night: 1, intimate: 1 }, description: "Ambroxan power meets Juniper freshness. The ultimate 'clean' scent profile.", instructions: "3 sprays of each on opposite shirt shoulders.", wearCount: 0, userNotes: "" },
+            { id: "combo_midnight_tea", name: "Midnight Tea", parts: ["eau_noir", "brooklyn_jazz"], tags: ["dark", "boozy", "suspense"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 5, intimate: 4 }, description: "Black tea and Fig mixed with Rum and Tobacco. Dark, moody, and intellectual.", instructions: "Brooklyn Jazz (4x) on clothes. Eau Noir (3x) behind ears.", wearCount: 0, userNotes: "" }
         ];
 
         const DEFAULT_TIMELINE = [
@@ -176,71 +432,39 @@
         ];
 
         window.addEventListener('DOMContentLoaded', () => {
-            try {
-                loadData();
-                initUI();
-                initScout();
-                setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 100);
-            } catch(e) {
-                console.error("Init Error:", e);
-                // Fallback reset if total crash
-                localStorage.removeItem(APP_ID);
-                location.reload();
-            }
+            loadData();
+            initUI();
+            initScout();
+            setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 100);
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            if (isIOS && !window.navigator.standalone) setTimeout(() => document.getElementById('install-prompt').classList.remove('translate-y-full'), 2000);
         });
 
-        // Loop for icons to ensure they render
-        setInterval(() => { if (window.lucide) lucide.createIcons(); }, 1000);
+        let iconInterval = setInterval(() => { if (window.lucide) lucide.createIcons(); }, 500);
+        setTimeout(() => clearInterval(iconInterval), 5000);
 
-        // --- CORE FUNCTIONS (LOAD/SAVE/RESTORE) ---
         function loadData() {
             const raw = localStorage.getItem(APP_ID);
             if (raw) {
-                try {
-                    let savedData = JSON.parse(raw);
-                    // Safe defaults
-                    state.data.history = savedData.history || [];
-                    state.data.futurePlan = savedData.futurePlan || [];
-                    state.data.decants = savedData.decants || [];
-                    
-                    // Merge Fragrances (Keep user data, overwrite tech specs)
-                    state.data.fragrances = CUSTOM_DB.map(sysF => {
-                        const savedF = (savedData.fragrances || []).find(f => f.id === sysF.id);
-                        if (savedF) {
-                            return { 
-                                ...sysF, 
-                                wearCount: savedF.wearCount || 0,
-                                userNotes: savedF.userNotes || "",
-                                userRating: savedF.userRating || '-',
-                                pairingOnly: savedF.pairingOnly || false,
-                                paused: savedF.paused || false,
-                                reviewStatus: savedF.reviewStatus || 'approved'
-                            };
-                        }
-                        return sysF;
-                    });
-                    
-                    // Merge Custom/Smart-Added Fragrances
-                    (savedData.fragrances || []).forEach(f => {
-                         if (!CUSTOM_DB.find(cdb => cdb.id === f.id)) state.data.fragrances.push(f);
-                    });
+                let savedData = JSON.parse(raw);
+                if(!savedData.decants) savedData.decants = [];
+                savedData.fragrances = savedData.fragrances.map(savedF => {
+                    const codeF = CUSTOM_DB.find(cf => cf.id === savedF.id);
+                    if (codeF) {
+                        return {
+                            ...codeF, 
+                            wearCount: savedF.wearCount || 0, 
+                            userNotes: savedF.userNotes || "",
+                            userRating: savedF.userRating || '-',
+                            pairingOnly: savedF.pairingOnly || false
+                        };
+                    }
+                    return savedF;
+                });
+                state.data = savedData;
+                if (!state.data.futurePlan) state.data.futurePlan = [];
+                if (!state.data.combos || state.data.combos.length < 8) state.data.combos = JSON.parse(JSON.stringify(COMBOS_DB));
 
-                    // Merge Combos
-                    state.data.combos = COMBOS_DB.map(sysC => {
-                        const savedC = (savedData.combos || []).find(c => c.id === sysC.id);
-                        if (savedC) {
-                            return { ...sysC, wearCount: savedC.wearCount || 0, userNotes: savedC.userNotes || "", userRating: savedC.userRating || 0 };
-                        }
-                        return sysC;
-                    });
-                    
-                    // Sanitize History
-                    state.data.history = state.data.history.filter(h => h && h.id && h.date);
-
-                } catch(e) {
-                    console.error("Data Corrupted. Resetting.");
-                    hardReset(); // Auto-heal
-                }
             } else {
                 state.data = { fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), decants: [], combos: JSON.parse(JSON.stringify(COMBOS_DB)), history: [], futurePlan: JSON.parse(JSON.stringify(DEFAULT_TIMELINE)) };
                 saveData();
@@ -253,20 +477,9 @@
             document.getElementById('backup-area').value = JSON.stringify(state.data);
         }
 
-        function hardReset() {
-            localStorage.removeItem(APP_ID);
-            location.reload();
-        }
-
         function restoreData() {
             try {
-                let rawInput = document.getElementById('restore-area').value.trim();
-                // Basic cleanup for common copy-paste errors
-                if (rawInput.startsWith('"') && rawInput.endsWith('"')) {
-                    rawInput = rawInput.substring(1, rawInput.length - 1).replace(/\\"/g, '"');
-                }
-                
-                const backup = JSON.parse(rawInput);
+                const backup = JSON.parse(document.getElementById('restore-area').value);
                 const freshState = {
                     fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)),
                     decants: backup.decants || [],
@@ -274,7 +487,6 @@
                     history: [],
                     futurePlan: []
                 };
-
                 if (backup.fragrances) {
                     backup.fragrances.forEach(oldF => {
                         const newF = freshState.fragrances.find(f => f.id === oldF.id);
@@ -282,209 +494,258 @@
                             newF.wearCount = oldF.wearCount || 0;
                             newF.userNotes = oldF.userNotes || "";
                             newF.userRating = oldF.userRating || 0;
-                            newF.pairingOnly = oldF.pairingOnly || false;
-                            newF.paused = oldF.paused || false;
-                            newF.reviewStatus = oldF.reviewStatus || 'approved';
+                            newF.pairingOnly = oldF.pairingOnly || false; 
                         } else {
                             freshState.fragrances.push(oldF);
                         }
                     });
                 }
-                
-                // Combos, History, Plan
                 if (backup.combos) {
                      backup.combos.forEach(oldC => {
                         const newC = freshState.combos.find(c => c.id === oldC.id);
                         if (newC) {
                             newC.wearCount = oldC.wearCount || 0;
                             newC.userNotes = oldC.userNotes || "";
-                            newC.userRating = oldC.userRating || 0;
                         } else {
                             freshState.combos.push(oldC);
                         }
                     });
                 }
-                
                 freshState.history = backup.history || [];
                 freshState.futurePlan = backup.futurePlan || [];
-
                 state.data = freshState;
                 saveData();
-                alert("Data Restored Successfully!");
                 location.reload();
             } catch (e) {
-                alert('Invalid JSON Data. Please check your text.');
-                console.error(e);
+                alert('Invalid JSON');
             }
         }
 
-        // --- UI UPDATES ---
-        function initUI() {
-            switchView('selector');
-        }
-        
-        function switchView(viewName) {
-            ['view-selector', 'view-results', 'view-collection', 'view-timeline', 'view-history'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
+        function initUI() { updateContextUI(); showCollection(); }
+
+        function initScout() {
+            const date = new Date();
+            const weekNumYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 604800000);
+            const month = date.toLocaleString('default', { month: 'short' });
+            const weekOfMonth = Math.ceil(date.getDate() / 7);
+            
+            const lovedTags = new Set();
+            const hatedTags = new Set();
+
+            state.data.fragrances.forEach(f => {
+                if (['S', 'A'].includes(f.userRating)) f.tags.forEach(t => lovedTags.add(t));
+                if (f.wearCount > 4) f.tags.forEach(t => lovedTags.add(t));
             });
-            
-            const target = document.getElementById(viewName === 'selector' ? 'view-selector' : 'view-' + viewName);
-            if(target) target.classList.remove('hidden');
+            state.data.decants.forEach(d => {
+                if (d.rating === 'like') d.tags.forEach(t => lovedTags.add(t));
+                if (d.rating === 'dislike') d.tags.forEach(t => hatedTags.add(t));
+            });
 
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-teal-500'));
-            const navMap = { 'selector': 0, 'results': 0, 'collection': 1, 'history': 2, 'timeline': 3 };
-            const idx = navMap[viewName];
-            const navBtns = document.querySelectorAll('nav button');
-            if(navBtns[idx]) navBtns[idx].classList.add('text-teal-500');
+            let candidates = SCOUT_DB.map(scout => {
+                let score = 0;
+                scout.tags.forEach(t => {
+                    if (lovedTags.has(t)) score += 2;
+                    if (hatedTags.has(t)) score -= 5;
+                });
+                return { ...scout, score };
+            }).sort((a,b) => b.score - a.score);
 
-            if (viewName === 'collection') showCollection(); 
-            if (viewName === 'timeline') renderTimeline(); 
-            if (viewName === 'history') renderHistory();
+            const scoutA = candidates[weekNumYear % Math.max(1, Math.min(3, candidates.length))]; 
+            let scoutB = candidates.find(c => c.name !== scoutA.name && c.season !== scoutA.season);
+            if (!scoutB) scoutB = candidates.find(c => c.name !== scoutA.name);
+
+            scoutRecommendations = [
+                { item: scoutA, date: getSmartDate(scoutA.season) },
+                { item: scoutB, date: getSmartDate(scoutB.season) }
+            ];
             
-            document.getElementById('main-content').scrollTop = 0;
-            if (window.lucide) lucide.createIcons();
+            renderScouts(month, weekOfMonth); // Pass label data directly to render
         }
 
-        // --- RENDER FUNCTIONS ---
-        function renderHistory() {
-            const list = document.getElementById('history-list'); 
-            list.innerHTML = '';
+        function renderScouts(month, weekOfMonth) {
+            const container = document.getElementById('scout-container');
+            container.innerHTML = '';
             
-            const sortedHistory = [...state.data.history].sort((a,b) => new Date(b.date) - new Date(a.date));
-            
-            if(sortedHistory.length === 0) { 
-                list.innerHTML = `<div class="text-center text-gray-500 mt-10">No wear history yet.</div>`; 
-                return; 
-            }
-
-            sortedHistory.forEach((log, index) => {
-                // Find actual index in source
-                const realIndex = state.data.history.indexOf(log);
-                let name = "Unknown"; let brand = ""; let item = null;
-
-                if (log.type === 'single') {
-                    item = state.data.fragrances.find(f => f.id === log.id);
-                    if(item) { name = item.name; brand = item.brand; }
-                } else if (log.type === 'combo') {
-                    item = state.data.combos.find(c => c.id === log.id);
-                    if(item) { name = item.name; brand = "Combo"; }
-                } else if (log.type === 'decant') {
-                    item = state.data.decants.find(d => d.id === log.id);
-                    if(item) { name = item.name; brand = "Decant"; }
-                }
-
-                const dateObj = new Date(log.date);
-                const dateStr = dateObj.toLocaleDateString();
-                
-                // Button Logic: Only for Decant or Combo if not recorded
-                let buttonsHtml = '';
-                const showButtons = !log.feedbackRecorded && (log.type === 'combo' || log.type === 'decant');
-                
-                if (showButtons) {
-                    buttonsHtml = `
-                    <div class="mt-3 flex gap-2 pt-2 border-t border-white/5">
-                        <button onclick="handleFeedback(${realIndex}, 'like')" class="flex-1 py-1.5 bg-green-500/20 text-green-300 rounded text-xs hover:bg-green-500/40">Like</button>
-                        <button onclick="handleFeedback(${realIndex}, 'try_more')" class="flex-1 py-1.5 bg-blue-500/20 text-blue-300 rounded text-xs hover:bg-blue-500/40">Retry</button>
-                        <button onclick="handleFeedback(${realIndex}, 'dislike')" class="flex-1 py-1.5 bg-red-500/20 text-red-300 rounded text-xs hover:bg-red-500/40">Dislike</button>
-                    </div>`;
-                }
-
+            scoutRecommendations.forEach((rec, index) => {
+                const isPrimary = index === 0;
                 const div = document.createElement('div');
-                div.className = "glass-panel p-4 rounded-xl border border-white/5";
+                div.className = `glass-panel rounded-xl p-4 relative overflow-hidden ${isPrimary ? 'border-teal-500/30' : 'border-white/5 opacity-90'}`;
+                
+                // Only Primary gets the Week Label logic visually, or both can have context
+                const labelHtml = isPrimary ? `<span class="text-[10px] text-teal-300 font-mono block mb-1">${month} Week ${weekOfMonth}</span>` : '';
+
                 div.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <span class="text-[10px] text-gray-400">${dateStr}</span>
-                            <h4 class="font-bold text-white text-sm">${name}</h4>
-                            <p class="text-[10px] text-teal-400">${brand}</p>
+                    <div class="absolute top-0 right-0 p-3 opacity-10"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-${isPrimary ? 'star' : 'sparkles'}"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                    <div class="relative z-10">
+                        ${labelHtml}
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[9px] bg-white/10 text-white px-2 py-0.5 rounded uppercase font-bold tracking-wider">${rec.item.season}</span>
+                            <span class="text-[9px] text-teal-400 uppercase font-bold tracking-wider">Montagne ($40)</span>
                         </div>
-                        <button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors">
-                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        <h3 class="font-bold text-lg text-white mb-1">${rec.item.name}</h3>
+                        <p class="text-xs text-gray-300 mb-3 leading-relaxed">${rec.item.reason}</p>
+                        <button onclick="openScoutModal(${index})" class="w-full bg-teal-500/20 hover:bg-teal-500/40 border border-teal-500/50 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center gap-2 transition-colors">
+                            Add to Plan <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
                         </button>
                     </div>
-                    ${buttonsHtml}
                 `;
-                list.appendChild(div);
+                container.appendChild(div);
             });
-            if (window.lucide) lucide.createIcons();
+            if(window.lucide) lucide.createIcons();
         }
 
-        function handleFeedback(idx, action) {
-             const log = state.data.history[idx];
-             if(!log) return;
-             log.feedbackRecorded = true;
-             
-             if(action === 'dislike') {
-                 if(log.type === 'decant') {
-                     // Delete decant
-                     state.data.decants = state.data.decants.filter(d => d.id !== log.id);
-                     showToast("Decant Removed");
-                 } else if(log.type === 'combo') {
-                     showToast("Combo Disliked");
-                 }
-             } else if (action === 'like') {
-                 if(log.type === 'decant') {
-                    if(confirm("Add full bottle to plan?")) {
-                        // find name
-                        const d = state.data.decants.find(x => x.id === log.id);
-                        if(d) state.data.futurePlan.push({ id: 'plan_' + Date.now(), name: d.name, month: "Next", year: new Date().getFullYear(), description: "Upgraded" });
-                    }
-                 }
-                 showToast("Liked");
-             } else {
-                 showToast("Will ask again");
-             }
-             saveData();
-             renderHistory();
+        function getSmartDate(targetSeason) {
+            const now = new Date();
+            let year = now.getFullYear();
+            let targetMonthIdx = 0; 
+            switch(targetSeason) { case 'Summer': targetMonthIdx = 4; break; case 'Spring': targetMonthIdx = 2; break; case 'Fall': targetMonthIdx = 8; break; case 'Winter': targetMonthIdx = 10; break; }
+            if (now.getMonth() > targetMonthIdx) year++;
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return { month: months[targetMonthIdx], year: year };
         }
 
-        // ... (Include Standard Helpers: showToast, toggleSettings, modals, etc.) ...
-        
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
-            toast.querySelector('span').innerText = msg;
-            toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
-            toastTimeout = setTimeout(() => { toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible'); }, 2000);
+        function openScoutModal(index) { 
+            currentScout = scoutRecommendations[index].item;
+            suggestedScoutDate = scoutRecommendations[index].date;
+            document.getElementById('scout-modal-name').innerText = currentScout.name;
+            document.getElementById('scout-suggested-date').innerText = `${suggestedScoutDate.month} ${suggestedScoutDate.year}`;
+            document.getElementById('scout-modal').classList.remove('hidden'); 
+            document.getElementById('scout-custom-inputs').classList.add('hidden'); 
         }
         
-        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        function openAddLogModal() { document.getElementById('add-log-modal').classList.remove('hidden'); populateLogDropdown(); }
-        function closeAddLogModal() { document.getElementById('add-log-modal').classList.add('hidden'); }
-        function copyData() { const data = document.getElementById('backup-area'); data.select(); document.execCommand('copy'); alert('Copied!'); }
+        function closeScoutModal() { document.getElementById('scout-modal').classList.add('hidden'); }
+        function toggleScoutCustom() { document.getElementById('scout-custom-inputs').classList.remove('hidden'); }
+        function confirmScoutAdd(useSuggested) {
+            let m, y;
+            if(useSuggested) { m = suggestedScoutDate.month; y = suggestedScoutDate.year; } else { m = document.getElementById('scout-month').value; y = document.getElementById('scout-year').value; }
+            state.data.futurePlan.push({ id: 'plan_' + Date.now(), name: currentScout.name, month: m, year: y, description: currentScout.reason });
+            saveData(); renderTimeline(); closeScoutModal(); showToast('Added to Plan');
+        }
+        function openPlanModal() { document.getElementById('plan-modal').classList.remove('hidden'); }
+        function closePlanModal() { document.getElementById('plan-modal').classList.add('hidden'); document.getElementById('plan-name').value = ''; document.getElementById('plan-desc').value = ''; }
+        function savePlan() { const name = document.getElementById('plan-name').value; const desc = document.getElementById('plan-desc').value; if (!name) return alert("Enter name"); state.data.futurePlan.push({ id: 'plan_' + Date.now(), name, month: "Next", year: new Date().getFullYear(), description: desc }); saveData(); closePlanModal(); renderTimeline(); showToast('Plan Added'); }
+        function deletePlan(id) { if(confirm("Remove?")) { state.data.futurePlan = state.data.futurePlan.filter(p => p.id !== id); saveData(); renderTimeline(); }}
         
-        function populateLogDropdown() {
-             const select = document.getElementById('add-log-fragrance');
-            select.innerHTML = '';
-            
-            const fragGroup = document.createElement('optgroup');
-            fragGroup.label = "Fragrances";
-            state.data.fragrances.forEach(f => {
-                const opt = document.createElement('option');
-                opt.value = f.id;
-                opt.text = f.name;
-                fragGroup.appendChild(opt);
-            });
-            select.appendChild(fragGroup);
-            
-            const comboGroup = document.createElement('optgroup');
-            comboGroup.label = "Combos";
-            state.data.combos.forEach(c => {
-                 const opt = document.createElement('option');
-                 opt.value = c.id;
-                 opt.text = c.name + " (Combo)";
-                 comboGroup.appendChild(opt);
-            });
-            select.appendChild(comboGroup);
-            
-             const now = new Date();
-             const isoString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
-             document.getElementById('add-log-date').value = isoString;
+        function setRating(id, tier) {
+            const f = state.data.fragrances.find(i => i.id === id);
+            if(f) { f.userRating = tier; saveData(); showCollection(); initScout(); }
         }
 
-        // Required logic for other views (Collection, Timeline, Scout) fully implemented in prior steps
-        // Merging key functions below to ensure self-contained file works.
-        
+        function togglePairingOnly(id) {
+            const f = state.data.fragrances.find(i => i.id === id);
+            if(f) { f.pairingOnly = !f.pairingOnly; saveData(); showCollection(); showToast(f.pairingOnly ? "Set to Pairing Only" : "Set to Solo + Pairing"); }
+        }
+
+        function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); document.getElementById('sa-results').classList.add('hidden'); tempSmartObj = null; }
+        function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); document.getElementById('sa-text').value = ''; document.getElementById('sa-name').value = ''; document.getElementById('sa-brand').value = ''; document.getElementById('sa-is-decant').checked = false; }
+        function analyzeText() {
+            const text = document.getElementById('sa-text').value.toLowerCase();
+            const name = document.getElementById('sa-name').value;
+            const brand = document.getElementById('sa-brand').value;
+            if(!text) return alert("Paste text first");
+            let tags = []; let affinity = { winter_sunny: 0, winter_rainy: 0, summer_sunny: 0, summer_rainy: 0, spring: 0, fall: 0 }; let ratings = { office: 2, gym: 1, casual: 3, date_night: 2, intimate: 2 };
+            if (KEYWORDS.winter.some(k => text.includes(k))) { tags.push('winter', 'cozy'); affinity.winter_sunny += 2; affinity.winter_rainy += 2; affinity.summer_sunny -= 3; ratings.date_night += 2; ratings.intimate += 2; ratings.gym = 0; }
+            if (KEYWORDS.summer.some(k => text.includes(k))) { tags.push('fresh', 'citrus'); affinity.summer_sunny += 2; affinity.summer_rainy += 1; affinity.winter_sunny -= 1; ratings.gym += 3; ratings.office += 2; ratings.date_night -= 1; }
+            if (KEYWORDS.fall.some(k => text.includes(k))) { tags.push('woody', 'spicy'); affinity.fall += 2; affinity.spring += 1; ratings.casual += 2; ratings.office += 1; }
+            if (KEYWORDS.office.some(k => text.includes(k))) { tags.push('clean', 'safe'); ratings.office += 3; ratings.gym += 1; }
+            if(text.includes('dark') || text.includes('mysterious') || text.includes('incense')) { tags.push('suspense'); ratings.date_night += 1; }
+            let comboSuggestion = "None detected"; if(tags.includes('fresh')) comboSuggestion = "Try layering with Aventus/Gentle Silver for depth."; if(tags.includes('winter')) comboSuggestion = "Try layering with Vanille Absolute for sweetness.";
+            const resultsDiv = document.getElementById('sa-results'); resultsDiv.classList.remove('hidden'); document.getElementById('sa-tags').innerHTML = tags.map(t => `<span class="bg-teal-900 text-teal-300 text-[10px] px-2 py-1 rounded-full">${t}</span>`).join(''); document.getElementById('sa-combo').innerText = comboSuggestion;
+            tempSmartObj = { id: 'custom_' + Date.now(), name: name, brand: brand, inspiration: "Imported", tags: tags, weatherAffinity: affinity, situationRatings: ratings, sprayInstructions: "4-5 sprays (Clothes/Neck)", description: "Smart-Added: " + text.substring(0, 50) + "...", wearCount: 0, userNotes: comboSuggestion, userRating: 0, pairingOnly: false };
+        }
+        function saveSmartAdd() { 
+            if(!tempSmartObj) return alert("Please click 'Analyze' first."); 
+            tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; 
+            tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; 
+            const isDecant = document.getElementById('sa-is-decant').checked;
+            
+            if(isDecant) {
+                state.data.decants.push({
+                    id: tempSmartObj.id,
+                    name: tempSmartObj.name,
+                    brand: tempSmartObj.brand,
+                    tags: tempSmartObj.tags,
+                    description: tempSmartObj.description,
+                    rating: null
+                });
+                showToast('Decant Added');
+            } else {
+                state.data.fragrances.push(tempSmartObj); 
+                showToast('Bottle Added');
+            }
+            saveData(); closeSmartAdd(); showCollection(); initScout();
+        }
+
+        function setCollectionMode(mode) {
+            state.ui.collectionMode = mode;
+            document.getElementById('tab-bottles').className = mode === 'bottles' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
+            document.getElementById('tab-decants').className = mode === 'decants' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
+            showCollection();
+        }
+
+        function showCollection() {
+            const list = document.getElementById('collection-list'); list.innerHTML = '';
+            
+            if (state.ui.collectionMode === 'bottles') {
+                state.data.fragrances.sort((a,b) => a.name.localeCompare(b.name)).forEach(f => {
+                    const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5`;
+                    let tiersHtml = '';
+                    TIERS.forEach(tier => {
+                        const isActive = f.userRating === tier;
+                        const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`;
+                        tiersHtml += `<button onclick="setRating('${f.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`;
+                    });
+                    const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3></div>
+                            <div class="flex items-center gap-3">
+                                 <button onclick="togglePairingOnly('${f.id}')" class="${pairingClass} transition-colors" title="Toggle Pairing Only Mode"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></button>
+                                 <button onclick="openNote('${f.id}')" class="text-gray-400"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button>
+                                 <button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 px-2 py-1">Reset</button>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center"><div class="flex gap-1">${tiersHtml}</div><p class="text-[10px] text-gray-400 font-mono mt-1">Wears: ${f.wearCount}</p></div>`;
+                    list.appendChild(div);
+                });
+            } else {
+                if(state.data.decants.length === 0) list.innerHTML = `<div class="text-center text-gray-500 p-4">No decants yet. Use Smart Add to add one.</div>`;
+                state.data.decants.forEach((d, idx) => {
+                    const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5`;
+                    const likeClass = d.rating === 'like' ? 'bg-teal-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-teal-500/20';
+                    const dislikeClass = d.rating === 'dislike' ? 'bg-red-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-red-500/20';
+                    
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${d.brand}</span><h3 class="font-bold text-sm text-white">${d.name}</h3></div>
+                            <button onclick="deleteDecant(${idx})" class="text-gray-600 hover:text-red-500"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <button onclick="rateDecant(${idx}, 'like')" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 ${likeClass}"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-thumbs-up"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg> Keep</button>
+                            <button onclick="rateDecant(${idx}, 'dislike')" class="flex-1 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 ${dislikeClass}"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-thumbs-down"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22h0a3.13 3.13 0 0 1-3-3.88Z"/></svg> Discard</button>
+                        </div>`;
+                    list.appendChild(div);
+                });
+            }
+            if(window.lucide) lucide.createIcons();
+        }
+
+        function rateDecant(idx, rating) {
+            state.data.decants[idx].rating = rating;
+            saveData();
+            showCollection();
+            initScout(); // Re-run scout with new preference
+            showToast(rating === 'like' ? 'Saved Preference' : 'Noted Dislike');
+        }
+
+        function deleteDecant(idx) {
+            if(confirm('Remove this decant?')) {
+                state.data.decants.splice(idx, 1);
+                saveData();
+                showCollection();
+            }
+        }
+
         function setContext(type, value) {
             state.context[type] = value;
             const sus = document.getElementById('suspense-section');
@@ -502,14 +763,15 @@
                 else { btn.classList.remove('btn-active'); btn.classList.add('glass-panel'); const icon = btn.querySelector('svg'); if(icon) { icon.classList.remove('text-white'); if(group === 'situation') icon.classList.add('text-teal-300'); if(val === 'sunny') icon.classList.add('text-yellow-400'); if(val === 'rainy') icon.classList.add('text-blue-400'); } }
             });
         }
-        
+
         function calculateScore(item, isCombo = false) {
-             const ctx = state.context; let score = 0;
+            const ctx = state.context; let score = 0;
             const sitScore = item.situationRatings[ctx.situation] || 0; if (sitScore < 2) return -100; score += sitScore * 2;
             
             if (!isCombo) {
-                if(item.pairingOnly || item.paused) return -999;
+                if(item.pairingOnly) return -999;
                 
+                // TIER BONUSES
                 if (item.userRating === 'S') score += 5.0;
                 else if (item.userRating === 'A') score += 3.0;
                 else if (item.userRating === 'B') score += 1.0;
@@ -518,6 +780,7 @@
                 if (item.weatherAffinity[weatherKey] === undefined) { if (ctx.season === 'fall' && ctx.weather === 'sunny') weatherKey = 'fall'; else if (ctx.season === 'spring' && ctx.weather === 'sunny') weatherKey = 'spring'; }
                 score += (item.weatherAffinity[weatherKey] || 0) * 1.5;
                 
+                // ROTATION PENALTY (Relaxed for S and A)
                 let limit = 5;
                 if (item.userRating === 'S') limit = 12;
                 else if (item.userRating === 'A') limit = 8;
@@ -535,126 +798,159 @@
             const container = document.getElementById('results-container'); container.innerHTML = '';
             const scoredSingles = state.data.fragrances.map(f => ({ ...f, score: calculateScore(f, false), type: 'single' }));
             const scoredCombos = state.data.combos.map(c => ({ ...c, score: calculateScore(c, true), type: 'combo' }));
-            // Add decants to pool
-            const scoredDecants = state.data.decants.map(d => {
-                // Approximate scoring for decants based on tags/season match
-                let score = 0;
-                if(d.tags.includes(state.context.season)) score += 5;
-                return { ...d, score, type: 'decant' };
-            });
-
-            const results = [...scoredSingles, ...scoredCombos, ...scoredDecants].filter(f => f.score > -20).sort((a, b) => b.score - a.score);
+            const results = [...scoredSingles, ...scoredCombos].filter(f => f.score > -20).sort((a, b) => b.score - a.score);
 
             if (results.length === 0) container.innerHTML = `<div class="p-6 text-center text-gray-400">No suitable fragrances found.</div>`;
             else {
-                // Render top 3
-                results.slice(0, 3).forEach((item, idx) => {
-                    if(idx===0) container.appendChild(createTierHeader("🏆 The Signature"));
-                    if(idx===1) container.appendChild(createTierHeader("🥈 Alternative"));
-                    
-                    if(item.type === 'single') container.appendChild(createFragranceCard(item));
-                    else if(item.type === 'combo') container.appendChild(createComboCard(item));
-                    else if(item.type === 'decant') {
-                        // Minimal card for decant result
-                        const div = document.createElement('div');
-                        div.className = "glass-panel p-4 rounded-xl border border-dashed border-teal-500/50";
-                        div.innerHTML = `<h3 class="font-bold text-white">${item.name}</h3><span class="text-[10px] bg-teal-500 px-2 rounded text-white">DECANT</span>
-                        <button onclick="logDecantWear('${item.id}')" class="mt-2 w-full bg-white/10 py-2 rounded text-xs">Log Wear</button>`;
-                        container.appendChild(div);
-                    }
-                });
+                container.appendChild(createTierHeader("🏆 The Signature"));
+                const top = results[0];
+                container.appendChild(top.type === 'single' ? createFragranceCard(top, true) : createComboCard(top, true));
+                const midTier = results.slice(1, 3);
+                if (midTier.length > 0) { container.appendChild(createTierHeader("🥈 Solid Rotation")); midTier.forEach(f => container.appendChild(f.type === 'single' ? createFragranceCard(f, false) : createComboCard(f, false))); }
+                const lowTier = results.slice(3, 6); 
+                if (lowTier.length > 0) { container.appendChild(createTierHeader("🥉 Playable Options")); lowTier.forEach(f => container.appendChild(f.type === 'single' ? createFragranceCard(f, false) : createComboCard(f, false))); }
             }
             switchView('results');
-        }
-        
-        function logDecantWear(id) {
-            state.data.history.push({ id, type: 'decant', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false });
-            saveData();
-            showToast("Logged Decant");
-            switchView('history');
+            document.getElementById('main-content').scrollTop = 0;
+            if (window.lucide) lucide.createIcons();
         }
 
         function createTierHeader(text) { const div = document.createElement('div'); div.className = 'tier-header'; div.innerText = text; return div; }
+        
+        function createFragranceCard(f, isTop) {
+            const div = document.createElement('div');
+            const bgClass = isTop ? 'bg-gradient-to-br from-charcoal-800 to-teal-900/20 border-teal-500/50' : 'glass-panel border-white/5';
+            const wearColor = f.wearCount > 4 ? 'text-red-400' : (f.wearCount === 0 ? 'text-green-400' : 'text-gray-400');
+            div.className = `${bgClass} p-5 rounded-2xl border relative transition-all`;
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <span class="text-[10px] font-bold tracking-widest text-teal-400 uppercase">${f.brand}</span>
+                        <h3 class="text-xl font-bold text-white leading-tight">${f.name}</h3>
+                        <p class="text-xs text-teal-300 italic mt-0.5">${f.inspiration}</p>
+                    </div>
+                    <div class="flex flex-col items-end gap-1"><button onclick="openNote('${f.id}')" class="text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button></div>
+                </div>
+                <div class="bg-black/20 p-3 rounded-lg my-3 border border-white/5"><p class="text-sm text-gray-200 leading-relaxed">"${f.description}"</p></div>
+                <div class="flex items-center gap-2 mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-spray-can text-gray-400"><path d="M3 3h.01"/><path d="M7 5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4l-5 3-5-3V5z"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg><span class="text-xs text-gray-400 font-mono">${f.sprayInstructions}</span></div>
+                <div class="flex justify-between items-center pt-3 border-t border-white/5">
+                    <span class="text-xs font-mono ${wearColor}">Wears: ${f.wearCount}</span>
+                    <button onclick="logWear('${f.id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Wear <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+                </div>`;
+            return div;
+        }
 
-        // Shortened render functions (refer to full logic in previous turns if needed, but essential structure provided)
-        function createFragranceCard(f) {
-             const div = document.createElement('div');
-             div.className = "glass-panel p-4 rounded-xl border border-white/5";
-             div.innerHTML = `<div><h3 class="font-bold text-white">${f.name}</h3><p class="text-xs text-gray-400">${f.sprayInstructions}</p></div><button onclick="logWear('${f.id}')" class="mt-2 w-full bg-teal-600 py-2 rounded text-xs font-bold text-white">Log Wear</button>`;
-             return div;
+        function createComboCard(c, isTop) {
+            const div = document.createElement('div');
+            const bgClass = isTop ? 'bg-gradient-to-br from-purple-900/30 to-teal-900/30 border-teal-500/50' : 'combo-gradient border-teal-500/20';
+            const partNames = c.parts.map(pid => { const f = state.data.fragrances.find(x => x.id === pid); return f ? f.name : pid; }).join(' + ');
+            div.className = `${bgClass} p-5 rounded-2xl border relative transition-all`;
+            div.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div><span class="text-[10px] font-bold tracking-widest text-teal-300 uppercase">LAYER COMBO</span><h3 class="text-xl font-bold text-white leading-tight">${c.name}</h3><p class="text-xs text-gray-300 mt-1">${partNames}</p></div>
+                    <div class="flex flex-col items-end gap-1"><button onclick="openNote('${c.id}')" class="text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sticky-note ${c.userNotes ? 'text-yellow-400 fill-current' : ''}"><path d="M15.5 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2V8.5L15.5 3Z"/><path d="M15 3v6h6"/></svg></button></div>
+                </div>
+                <div class="bg-black/20 p-3 rounded-lg my-3 border border-white/5"><p class="text-sm text-gray-200 leading-relaxed">"${c.description}"</p><div class="mt-2 pt-2 border-t border-white/10 flex items-start gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layers text-teal-300 mt-1"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg><p class="text-xs text-teal-100 font-mono">${c.instructions}</p></div></div>
+                <div class="flex justify-between items-center pt-3 border-t border-white/5"><span class="text-xs font-mono text-gray-400">Combo Wears: ${c.wearCount}</span><button onclick="logComboWear('${c.id}')" class="bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Pair <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></button></div>`;
+            return div;
         }
-        function createComboCard(c) {
-             const div = document.createElement('div');
-             div.className = "combo-gradient p-4 rounded-xl border border-teal-500/30";
-             div.innerHTML = `<div><h3 class="font-bold text-white">${c.name}</h3><p class="text-xs text-teal-200">Combo</p></div><button onclick="logComboWear('${c.id}')" class="mt-2 w-full bg-teal-600 py-2 rounded text-xs font-bold text-white">Log Combo</button>`;
-             return div;
-        }
+
         function logWear(id) {
              const idx = state.data.fragrances.findIndex(f => f.id === id);
-             if (idx > -1) { state.data.fragrances[idx].wearCount++; state.data.history.push({ id, type:'single', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: true }); saveData(); showToast('Wear Logged'); switchView('selector'); }
+             if (idx > -1) { state.data.fragrances[idx].wearCount++; state.data.history.push({ id, type:'single', date: new Date().toISOString(), context: { ...state.context } }); saveData(); showToast('Wear Logged'); setTimeout(() => switchView('selector'), 1000); }
         }
         function logComboWear(id) {
-             state.data.history.push({ id, type:'combo', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false }); saveData(); showToast('Pair Logged'); switchView('history'); 
+             const comboIdx = state.data.combos.findIndex(c => c.id === id);
+             if (comboIdx > -1) { 
+                 const combo = state.data.combos[comboIdx]; combo.wearCount++;
+                 combo.parts.forEach(pid => { const fIdx = state.data.fragrances.findIndex(f => f.id === pid); if(fIdx > -1) state.data.fragrances[fIdx].wearCount++; });
+                 state.data.history.push({ id, type:'combo', date: new Date().toISOString(), context: { ...state.context } }); saveData(); showToast('Pair Logged'); setTimeout(() => switchView('selector'), 1000); 
+            }
         }
 
-        // Initialize empty functions to prevent reference errors if unused
-        function initScout() {}
-        function openScoutModal() {}
-        function closeScoutModal() {}
-        function toggleScoutCustom() {}
-        function confirmScoutAdd() {}
-        function saveMissedLog() {
-             const dateVal = document.getElementById('add-log-date').value;
-            const idVal = document.getElementById('add-log-fragrance').value;
-            const situationVal = document.getElementById('add-log-situation').value;
-            
-            if(!dateVal || !idVal) return alert("Date and Fragrance required");
-            
-            const isCombo = state.data.combos.some(c => c.id === idVal);
-            
-            state.data.history.push({
-                id: idVal,
-                type: isCombo ? 'combo' : 'single',
-                date: new Date(dateVal).toISOString(),
-                context: { situation: situationVal, season: state.context.season, weather: state.context.weather, suspense: false },
-                feedbackRecorded: false 
+        function renderHistory() {
+            const list = document.getElementById('history-list'); list.innerHTML = '';
+            const sortedHistory = [...state.data.history].sort((a,b) => new Date(b.date) - new Date(a.date));
+            if(sortedHistory.length === 0) { list.innerHTML = `<div class="text-center text-gray-500 mt-10">No wear history yet.</div>`; return; }
+            sortedHistory.forEach((log, index) => {
+                const realIndex = state.data.history.indexOf(log);
+                let name = "Unknown Item"; let brand = "";
+                if (log.type === 'single') { const f = state.data.fragrances.find(x => x.id === log.id); if(f) { name = f.name; brand = f.brand; } } else { const c = state.data.combos.find(x => x.id === log.id); if(c) { name = c.name; brand = "Combo"; } }
+                const dateObj = new Date(log.date); const dateStr = dateObj.toLocaleDateString(); const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const div = document.createElement('div'); div.className = "glass-panel p-4 rounded-xl border border-white/5 flex justify-between items-center";
+                div.innerHTML = `<div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] text-gray-400 font-mono">${dateStr} • ${timeStr}</span><span class="text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300 uppercase">${log.context.situation}</span></div><h4 class="font-bold text-white text-sm">${name}</h4><p class="text-[10px] text-teal-400 uppercase tracking-wider">${brand}</p></div><button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-edit-2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg></button>`;
+                list.appendChild(div);
             });
-            
-            saveData();
-            closeAddLogModal();
-            renderHistory();
-            showCollection();
-            showToast('Log Added');
+            if (window.lucide) lucide.createIcons();
         }
         
-        function setCollectionMode(mode) {
-             state.ui.collectionMode = mode;
-             // UI toggle logic here
-             showCollection();
+        function openHistoryEdit(index) {
+            editingHistoryIndex = index;
+            const log = state.data.history[index];
+            const modal = document.getElementById('history-edit-modal');
+            const dateInput = document.getElementById('hist-edit-date');
+            const select = document.getElementById('hist-edit-fragrance');
+            const d = new Date(log.date); const isoString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); dateInput.value = isoString;
+            select.innerHTML = '';
+            const optGroupFrag = document.createElement('optgroup'); optGroupFrag.label = "Fragrances";
+            state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; if(f.id === log.id) opt.selected = true; optGroupFrag.appendChild(opt); });
+            select.appendChild(optGroupFrag);
+            const optGroupCombo = document.createElement('optgroup'); optGroupCombo.label = "Combos";
+            state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; if(c.id === log.id) opt.selected = true; optGroupCombo.appendChild(opt); });
+            select.appendChild(optGroupCombo);
+            modal.classList.remove('hidden');
         }
-        function showCollection() {
-             const list = document.getElementById('collection-list');
-             list.innerHTML = `<div class="p-4 text-gray-500 text-center">Collection View Active (${state.ui.collectionMode})</div>`;
-             // Full render logic omitted for brevity in this specific fix block, but essential structure is here.
+        function closeHistoryEdit() { document.getElementById('history-edit-modal').classList.add('hidden'); editingHistoryIndex = null; }
+        function saveHistoryEdit() {
+            if (editingHistoryIndex === null) return;
+            const log = state.data.history[editingHistoryIndex]; const newDate = document.getElementById('hist-edit-date').value; const newId = document.getElementById('hist-edit-fragrance').value; const oldId = log.id;
+            log.date = new Date(newDate).toISOString();
+            if (newId !== oldId) { changeWearCount(oldId, -1); changeWearCount(newId, 1); log.id = newId; const isCombo = state.data.combos.some(c => c.id === newId); log.type = isCombo ? 'combo' : 'single'; }
+            saveData(); closeHistoryEdit(); renderHistory(); showCollection(); showToast('Log Updated');
         }
-        function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); }
-        function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); }
-        function analyzeText() { alert("Paste text logic"); }
-        function saveSmartAdd() { alert("Saved"); closeSmartAdd(); }
-        function setRating() {}
-        function togglePairingOnly() {}
-        function openNote() {}
-        function closeNotesModal() { document.getElementById('notes-modal').classList.add('hidden'); }
-        function saveNote() {}
-        function resetWear() {}
-        function deleteDecant() {}
-        function rateDecant() {}
+        function deleteHistoryEntry() { if (editingHistoryIndex === null) return; if(!confirm("Delete this log entry?")) return; const log = state.data.history[editingHistoryIndex]; changeWearCount(log.id, -1); state.data.history.splice(editingHistoryIndex, 1); saveData(); closeHistoryEdit(); renderHistory(); showCollection(); showToast('Entry Deleted'); }
+        function changeWearCount(id, delta) {
+            const fIdx = state.data.fragrances.findIndex(f => f.id === id); if (fIdx > -1) { state.data.fragrances[fIdx].wearCount += delta; if(state.data.fragrances[fIdx].wearCount < 0) state.data.fragrances[fIdx].wearCount = 0; return; }
+            const cIdx = state.data.combos.findIndex(c => c.id === id); if (cIdx > -1) { const combo = state.data.combos[cIdx]; combo.wearCount += delta; if(combo.wearCount < 0) combo.wearCount = 0; combo.parts.forEach(pid => { const partIdx = state.data.fragrances.findIndex(f => f.id === pid); if(partIdx > -1) { state.data.fragrances[partIdx].wearCount += delta; if(state.data.fragrances[partIdx].wearCount < 0) state.data.fragrances[partIdx].wearCount = 0; } }); }
+        }
+        function renderTimeline() {
+            const container = document.getElementById('timeline-list'); container.innerHTML = '';
+            const sorted = state.data.futurePlan.sort((a, b) => { if (a.year !== b.year) return a.year - b.year; const ma = MONTH_MAP[a.month] || 99; const mb = MONTH_MAP[b.month] || 99; return ma - mb; });
+            sorted.forEach((item, index) => {
+                const div = document.createElement('div'); div.className = 'relative z-10 mb-8 pl-8'; const isNext = index === 0;
+                div.innerHTML = `<div class="absolute left-1 top-2 w-3 h-3 ${isNext ? 'bg-teal-500' : 'bg-gray-600'} rounded-full border-4 border-charcoal-700"></div><div class="flex justify-between items-center"><span class="text-xs font-mono ${isNext ? 'text-teal-400' : 'text-gray-400'} uppercase tracking-widest">${item.month} ${item.year}</span><button onclick="deletePlan('${item.id}')" class="text-gray-600 hover:text-red-500"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button></div><div class="glass-panel p-4 mt-2 rounded-xl border border-white/5 ${!isNext ? 'opacity-80' : ''}"><h3 class="font-bold text-lg">${item.name}</h3><p class="text-sm text-gray-400">${item.description}</p></div>`;
+                container.appendChild(div);
+            });
+            if (window.lucide) lucide.createIcons();
+        }
+        function switchView(viewName) {
+            document.getElementById('view-selector').classList.add('hidden'); document.getElementById('view-results').classList.add('hidden'); document.getElementById('view-collection').classList.add('hidden'); document.getElementById('view-timeline').classList.add('hidden'); document.getElementById('view-history').classList.add('hidden');
+            document.getElementById(`view-${viewName === 'results' ? 'results' : viewName}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-teal-500'));
+            const navMap = { 'selector': 0, 'collection': 1, 'history': 2, 'timeline': 3 };
+            const navIndex = navMap[viewName] !== undefined ? navMap[viewName] : 0;
+            if (document.querySelectorAll('.nav-btn')[navIndex]) document.querySelectorAll('.nav-btn')[navIndex].classList.add('text-teal-500');
+            if (viewName === 'collection') showCollection(); if (viewName === 'timeline') renderTimeline(); if (viewName === 'history') renderHistory();
+            document.getElementById('main-content').scrollTop = 0;
+        }
+        function showToast(msg) {
+            const toast = document.getElementById('toast'); if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
+            toast.querySelector('span').innerText = msg; toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
+            toastTimeout = setTimeout(() => { toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible'); }, 2000);
+        }
+        function dismissInstallPrompt() { document.getElementById('install-prompt').classList.add('translate-y-full'); }
+        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
+        function copyData() { const data = document.getElementById('backup-area'); data.select(); document.execCommand('copy'); alert('Copied!'); }
+        function toggleRestoreMode() { document.getElementById('restore-section').classList.toggle('hidden'); }
+        function restoreData() { try { const parsed = JSON.parse(document.getElementById('restore-area').value); state.data = parsed; saveData(); location.reload(); } catch (e) { alert('Invalid JSON'); } }
+        
         function openPlanModal() { document.getElementById('plan-modal').classList.remove('hidden'); }
-        function closePlanModal() { document.getElementById('plan-modal').classList.add('hidden'); }
-        function savePlan() {}
-        function deletePlan() {}
-
+        function closePlanModal() { document.getElementById('plan-modal').classList.add('hidden'); document.getElementById('plan-name').value = ''; document.getElementById('plan-desc').value = ''; }
+        function savePlan() { const name = document.getElementById('plan-name').value; const desc = document.getElementById('plan-desc').value; if (!name) return alert("Enter name"); state.data.futurePlan.push({ id: 'plan_' + Date.now(), name, month: "Next", year: new Date().getFullYear(), description: desc }); saveData(); closePlanModal(); renderTimeline(); showToast('Plan Added'); }
+        function deletePlan(id) { if(confirm("Remove?")) { state.data.futurePlan = state.data.futurePlan.filter(p => p.id !== id); saveData(); renderTimeline(); }}
+        function openNote(id) { currentNoteId = id; let item = state.data.fragrances.find(f => f.id === id); if (!item) item = state.data.combos.find(c => c.id === id); document.getElementById('note-input').value = item.userNotes || ""; document.getElementById('notes-modal').classList.remove('hidden'); }
+        function closeNotesModal() { document.getElementById('notes-modal').classList.add('hidden'); currentNoteId = null; }
+        function saveNote() { if (!currentNoteId) return; const text = document.getElementById('note-input').value; let item = state.data.fragrances.find(f => f.id === currentNoteId); if (!item) item = state.data.combos.find(c => c.id === currentNoteId); if (item) { item.userNotes = text; saveData(); showToast('Note Saved'); closeNotesModal(); if(!document.getElementById('view-results').classList.contains('hidden')) generateRecommendations(); if(!document.getElementById('view-collection').classList.contains('hidden')) showCollection(); } }
     </script>
 </body>
 </html>
-
