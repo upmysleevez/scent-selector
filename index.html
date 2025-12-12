@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="ScentSelector">
     <meta name="theme-color" content="#1F2121">
-    <title>Fragrance Sommelier v58</title>
+    <title>Fragrance Sommelier v60</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -105,44 +105,28 @@
 
     <!-- MAIN CONTENT AREA -->
     <div id="app-container" class="flex-1 flex flex-col relative h-full">
-        <!-- pt-36 to clear header, pb-48 to clear footer -->
-        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-36 pb-48" id="main-content">
+        <!-- pt-36 to clear header, pb-32 to clear footer -->
+        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-36 pb-32" id="main-content">
             
             <!-- VIEW 1: SELECTOR -->
             <div id="view-selector" class="space-y-6 max-w-md mx-auto fade-enter-active">
                 <section>
                     <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Situation</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="setContext('situation', 'office')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="office">
-                            <i data-lucide="briefcase" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Office</span>
-                        </button>
-                        <button onclick="setContext('situation', 'gym')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="gym">
-                            <i data-lucide="dumbbell" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Gym</span>
-                        </button>
-                        <button onclick="setContext('situation', 'date_night')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="date_night">
-                            <i data-lucide="wine" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Date Night</span>
-                        </button>
-                        <button onclick="setContext('situation', 'casual')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="casual">
-                            <i data-lucide="coffee" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Casual</span>
-                        </button>
-                        <button onclick="setContext('situation', 'intimate')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all col-span-2" data-group="situation" data-val="intimate">
-                            <i data-lucide="flame" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Intimate</span>
-                        </button>
+                        <button onclick="setContext('situation', 'office')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="office"><i data-lucide="briefcase" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Office</span></button>
+                        <button onclick="setContext('situation', 'gym')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="gym"><i data-lucide="dumbbell" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Gym</span></button>
+                        <button onclick="setContext('situation', 'date_night')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="date_night"><i data-lucide="wine" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Date Night</span></button>
+                        <button onclick="setContext('situation', 'casual')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all" data-group="situation" data-val="casual"><i data-lucide="coffee" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Casual</span></button>
+                        <button onclick="setContext('situation', 'intimate')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all col-span-2" data-group="situation" data-val="intimate"><i data-lucide="flame" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Intimate</span></button>
                     </div>
                 </section>
-
                 <section>
                     <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Weather</label>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="setContext('weather', 'sunny')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="sunny">
-                            <i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i><span class="text-sm">Sunny</span>
-                        </button>
-                        <button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="rainy">
-                            <i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i><span class="text-sm">Rainy/Cold</span>
-                        </button>
+                        <button onclick="setContext('weather', 'sunny')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="sunny"><i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i><span class="text-sm">Sunny</span></button>
+                        <button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="rainy"><i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i><span class="text-sm">Rainy/Cold</span></button>
                     </div>
                 </section>
-
                 <section>
                     <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Season</label>
                     <div class="grid grid-cols-4 gap-2">
@@ -152,36 +136,18 @@
                         <button onclick="setContext('season', 'fall')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="fall">Fall</button>
                     </div>
                 </section>
-
                 <section id="suspense-section" class="hidden transition-all duration-300">
                     <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-teal-500/30 border">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-teal-500/20 p-2 rounded-lg">
-                                <i data-lucide="ghost" class="w-5 h-5 text-teal-300"></i>
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-semibold text-teal-100">Suspense Mode</h4>
-                                <p class="text-xs text-gray-400">Prioritize mystery & depth</p>
-                            </div>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="suspense-toggle" class="sr-only peer" onchange="toggleSuspense()">
-                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
-                        </label>
+                        <div class="flex items-center gap-3"><div class="bg-teal-500/20 p-2 rounded-lg"><i data-lucide="ghost" class="w-5 h-5 text-teal-300"></i></div><div><h4 class="text-sm font-semibold text-teal-100">Suspense Mode</h4><p class="text-xs text-gray-400">Prioritize mystery & depth</p></div></div>
+                        <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="suspense-toggle" class="sr-only peer" onchange="toggleSuspense()"><div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label>
                     </div>
                 </section>
-
-                <button onclick="generateRecommendations()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-900/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4">
-                    <i data-lucide="sparkles" class="w-5 h-5"></i>
-                    <span>Find My Scent</span>
-                </button>
+                <button onclick="generateRecommendations()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-900/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4"><i data-lucide="sparkles" class="w-5 h-5"></i><span>Find My Scent</span></button>
             </div>
 
             <!-- VIEW 2: RESULTS (TIERED) -->
             <div id="view-results" class="hidden space-y-4 max-w-md mx-auto">
-                <button onclick="resetView()" class="mb-4 text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Filter
-                </button>
+                <button onclick="resetView()" class="mb-4 text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Filter</button>
                 <div id="results-container" class="space-y-2"></div>
             </div>
 
@@ -189,47 +155,37 @@
             <div id="view-collection" class="hidden space-y-4 max-w-md mx-auto relative">
                 <div class="flex justify-between items-center mb-4">
                      <h2 class="text-2xl font-bold">My Collection</h2>
-                     <button onclick="openSmartAdd()" class="bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 shadow-lg">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Add
-                     </button>
+                     <button onclick="openSmartAdd()" class="bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 shadow-lg"><i data-lucide="plus" class="w-4 h-4"></i> Add</button>
                 </div>
-                
-                <!-- Toggle Switch -->
                 <div class="flex p-1 bg-black/40 rounded-xl mb-4 border border-white/5">
                     <button onclick="setCollectionMode('bottles')" id="tab-bottles" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white">Bottles</button>
                     <button onclick="setCollectionMode('decants')" id="tab-decants" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Decants</button>
                      <button onclick="setCollectionMode('combos')" id="tab-combos" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Combos</button>
                 </div>
-
                 <div id="collection-list" class="space-y-3"></div>
             </div>
 
-            <!-- VIEW 4: HISTORY -->
+            <!-- VIEW 4: HISTORY (Moved from pos 5 to 4) -->
             <div id="view-history" class="hidden space-y-4 max-w-md mx-auto relative">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Wear Log</h2>
                     <!-- ADD ENTRY BUTTON -->
-                    <button onclick="openAddLogModal()" class="bg-teal-500 p-2 rounded-full shadow-lg active:scale-90 transition-transform text-white">
-                        <i data-lucide="plus-square" class="w-5 h-5"></i>
-                    </button>
+                    <button onclick="openAddLogModal()" class="bg-teal-500 p-2 rounded-full shadow-lg active:scale-90 transition-transform text-white"><i data-lucide="plus-square" class="w-5 h-5"></i></button>
                 </div>
                 <div id="history-list" class="space-y-3"></div>
             </div>
         </main>
         
-        <!-- FOOTER NAV - SOLID CHARCOAL -->
+        <!-- FOOTER NAV - SOLID CHARCOAL, 3 ITEMS -->
         <nav class="fixed bottom-0 w-full bg-charcoal-900 border-t border-white/5 flex justify-around items-center px-4 pt-4 z-50 safe-bottom pb-6 shadow-2xl">
             <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1.5 text-teal-500 active:scale-95 transition-transform">
-                <i data-lucide="search" class="w-8 h-8"></i>
-                <span class="text-xs font-bold tracking-wide">Select</span>
+                <i data-lucide="search" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Select</span>
             </button>
             <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
-                <i data-lucide="library" class="w-8 h-8"></i>
-                <span class="text-xs font-bold tracking-wide">Collect</span>
+                <i data-lucide="library" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Collect</span>
             </button>
             <button onclick="switchView('history')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
-                <i data-lucide="history" class="w-8 h-8"></i>
-                <span class="text-xs font-bold tracking-wide">History</span>
+                <i data-lucide="history" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">History</span>
             </button>
         </nav>
     </div>
@@ -237,84 +193,37 @@
     <!-- MODALS -->
     
     <!-- History Edit Modal -->
-    <div id="history-edit-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
-            <h3 class="text-xl font-bold mb-4">Edit Log</h3>
-            <div class="space-y-4">
-                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="hist-edit-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div>
-                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label><select id="hist-edit-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div>
-                <div class="flex gap-2 pt-2"><button onclick="closeHistoryEdit()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveHistoryEdit()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Update Log</button></div>
-                <button onclick="deleteHistoryEntry()" class="w-full text-red-400 text-xs font-bold py-2 mt-2 hover:text-red-300">Delete Entry</button>
-            </div>
-        </div>
-    </div>
+    <div id="history-edit-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><h3 class="text-xl font-bold mb-4">Edit Log</h3><div class="space-y-4"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="hist-edit-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label><select id="hist-edit-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div><div class="flex gap-2 pt-2"><button onclick="closeHistoryEdit()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveHistoryEdit()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Update Log</button></div><button onclick="deleteHistoryEntry()" class="w-full text-red-400 text-xs font-bold py-2 mt-2 hover:text-red-300">Delete Entry</button></div></div></div>
 
     <!-- Smart Add Modal -->
-    <div id="smart-add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all h-[80vh] flex flex-col">
-            <div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Smart Add</h3><button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button></div>
-            <div class="space-y-4 overflow-y-auto no-scrollbar flex-1">
-                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label><input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name"><input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House"></div>
-                <div class="flex items-center gap-2 mt-2"><input type="checkbox" id="sa-is-decant" class="w-4 h-4 rounded border-gray-600 text-teal-500 focus:ring-teal-500"><label for="sa-is-decant" class="text-sm font-bold text-gray-300">Save as Decant/Sample</label></div>
-                <div class="bg-teal-900/20 p-4 rounded-xl border border-teal-500/20">
-                    <div class="flex items-center gap-2 mb-2"><i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i><label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label></div>
-                    <textarea id="sa-text" class="w-full bg-black/40 text-xs text-gray-300 p-3 rounded-lg border border-white/10 h-32 focus:outline-none focus:border-teal-500" placeholder="Paste notes/description..."></textarea>
-                    <button onclick="analyzeText()" class="w-full mt-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-2 rounded-lg">Analyze & Auto-Fill</button>
-                </div>
-                <div id="sa-results" class="hidden space-y-3"><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4><div id="sa-tags" class="flex flex-wrap gap-1"></div></div><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4><p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p></div></div>
-            </div>
-            <button onclick="saveSmartAdd()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Save to Collection</button>
-        </div>
-    </div>
+    <div id="smart-add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Smart Add</h3><button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button></div><div class="space-y-4 overflow-y-auto no-scrollbar flex-1"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label><input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name"><input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House"></div><div class="flex items-center gap-2 mt-2"><input type="checkbox" id="sa-is-decant" class="w-4 h-4 rounded border-gray-600 text-teal-500 focus:ring-teal-500"><label for="sa-is-decant" class="text-sm font-bold text-gray-300">Save as Decant/Sample</label></div><div class="bg-teal-900/20 p-4 rounded-xl border border-teal-500/20"><div class="flex items-center gap-2 mb-2"><i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i><label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label></div><textarea id="sa-text" class="w-full bg-black/40 text-xs text-gray-300 p-3 rounded-lg border border-white/10 h-32 focus:outline-none focus:border-teal-500" placeholder="Paste notes/description..."></textarea><button onclick="analyzeText()" class="w-full mt-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-2 rounded-lg">Analyze & Auto-Fill</button></div><div id="sa-results" class="hidden space-y-3"><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4><div id="sa-tags" class="flex flex-wrap gap-1"></div></div><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4><p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p></div></div></div><button onclick="saveSmartAdd()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Save to Collection</button></div></div>
     
     <!-- Settings Modal -->
     <div id="settings-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
         <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
             <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">Data</h3><button onclick="toggleSettings()" class="p-2"><i data-lucide="x" class="w-4 h-4"></i></button></div>
             <textarea id="backup-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" readonly></textarea>
-            <div class="flex gap-2 mb-4"><button onclick="copyData()" class="flex-1 bg-white/10 hover:bg-white/20 py-2 rounded-lg text-xs font-bold">Copy</button><button onclick="hardReset()" class="flex-1 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg text-xs font-bold">Hard Reset</button></div>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button onclick="copyData()" class="bg-white/10 hover:bg-white/20 py-2 rounded-lg text-xs font-bold">Copy JSON</button>
+                <button onclick="copyStats()" class="bg-teal-500/20 hover:bg-teal-500/40 text-teal-300 py-2 rounded-lg text-xs font-bold">Copy Stats</button>
+                <button onclick="hardReset()" class="col-span-2 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg text-xs font-bold">Hard Reset</button>
+            </div>
             <textarea id="restore-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" placeholder="Paste JSON"></textarea>
             <button onclick="restoreData()" class="w-full bg-teal-500 hover:bg-teal-400 py-2 rounded-lg text-xs font-bold">Restore (Smart Merge)</button>
         </div>
     </div>
     
     <!-- Notes Modal -->
-    <div id="notes-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4">
-        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6">
-            <h3 class="mb-2 font-bold">Notes</h3>
-            <textarea id="note-input" class="w-full input-glass p-3 h-32 mb-4 rounded"></textarea>
-            <div class="flex gap-2"><button onclick="closeNotesModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="saveNote()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div>
-        </div>
-    </div>
+    <div id="notes-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6"><h3 class="mb-2 font-bold">Notes</h3><textarea id="note-input" class="w-full input-glass p-3 h-32 mb-4 rounded"></textarea><div class="flex gap-2"><button onclick="closeNotesModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="saveNote()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div></div></div>
 
     <!-- Add Log Modal -->
-    <div id="add-log-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
-            <h3 class="text-xl font-bold mb-4">Log Missed Wear</h3>
-            <div class="space-y-4">
-                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="add-log-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div>
-                <div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance / Combo</label><select id="add-log-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div>
-                <div>
-                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Situation</label>
-                     <select id="add-log-situation" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none">
-                         <option value="office">Office</option>
-                         <option value="gym">Gym</option>
-                         <option value="date_night">Date Night</option>
-                         <option value="casual">Casual</option>
-                         <option value="intimate">Intimate</option>
-                     </select>
-                </div>
-                <div class="flex gap-2 pt-2"><button onclick="closeAddLogModal()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveMissedLog()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Save Log</button></div>
-            </div>
-        </div>
-    </div>
+    <div id="add-log-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><h3 class="text-xl font-bold mb-4">Log Missed Wear</h3><div class="space-y-4"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="add-log-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance / Combo</label><select id="add-log-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Situation</label><select id="add-log-situation" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"><option value="office">Office</option><option value="gym">Gym</option><option value="date_night">Date Night</option><option value="casual">Casual</option><option value="intimate">Intimate</option></select></div><div class="flex gap-2 pt-2"><button onclick="closeAddLogModal()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveMissedLog()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Save Log</button></div></div></div></div>
 
     <!-- TOAST -->
     <div id="toast" class="fixed top-32 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]"><i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span></div>
 
     <script>
-        const APP_ID = "scentApp_db_v58_fixed"; 
-        const MONTH_MAP = { "Jan": 0, "Feb": 1, "Mar": 2, "Apr": 3, "May": 4, "Jun": 5, "Jul": 6, "Aug": 7, "Sep": 8, "Oct": 9, "Nov": 10, "Dec": 11, "Next": 0.5 };
+        const APP_ID = "scentApp_db_v60_clean_no_future"; 
         const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
         let state = {
@@ -1029,9 +938,6 @@
         function openNote(id) { currentNoteId = id; let item = state.data.fragrances.find(f => f.id === id); if (!item) item = state.data.combos.find(c => c.id === id); document.getElementById('note-input').value = item.userNotes || ""; document.getElementById('notes-modal').classList.remove('hidden'); }
         function closeNotesModal() { document.getElementById('notes-modal').classList.add('hidden'); }
         function saveNote() {}
-        function openPlanModal() { document.getElementById('plan-modal').classList.remove('hidden'); }
-        function closePlanModal() { document.getElementById('plan-modal').classList.add('hidden'); }
-        function savePlan() {}
         
         function openAddLogModal() {
             const select = document.getElementById('add-log-fragrance');
@@ -1068,6 +974,26 @@
         
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
         function copyData() { const data = document.getElementById('backup-area'); data.select(); document.execCommand('copy'); alert('Copied!'); }
+        function copyStats() {
+            let report = "--- FRAGRANCE SOMMELIER STATS ---\n\n";
+            report += "== BOTTLES ==\n";
+            state.data.fragrances.sort((a,b) => b.wearCount - a.wearCount).forEach(f => {
+                report += `${f.name}: ${f.wearCount}\n`;
+            });
+            
+            report += "\n== COMBOS ==\n";
+            state.data.combos.sort((a,b) => b.wearCount - a.wearCount).forEach(c => {
+                if(c.wearCount > 0) report += `${c.name}: ${c.wearCount}\n`;
+            });
+
+            report += `\n== TOTAL LOGS: ${state.data.history.length} ==`;
+
+            const area = document.getElementById('backup-area');
+            area.value = report;
+            area.select();
+            document.execCommand('copy');
+            showToast('Stats Copied');
+        }
         function resetView() { switchView('selector'); }
 
     </script>
