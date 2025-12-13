@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="ScentSelector">
     <meta name="theme-color" content="#1F2121">
-    <title>Fragrance Sommelier v60</title>
+    <title>Fragrance Sommelier v63</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -90,7 +90,7 @@
 </head>
 <body class="h-screen w-screen flex flex-col overflow-hidden text-gray-100 selection:bg-teal-500 selection:text-white">
 
-    <!-- HEADER -->
+    <!-- HEADER (Solid Background, Fixed) -->
     <header class="fixed top-0 w-full z-50 bg-charcoal-700 border-b border-white/5 shadow-lg px-6 py-4 safe-top">
         <div class="flex justify-between items-center">
             <div>
@@ -105,8 +105,8 @@
 
     <!-- MAIN CONTENT AREA -->
     <div id="app-container" class="flex-1 flex flex-col relative h-full">
-        <!-- pt-36 to clear header, pb-32 to clear footer -->
-        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-36 pb-32" id="main-content">
+        <!-- pt-36 to fully clear the header and provide breathing room -->
+        <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-36 pb-48" id="main-content">
             
             <!-- VIEW 1: SELECTOR -->
             <div id="view-selector" class="space-y-6 max-w-md mx-auto fade-enter-active">
@@ -120,6 +120,7 @@
                         <button onclick="setContext('situation', 'intimate')" class="ctx-btn glass-panel p-4 rounded-xl flex flex-col items-center gap-2 active:scale-95 transition-all col-span-2" data-group="situation" data-val="intimate"><i data-lucide="flame" class="w-6 h-6 text-teal-300"></i><span class="text-sm font-medium">Intimate</span></button>
                     </div>
                 </section>
+
                 <section>
                     <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Weather</label>
                     <div class="grid grid-cols-2 gap-3">
@@ -127,6 +128,7 @@
                         <button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="rainy"><i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i><span class="text-sm">Rainy/Cold</span></button>
                     </div>
                 </section>
+
                 <section>
                     <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Season</label>
                     <div class="grid grid-cols-4 gap-2">
@@ -136,12 +138,14 @@
                         <button onclick="setContext('season', 'fall')" class="ctx-btn glass-panel py-3 rounded-lg text-xs font-medium active:scale-95 transition-all" data-group="season" data-val="fall">Fall</button>
                     </div>
                 </section>
+
                 <section id="suspense-section" class="hidden transition-all duration-300">
                     <div class="glass-panel p-4 rounded-xl flex items-center justify-between border-teal-500/30 border">
                         <div class="flex items-center gap-3"><div class="bg-teal-500/20 p-2 rounded-lg"><i data-lucide="ghost" class="w-5 h-5 text-teal-300"></i></div><div><h4 class="text-sm font-semibold text-teal-100">Suspense Mode</h4><p class="text-xs text-gray-400">Prioritize mystery & depth</p></div></div>
                         <label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" id="suspense-toggle" class="sr-only peer" onchange="toggleSuspense()"><div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div></label>
                     </div>
                 </section>
+
                 <button onclick="generateRecommendations()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-4 rounded-xl shadow-lg shadow-teal-900/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-4"><i data-lucide="sparkles" class="w-5 h-5"></i><span>Find My Scent</span></button>
             </div>
 
@@ -153,19 +157,16 @@
 
             <!-- VIEW 3: COLLECTION -->
             <div id="view-collection" class="hidden space-y-4 max-w-md mx-auto relative">
-                <div class="flex justify-between items-center mb-4">
-                     <h2 class="text-2xl font-bold">My Collection</h2>
-                     <button onclick="openSmartAdd()" class="bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 shadow-lg"><i data-lucide="plus" class="w-4 h-4"></i> Add</button>
-                </div>
+                <div class="flex justify-between items-center mb-4"><h2 class="text-2xl font-bold">My Collection</h2><button onclick="openSmartAdd()" class="bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 shadow-lg"><i data-lucide="plus" class="w-4 h-4"></i> Add</button></div>
                 <div class="flex p-1 bg-black/40 rounded-xl mb-4 border border-white/5">
                     <button onclick="setCollectionMode('bottles')" id="tab-bottles" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white">Bottles</button>
                     <button onclick="setCollectionMode('decants')" id="tab-decants" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Decants</button>
-                     <button onclick="setCollectionMode('combos')" id="tab-combos" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Combos</button>
+                    <button onclick="setCollectionMode('combos')" id="tab-combos" class="flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white">Combos</button>
                 </div>
                 <div id="collection-list" class="space-y-3"></div>
             </div>
 
-            <!-- VIEW 4: HISTORY (Moved from pos 5 to 4) -->
+            <!-- VIEW 5: HISTORY -->
             <div id="view-history" class="hidden space-y-4 max-w-md mx-auto relative">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Wear Log</h2>
@@ -176,17 +177,11 @@
             </div>
         </main>
         
-        <!-- FOOTER NAV - SOLID CHARCOAL, 3 ITEMS -->
+        <!-- FOOTER NAV - SOLID CHARCOAL -->
         <nav class="fixed bottom-0 w-full bg-charcoal-900 border-t border-white/5 flex justify-around items-center px-4 pt-4 z-50 safe-bottom pb-6 shadow-2xl">
-            <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1.5 text-teal-500 active:scale-95 transition-transform">
-                <i data-lucide="search" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Select</span>
-            </button>
-            <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
-                <i data-lucide="library" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Collect</span>
-            </button>
-            <button onclick="switchView('history')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform">
-                <i data-lucide="history" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">History</span>
-            </button>
+            <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1.5 text-teal-500 active:scale-95 transition-transform"><i data-lucide="search" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Select</span></button>
+            <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform"><i data-lucide="library" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Collect</span></button>
+            <button onclick="switchView('history')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform"><i data-lucide="history" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">History</span></button>
         </nav>
     </div>
 
@@ -199,19 +194,7 @@
     <div id="smart-add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Smart Add</h3><button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button></div><div class="space-y-4 overflow-y-auto no-scrollbar flex-1"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label><input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name"><input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House"></div><div class="flex items-center gap-2 mt-2"><input type="checkbox" id="sa-is-decant" class="w-4 h-4 rounded border-gray-600 text-teal-500 focus:ring-teal-500"><label for="sa-is-decant" class="text-sm font-bold text-gray-300">Save as Decant/Sample</label></div><div class="bg-teal-900/20 p-4 rounded-xl border border-teal-500/20"><div class="flex items-center gap-2 mb-2"><i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i><label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label></div><textarea id="sa-text" class="w-full bg-black/40 text-xs text-gray-300 p-3 rounded-lg border border-white/10 h-32 focus:outline-none focus:border-teal-500" placeholder="Paste notes/description..."></textarea><button onclick="analyzeText()" class="w-full mt-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-2 rounded-lg">Analyze & Auto-Fill</button></div><div id="sa-results" class="hidden space-y-3"><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4><div id="sa-tags" class="flex flex-wrap gap-1"></div></div><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4><p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p></div></div></div><button onclick="saveSmartAdd()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Save to Collection</button></div></div>
     
     <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10">
-            <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">Data</h3><button onclick="toggleSettings()" class="p-2"><i data-lucide="x" class="w-4 h-4"></i></button></div>
-            <textarea id="backup-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" readonly></textarea>
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <button onclick="copyData()" class="bg-white/10 hover:bg-white/20 py-2 rounded-lg text-xs font-bold">Copy JSON</button>
-                <button onclick="copyStats()" class="bg-teal-500/20 hover:bg-teal-500/40 text-teal-300 py-2 rounded-lg text-xs font-bold">Copy Stats</button>
-                <button onclick="hardReset()" class="col-span-2 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg text-xs font-bold">Hard Reset</button>
-            </div>
-            <textarea id="restore-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" placeholder="Paste JSON"></textarea>
-            <button onclick="restoreData()" class="w-full bg-teal-500 hover:bg-teal-400 py-2 rounded-lg text-xs font-bold">Restore (Smart Merge)</button>
-        </div>
-    </div>
+    <div id="settings-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">Data</h3><button onclick="toggleSettings()" class="p-2"><i data-lucide="x" class="w-4 h-4"></i></button></div><textarea id="backup-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" readonly></textarea><div class="grid grid-cols-2 gap-2 mb-4"><button onclick="copyData()" class="bg-white/10 hover:bg-white/20 py-2 rounded-lg text-xs font-bold">Copy JSON</button><button onclick="copyStats()" class="bg-teal-500/20 hover:bg-teal-500/40 text-teal-300 py-2 rounded-lg text-xs font-bold">Copy Stats</button><button onclick="hardReset()" class="col-span-2 bg-red-600 hover:bg-red-500 text-white py-2 rounded-lg text-xs font-bold">Hard Reset</button></div><textarea id="restore-area" class="w-full bg-black/50 text-xs p-3 rounded-lg h-24 mb-2" placeholder="Paste JSON"></textarea><button onclick="restoreData()" class="w-full bg-teal-500 hover:bg-teal-400 py-2 rounded-lg text-xs font-bold">Restore (Smart Merge)</button></div></div>
     
     <!-- Notes Modal -->
     <div id="notes-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6"><h3 class="mb-2 font-bold">Notes</h3><textarea id="note-input" class="w-full input-glass p-3 h-32 mb-4 rounded"></textarea><div class="flex gap-2"><button onclick="closeNotesModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="saveNote()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div></div></div>
@@ -223,7 +206,7 @@
     <div id="toast" class="fixed top-32 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]"><i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span></div>
 
     <script>
-        const APP_ID = "scentApp_db_v60_clean_no_future"; 
+        const APP_ID = "scentApp_db_v63_clean_slate"; 
         const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
         let state = {
@@ -286,33 +269,8 @@
             { id: "combo_tropical_hearth", name: "Tropical Hearth", parts: ["creed_aventus", "maison_du_soir"], tags: ["smoky", "fruity", "unique"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 4, intimate: 4 }, description: "Smoky Pineapple meets Chestnut Fire. Complex smoke layers.", instructions: "Maison chest, Aventus neck.", wearCount: 0, userNotes: "", userRating: 0 }
         ];
 
-        // GLOBAL INITIALIZATION
-        window.addEventListener('DOMContentLoaded', () => {
-            try {
-                loadData();
-                initUI();
-                
-                // Hide modals on init
-                document.querySelectorAll('[id$="-modal"]').forEach(el => el.classList.add('hidden'));
-                
-                // Load icons with delay for safety
-                setTimeout(() => { 
-                    if (window.lucide) lucide.createIcons(); 
-                }, 100);
-                
-            } catch(e) {
-                console.error("Critical Init Error:", e);
-                // Fail gracefully
-                localStorage.removeItem(APP_ID);
-                location.reload();
-            }
-        });
-
-        // Icon heartbeat
-        setInterval(() => { if (window.lucide) lucide.createIcons(); }, 1000);
-
-        // --- CORE FUNCTIONS (GLOBAL SCOPE) ---
-
+        // --- GLOBAL INITIALIZATION ---
+        // Ensure everything is defined before running logic
         function loadData() {
             const raw = localStorage.getItem(APP_ID);
             if (raw) {
@@ -356,25 +314,51 @@
                     state.data.decants = savedData.decants;
                     state.data.history = savedData.history.filter(h => h && h.id && h.date);
 
+                    // AUTO-CALIBRATE WEAR COUNTS ON LOAD
+                    state.data.fragrances.forEach(f => f.wearCount = 0);
+                    state.data.combos.forEach(c => c.wearCount = 0);
+
+                    state.data.history.forEach(log => {
+                        if (log.type === 'single') {
+                            const f = state.data.fragrances.find(x => x.id === log.id);
+                            if(f) f.wearCount++;
+                        } else if (log.type === 'combo') {
+                            const c = state.data.combos.find(x => x.id === log.id);
+                            if(c) {
+                                c.wearCount++;
+                                c.parts.forEach(pid => {
+                                    const part = state.data.fragrances.find(p => p.id === pid);
+                                    if(part) part.wearCount++;
+                                });
+                            }
+                        }
+                    });
+
                 } catch(e) {
                     console.error("Data Corrupted", e);
-                    hardReset();
+                    setDefaultData();
                 }
             } else {
-                state.data = { 
-                    fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), 
-                    decants: [], 
-                    combos: JSON.parse(JSON.stringify(COMBOS_DB)), 
-                    history: []
-                };
-                saveData();
+                setDefaultData();
             }
-            document.getElementById('backup-area').value = JSON.stringify(state.data);
+            const backupArea = document.getElementById('backup-area');
+            if(backupArea) backupArea.value = JSON.stringify(state.data);
+        }
+
+        function setDefaultData() {
+            state.data = { 
+                fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), 
+                decants: [], 
+                combos: JSON.parse(JSON.stringify(COMBOS_DB)), 
+                history: []
+            };
+            saveData();
         }
 
         function saveData() {
             localStorage.setItem(APP_ID, JSON.stringify(state.data));
-            document.getElementById('backup-area').value = JSON.stringify(state.data);
+            const backupArea = document.getElementById('backup-area');
+            if(backupArea) backupArea.value = JSON.stringify(state.data);
         }
 
         function hardReset() {
@@ -391,88 +375,38 @@
                     rawInput = rawInput.substring(1, rawInput.length - 1).replace(/\\"/g, '"');
                 }
                 const backup = JSON.parse(rawInput);
-                const freshState = {
-                    fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)),
-                    decants: backup.decants || [],
-                    combos: JSON.parse(JSON.stringify(COMBOS_DB)),
-                    history: []
-                };
-
-                // Merge Logic for Bottles
-                if (backup.fragrances) {
-                    backup.fragrances.forEach(oldF => {
-                        const newF = freshState.fragrances.find(f => f.id === oldF.id);
-                        if (newF) {
-                            newF.wearCount = oldF.wearCount || 0;
-                            newF.userNotes = oldF.userNotes || "";
-                            newF.userRating = oldF.userRating || 0;
-                            newF.pairingOnly = oldF.pairingOnly || false;
-                            newF.paused = oldF.paused || false;
-                            newF.reviewStatus = oldF.reviewStatus || 'approved';
-                        } else {
-                            freshState.fragrances.push(oldF);
-                        }
-                    });
-                }
                 
-                // Merge Logic for Combos
-                if (backup.combos) {
-                     backup.combos.forEach(oldC => {
-                        const newC = freshState.combos.find(c => c.id === oldC.id);
-                        if (newC) {
-                            newC.wearCount = oldC.wearCount || 0;
-                            newC.userNotes = oldC.userNotes || "";
-                            newC.userRating = oldC.userRating || 0;
-                        } else {
-                            freshState.combos.push(oldC);
-                        }
-                    });
-                }
+                if(!backup.fragrances || !Array.isArray(backup.fragrances)) throw new Error("Invalid Format");
                 
-                freshState.history = backup.history || [];
-
-                state.data = freshState;
-                saveData();
-                alert("Data Restored Successfully!");
+                localStorage.setItem(APP_ID, JSON.stringify(backup));
+                alert("Data Restored!");
                 location.reload();
             } catch (e) {
-                alert('Invalid JSON Data. Please check your text.');
-                console.error(e);
+                alert('Invalid JSON Data.');
             }
         }
 
-        // --- HELPER FUNCTIONS ---
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
-            toast.querySelector('span').innerText = msg;
-            toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
-            toastTimeout = setTimeout(() => { toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible'); }, 2000);
-        }
-
+        // --- UI & LOGIC FUNCTIONS ---
+        
         function initUI() {
             switchView('selector');
             updateContextUI();
         }
 
         function switchView(viewName) {
-            // Hide all
             ['view-selector', 'view-results', 'view-collection', 'view-history'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             
-            // Show Target
             const target = document.getElementById(viewName === 'selector' ? 'view-selector' : 'view-' + viewName);
             if(target) target.classList.remove('hidden');
 
-            // Nav State
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-teal-500'));
             const navMap = { 'selector': 0, 'results': 0, 'collection': 1, 'history': 2 };
             const idx = navMap[viewName];
             const navBtns = document.querySelectorAll('nav button');
             if(navBtns[idx]) navBtns[idx].classList.add('text-teal-500');
 
-            // View Specific Logic
             if (viewName === 'collection') showCollection(); 
             if (viewName === 'history') renderHistory();
             
@@ -483,7 +417,6 @@
         function setContext(type, value) { 
             state.context[type] = value; 
             updateContextUI(); 
-            // Suspense logic check
             const sus = document.getElementById('suspense-section');
             if (state.context.situation === 'date_night' || state.context.situation === 'intimate') sus.classList.remove('hidden');
             else { sus.classList.add('hidden'); state.context.suspense = false; document.getElementById('suspense-toggle').checked = false; }
@@ -514,22 +447,18 @@
             const ctx = state.context; 
             let score = 0;
             
-            // Situation
             const sitScore = item.situationRatings ? (item.situationRatings[ctx.situation] || 0) : 0; 
             if (sitScore < 2) return -100; 
             score += sitScore * 2;
             
-            // Weather (Bottles Only usually have this detailed data)
             if (!isCombo && item.weatherAffinity) {
                 let weatherKey = `${ctx.season}_${ctx.weather}`;
-                // Fallback for missing keys in custom items
                 if (item.weatherAffinity[weatherKey] === undefined) { 
                     if (ctx.season === 'fall') weatherKey = 'fall'; 
                 }
                 score += (item.weatherAffinity[weatherKey] || 0) * 1.5;
             }
 
-            // User Rating & Wear Count
             if (!isCombo) {
                 if(item.pairingOnly || item.paused) return -999;
                 
@@ -537,7 +466,6 @@
                 else if (item.userRating === 'A') score += 3.0;
                 else if (item.userRating === 'B') score += 1.0;
 
-                // Rotation Logic
                 let limit = 5;
                 if (item.userRating === 'S') limit = 12;
                 else if (item.userRating === 'A') limit = 8;
@@ -545,10 +473,9 @@
                 if (item.wearCount === 0) score += 3; 
                 else if (item.wearCount > limit) score -= 2;
             } else {
-                score += 1; // Combo base bonus
+                score += 1; 
             }
 
-            // Suspense
             if (ctx.suspense && item.tags && item.tags.includes('suspense')) score += 3;
             
             return score;
@@ -560,11 +487,9 @@
             const scoredSingles = state.data.fragrances.map(f => ({ ...f, score: calculateScore(f, false), type: 'single' }));
             const scoredCombos = state.data.combos.map(c => ({ ...c, score: calculateScore(c, true), type: 'combo' }));
             
-            // Simple Decant Scoring
             const scoredDecants = state.data.decants.map(d => {
                 let score = 0;
-                // Boost decants that haven't been rated yet
-                if (d.rating === null) score = 15; // High priority to test
+                if (d.rating === null) score = 15; 
                 else if (d.rating === 'like') score = 10;
                 else score = -50;
                 return { ...d, score, type: 'decant' };
@@ -575,7 +500,6 @@
             if (results.length === 0) {
                 container.innerHTML = `<div class="p-6 text-center text-gray-400">No suitable fragrances found. Try changing the situation.</div>`;
             } else {
-                // Top 3
                 results.slice(0, 3).forEach((item, idx) => {
                     if(idx===0) container.appendChild(createTierHeader("🏆 The Signature"));
                     if(idx===1) container.appendChild(createTierHeader("🥈 Alternative"));
@@ -597,7 +521,6 @@
             switchView('results');
         }
 
-        // --- CARD FACTORY ---
         function createTierHeader(text) { const div = document.createElement('div'); div.className = 'tier-header'; div.innerText = text; return div; }
 
         function createFragranceCard(f, isTop) {
@@ -626,7 +549,6 @@
         function createComboCard(c, isTop) {
             const div = document.createElement('div');
             const bgClass = isTop ? 'bg-gradient-to-br from-purple-900/30 to-teal-900/30 border-teal-500/50' : 'combo-gradient border-teal-500/20';
-            // Resolve Names
             const partNames = c.parts.map(pid => { 
                 const f = state.data.fragrances.find(x => x.id === pid); 
                 return f ? f.name : pid; 
@@ -643,12 +565,11 @@
             return div;
         }
 
-        // --- LOGGING & FEEDBACK ---
         function logWear(id) {
              const idx = state.data.fragrances.findIndex(f => f.id === id);
              if (idx > -1) { 
                  state.data.fragrances[idx].wearCount++; 
-                 state.data.history.push({ id, type:'single', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: true }); // Auto-recorded for singles
+                 state.data.history.push({ id, type:'single', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: true });
                  saveData(); 
                  showToast('Wear Logged'); 
                  setTimeout(() => switchView('selector'), 500); 
@@ -659,10 +580,8 @@
              const comboIdx = state.data.combos.findIndex(c => c.id === id);
              if (comboIdx > -1) {
                  const combo = state.data.combos[comboIdx]; combo.wearCount++;
-                 // Update parts stats
                  combo.parts.forEach(pid => { const fIdx = state.data.fragrances.findIndex(f => f.id === pid); if(fIdx > -1) state.data.fragrances[fIdx].wearCount++; });
-                 
-                 state.data.history.push({ id, type:'combo', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false }); // Needs feedback
+                 state.data.history.push({ id, type:'combo', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false });
                  saveData(); 
                  showToast('Pair Logged'); 
                  setTimeout(() => switchView('history'), 500); 
@@ -670,16 +589,13 @@
         }
 
         function logDecantWear(id) {
-            // Find object
             let decant = state.data.decants.find(d => d.id === id);
-            // Fallback for older data structure if needed
             if (!decant && typeof id === 'number') decant = state.data.decants[id];
-            
             if (!decant) return;
-            state.data.history.push({ id: decant.id, type: 'decant', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false }); // Needs feedback
+            state.data.history.push({ id: decant.id, type: 'decant', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false });
             saveData();
             showToast("Logged Decant");
-            switchView('history'); // Go to history to show buttons
+            switchView('history');
         }
 
         function handleFeedback(logIndex, action) {
@@ -694,10 +610,8 @@
                      }
                  } else if (log.type === 'combo') {
                      showToast("Combo Disliked");
-                     // Could add pause logic here if desired
                  }
              } else if (action === 'like') {
-                 // Removed Acquisition Plan Prompt - Just save preference
                  if (log.type === 'decant') {
                      const d = state.data.decants.find(x => x.id === log.id);
                      if(d) d.rating = 'like';
@@ -716,13 +630,11 @@
             const list = document.getElementById('history-list'); 
             list.innerHTML = '';
             
-            // Sort Descending
             const sortedHistory = [...state.data.history].sort((a,b) => new Date(b.date) - new Date(a.date));
             
             if(sortedHistory.length === 0) { list.innerHTML = `<div class="text-center text-gray-500 mt-10">No wear history yet.</div>`; return; }
 
             sortedHistory.forEach((log, index) => {
-                // Find actual index in state.data.history for updates
                 const realIndex = state.data.history.indexOf(log);
                 
                 let name = "Unknown"; let brand = ""; 
@@ -732,14 +644,13 @@
                 else if (log.type === 'decant') { 
                     const d = state.data.decants.find(x => x.id === log.id); 
                     if(d) { name = d.name; brand = "Decant"; } 
-                    else { name = "Deleted Decant"; } // Handle deleted items
+                    else { name = "Deleted Decant"; } 
                 }
 
                 const dateObj = new Date(log.date); 
                 const dateStr = dateObj.toLocaleDateString(); 
                 const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
-                // Show buttons ONLY if not recorded AND is Combo/Decant
                 let buttonsHtml = '';
                 if (!log.feedbackRecorded && (log.type === 'combo' || log.type === 'decant')) {
                     buttonsHtml = `
@@ -759,7 +670,7 @@
                             <h4 class="font-bold text-white text-sm">${name}</h4>
                             <p class="text-[10px] text-teal-400 uppercase tracking-wider">${brand}</p>
                         </div>
-                        <button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                        <button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors relative z-10"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
                     </div>
                     ${buttonsHtml}
                 `;
@@ -768,11 +679,8 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        // --- COLLECTION & OTHER VIEWS ---
-
         function setCollectionMode(mode) {
              state.ui.collectionMode = mode;
-             // UI toggle logic here
              document.getElementById('tab-bottles').className = mode === 'bottles' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
              document.getElementById('tab-decants').className = mode === 'decants' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
              document.getElementById('tab-combos').className = mode === 'combos' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
@@ -820,7 +728,6 @@
                 if(state.data.decants.length === 0) list.innerHTML = `<div class="text-center text-gray-500 p-4">No decants yet. Use Smart Add to add one.</div>`;
                 state.data.decants.forEach((d, idx) => {
                     const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5`;
-                    // ... (existing decant logic)
                     div.innerHTML = `
                         <div class="flex justify-between items-start mb-2">
                             <div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${d.brand}</span><h3 class="font-bold text-sm text-white">${d.name}</h3></div>
@@ -833,7 +740,6 @@
                     list.appendChild(div);
                 });
             } else if (state.ui.collectionMode === 'combos') {
-                 // Show Combos
                 if(state.data.combos.length === 0) list.innerHTML = `<div class="text-center text-gray-500 p-4">No combos found.</div>`;
                 state.data.combos.forEach((c) => {
                     const div = document.createElement('div'); div.className = `combo-gradient p-4 rounded-xl border border-teal-500/20`;
@@ -874,13 +780,42 @@
             }
         }
         
+        function copyStats() {
+            let report = "--- FRAGRANCE SOMMELIER STATS ---\n\n";
+            report += "== BOTTLES ==\n";
+            state.data.fragrances.sort((a,b) => b.wearCount - a.wearCount).forEach(f => {
+                report += `${f.name} [${f.userRating || '-'}]: ${f.wearCount}\n`;
+            });
+            
+            report += "\n== COMBOS ==\n";
+            state.data.combos.sort((a,b) => b.wearCount - a.wearCount).forEach(c => {
+                if(c.wearCount > 0) report += `${c.name} [${c.userRating || '-'}]: ${c.wearCount}\n`;
+            });
+
+            report += `\n== TOTAL LOGS: ${state.data.history.length} ==`;
+
+            const area = document.getElementById('backup-area');
+            area.value = report;
+            area.select();
+            document.execCommand('copy');
+            showToast('Stats Copied');
+        }
+
         function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); }
         function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); }
         function analyzeText() { alert("Paste text logic"); }
         function saveSmartAdd() { 
-            // Simplified smart add logic for brevity
             if(!tempSmartObj) return alert("Please click 'Analyze' first."); 
-            // ... (Full Save Logic) ...
+            tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; 
+            tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; 
+            const isDecant = document.getElementById('sa-is-decant').checked;
+            if(isDecant) {
+                state.data.decants.push({ id: tempSmartObj.id, name: tempSmartObj.name, brand: tempSmartObj.brand, tags: tempSmartObj.tags, description: tempSmartObj.description, rating: null });
+                showToast('Decant Added');
+            } else {
+                state.data.fragrances.push(tempSmartObj); 
+                showToast('Bottle Added');
+            }
             saveData(); closeSmartAdd(); showCollection();
         }
         function togglePairingOnly(id) {
@@ -919,7 +854,6 @@
         }
         function rateDecant() {}
         function setRating(id, tier) {
-            // Check bottles
             let f = state.data.fragrances.find(i => i.id === id);
             if(f) {
                 f.userRating = tier;
@@ -927,7 +861,6 @@
                 showCollection(); 
                 return;
             }
-            // Check combos
             let c = state.data.combos.find(i => i.id === id);
             if(c) {
                 c.userRating = tier;
@@ -973,28 +906,121 @@
         function closeAddLogModal() { document.getElementById('add-log-modal').classList.add('hidden'); }
         
         function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        function copyData() { const data = document.getElementById('backup-area'); data.select(); document.execCommand('copy'); alert('Copied!'); }
-        function copyStats() {
-            let report = "--- FRAGRANCE SOMMELIER STATS ---\n\n";
-            report += "== BOTTLES ==\n";
-            state.data.fragrances.sort((a,b) => b.wearCount - a.wearCount).forEach(f => {
-                report += `${f.name}: ${f.wearCount}\n`;
-            });
-            
-            report += "\n== COMBOS ==\n";
-            state.data.combos.sort((a,b) => b.wearCount - a.wearCount).forEach(c => {
-                if(c.wearCount > 0) report += `${c.name}: ${c.wearCount}\n`;
-            });
-
-            report += `\n== TOTAL LOGS: ${state.data.history.length} ==`;
-
+        function copyData() { 
             const area = document.getElementById('backup-area');
-            area.value = report;
-            area.select();
-            document.execCommand('copy');
-            showToast('Stats Copied');
+            area.value = JSON.stringify(state.data);
+            area.select(); 
+            document.execCommand('copy'); 
+            alert('JSON Backup Copied!'); 
         }
         function resetView() { switchView('selector'); }
+
+        // --- INIT LISTENER ---
+        window.addEventListener('DOMContentLoaded', () => {
+             loadData(); initUI(); 
+             setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 100);
+             document.querySelectorAll('[id$="-modal"]').forEach(el => el.classList.add('hidden'));
+        });
+        
+        // --- HISTORY EDIT (RE-ADDED & FIXED) ---
+        function openHistoryEdit(index) {
+             editingHistoryIndex = index;
+             const log = state.data.history[index];
+             const modal = document.getElementById('history-edit-modal');
+             const dateInput = document.getElementById('hist-edit-date');
+             const select = document.getElementById('hist-edit-fragrance');
+             
+             const d = new Date(log.date); 
+             const isoString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); 
+             dateInput.value = isoString;
+             
+             select.innerHTML = '';
+             const optGroupFrag = document.createElement('optgroup'); optGroupFrag.label = "Fragrances";
+             state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; if(f.id === log.id) opt.selected = true; optGroupFrag.appendChild(opt); });
+             select.appendChild(optGroupFrag);
+             const optGroupCombo = document.createElement('optgroup'); optGroupCombo.label = "Combos";
+             state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; if(c.id === log.id) opt.selected = true; optGroupCombo.appendChild(opt); });
+             select.appendChild(optGroupCombo);
+             
+             if (state.data.decants.length > 0) {
+                const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants";
+                state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; if(d.id === log.id) opt.selected = true; decantGroup.appendChild(opt); });
+                select.appendChild(decantGroup);
+             }
+
+             modal.classList.remove('hidden');
+        }
+        function closeHistoryEdit() { document.getElementById('history-edit-modal').classList.add('hidden'); editingHistoryIndex = null; }
+        
+        function saveHistoryEdit() {
+            if (editingHistoryIndex === null) return;
+            const log = state.data.history[editingHistoryIndex]; 
+            const newDate = document.getElementById('hist-edit-date').value; 
+            const newId = document.getElementById('hist-edit-fragrance').value; 
+            const oldId = log.id;
+            
+            log.date = new Date(newDate).toISOString();
+            
+            if (newId !== oldId) { 
+                changeWearCount(oldId, -1); 
+                changeWearCount(newId, 1); 
+                
+                log.id = newId; 
+                
+                const isCombo = state.data.combos.some(c => c.id === newId); 
+                const isDecant = state.data.decants.some(d => d.id === newId);
+                
+                if (isCombo) log.type = 'combo';
+                else if (isDecant) log.type = 'decant';
+                else log.type = 'single';
+            }
+            
+            saveData(); 
+            closeHistoryEdit(); 
+            renderHistory(); 
+            showCollection(); 
+            showToast('Log Updated');
+        }
+        
+        function deleteHistoryEntry() { 
+            if (editingHistoryIndex === null) return; 
+            if(!confirm("Delete this log entry?")) return; 
+            
+            const log = state.data.history[editingHistoryIndex]; 
+            changeWearCount(log.id, -1); 
+            state.data.history.splice(editingHistoryIndex, 1); 
+            
+            saveData(); 
+            closeHistoryEdit(); 
+            renderHistory(); 
+            showCollection(); 
+            showToast('Entry Deleted'); 
+        }
+        
+        function changeWearCount(id, delta) {
+            const fIdx = state.data.fragrances.findIndex(f => f.id === id); 
+            if (fIdx > -1) { 
+                state.data.fragrances[fIdx].wearCount += delta; 
+                if(state.data.fragrances[fIdx].wearCount < 0) state.data.fragrances[fIdx].wearCount = 0; 
+                return; 
+            }
+            
+            const cIdx = state.data.combos.findIndex(c => c.id === id); 
+            if (cIdx > -1) { 
+                const combo = state.data.combos[cIdx]; 
+                combo.wearCount += delta; 
+                if(combo.wearCount < 0) combo.wearCount = 0; 
+                
+                combo.parts.forEach(pid => { 
+                    const partIdx = state.data.fragrances.findIndex(f => f.id === pid); 
+                    if(partIdx > -1) { 
+                        state.data.fragrances[partIdx].wearCount += delta; 
+                        if(state.data.fragrances[partIdx].wearCount < 0) state.data.fragrances[partIdx].wearCount = 0; 
+                    } 
+                }); 
+                return;
+            }
+        }
 
     </script>
 </body>
