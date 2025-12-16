@@ -232,7 +232,7 @@
     <div id="notes-modal" class="hidden fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6"><h3 class="mb-2 font-bold">Notes</h3><textarea id="note-input" class="w-full input-glass p-3 h-32 mb-4 rounded"></textarea><div class="flex gap-2"><button onclick="closeNotesModal()" class="flex-1 p-3 bg-white/10 rounded">Cancel</button><button onclick="saveNote()" class="flex-1 p-3 bg-teal-500 rounded">Save</button></div></div></div>
 
     <!-- Add Log Modal -->
-    <div id="add-log-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><h3 class="text-xl font-bold mb-4">Log Missed Wear</h3><div class="space-y-4"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="add-log-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label><select id="add-log-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Situation</label><select id="add-log-situation" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"><option value="office">Office</option><option value="gym">Gym</option><option value="date_night">Date Night</option><option value="casual">Casual</option><option value="intimate">Intimate</option></select></div><div class="flex gap-2 pt-2"><button onclick="closeAddLogModal()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveMissedLog()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Save Log</button></div></div></div></div>
+    <div id="add-log-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><h3 class="text-xl font-bold mb-4">Log Missed Wear</h3><div class="space-y-4"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="add-log-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance / Combo</label><select id="add-log-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Situation</label><select id="add-log-situation" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"><option value="office">Office</option><option value="gym">Gym</option><option value="date_night">Date Night</option><option value="casual">Casual</option><option value="intimate">Intimate</option></select></div><div class="flex gap-2 pt-2"><button onclick="closeAddLogModal()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveMissedLog()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Save Log</button></div></div></div></div>
 
     <!-- TOAST -->
     <div id="toast" class="fixed top-32 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]"><i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span></div>
@@ -434,36 +434,42 @@
             let score = 0;
             const sitScore = item.situationRatings ? (item.situationRatings[ctx.situation] || 0) : 0; 
             if (sitScore < 2) return -100; 
-            score += sitScore * 2;
+            score += sitScore * 4; 
             
             if (item.weatherAffinity) {
                 let weatherKey = `${ctx.season}_${ctx.weather}`;
                 if (item.weatherAffinity[weatherKey] !== undefined) {
-                    score += item.weatherAffinity[weatherKey] * 1.5;
+                    score += item.weatherAffinity[weatherKey] * 2;
                 } else if (item.weatherAffinity[ctx.season] !== undefined) {
-                    score += item.weatherAffinity[ctx.season] * 1.5;
+                    score += item.weatherAffinity[ctx.season] * 2;
                 }
             }
 
             if (!isCombo) {
                 if(item.pairingOnly || item.paused) return -999;
-                if (item.userRating === 'S') score += 5.0;
-                else if (item.userRating === 'A') score += 3.0;
-                else if (item.userRating === 'B') score += 1.0;
-                let limit = 5;
-                if (item.userRating === 'S') limit = 12;
-                else if (item.userRating === 'A') limit = 8;
-                if (item.wearCount === 0) score += 3; 
-                else if (item.wearCount > limit) score -= 2;
+                if (item.userRating === 'S') score += 20;
+                else if (item.userRating === 'A') score += 12;
+                else if (item.userRating === 'B') score += 5;
             } else {
-                score += 1;
+                score += 8; // Combo Base Bonus
             }
-            if (ctx.suspense && item.tags && item.tags.includes('suspense')) score += 3;
+
+            // 4. ROTATION LOGIC (Freshness vs Staleness)
+            // Bonus for unworn, penalty for worn
+            if (item.wearCount === 0) score += 5; 
+            else score -= (item.wearCount * 2);
+
+            // 5. RANDOM JITTER (Breaks ties, shuffles the deck slightly)
+            score += Math.random() * 4;
+
+            if (ctx.suspense && item.tags && item.tags.includes('suspense')) score += 10;
+            
             return score;
         }
 
         function generateRecommendations() {
             const container = document.getElementById('results-container'); container.innerHTML = '';
+            
             const scoredSingles = state.data.fragrances.map(f => ({ ...f, score: calculateScore(f, false), type: 'single' }));
             const scoredCombos = state.data.combos.map(c => ({ ...c, score: calculateScore(c, true), type: 'combo' }));
             
@@ -472,27 +478,40 @@
                 if (d.situationRatings) {
                     score = calculateScore(d, false);
                 } else {
+                    // Fallback for custom decants
                     if (d.rating === null) score = 15;
-                    else if (d.rating === 'like') score = 10;
+                    else if (d.rating === 'like') score = 25; // Boost liked decants
                     else score = -50;
+                    score -= (d.wearCount || 0) * 2;
                 }
                 return { ...d, score, type: 'decant' };
             });
 
-            const results = [...scoredSingles, ...scoredCombos, ...scoredDecants].filter(f => f.score > -20).sort((a, b) => b.score - a.score);
+            // Sort by Score High -> Low
+            const results = [...scoredSingles, ...scoredCombos, ...scoredDecants]
+                            .filter(f => f.score > -20)
+                            .sort((a, b) => b.score - a.score);
 
             if (results.length === 0) {
                 container.innerHTML = `<div class="p-6 text-center text-gray-400">No suitable fragrances found.</div>`;
             } else {
-                results.slice(0, 3).forEach((item, idx) => {
-                    if(idx===0) container.appendChild(createTierHeader("🏆 The Signature"));
-                    if(idx===1) container.appendChild(createTierHeader("🥈 Alternative"));
+                // RENDER TOP 3 + ROTATION OPTIONS
+                const topPicks = results.slice(0, 3);
+                const rotationOptions = results.slice(3, 8); // Next 5
+
+                // Top 3
+                topPicks.forEach((item, idx) => {
+                    let title = "🏆 The Signature";
+                    if(idx===1) title = "🥈 Alternative";
+                    if(idx===2) title = "🥉 Wildcard";
                     
-                    if(item.type === 'single') container.appendChild(createFragranceCard(item, idx===0));
-                    else if(item.type === 'combo') container.appendChild(createComboCard(item, idx===0));
+                    container.appendChild(createTierHeader(title));
+                    
+                    if(item.type === 'single') container.appendChild(createFragranceCard(item, true));
+                    else if(item.type === 'combo') container.appendChild(createComboCard(item, true));
                     else if(item.type === 'decant') {
                         const div = document.createElement('div');
-                        div.className = "glass-panel p-4 rounded-xl border border-dashed border-teal-500/50 mb-2";
+                        div.className = "bg-gradient-to-br from-charcoal-700 to-purple-900/20 p-4 rounded-xl border border-dashed border-teal-500/50 mb-2";
                         div.innerHTML = `
                             <div class="flex justify-between items-start">
                                 <div><h3 class="font-bold text-white">${item.name}</h3><span class="text-[10px] bg-teal-500 px-2 rounded text-white">DECANT</span></div>
@@ -501,6 +520,37 @@
                         container.appendChild(div);
                     }
                 });
+
+                // Rotation Section
+                if (rotationOptions.length > 0) {
+                    container.appendChild(createTierHeader("✨ Rotation Options"));
+                    rotationOptions.forEach(item => {
+                        // Simpler card for rotation options
+                        const div = document.createElement('div');
+                        const isCombo = item.type === 'combo';
+                        const isDecant = item.type === 'decant';
+                        
+                        // Border color based on type
+                        let borderClass = 'border-white/5';
+                        if(isCombo) borderClass = 'border-teal-500/30';
+                        if(isDecant) borderClass = 'border-purple-500/30';
+
+                        div.className = `glass-panel p-3 rounded-lg border ${borderClass} mb-2 flex justify-between items-center`;
+                        
+                        let action = `logWear('${item.id}')`;
+                        if(isCombo) action = `logComboWear('${item.id}')`;
+                        if(isDecant) action = `logDecantWear('${item.id}')`;
+
+                        div.innerHTML = `
+                            <div class="overflow-hidden">
+                                <h4 class="font-bold text-xs text-white truncate">${item.name}</h4>
+                                <p class="text-[10px] text-gray-400 truncate">${isCombo ? 'Combo' : (item.brand || 'Decant')}</p>
+                            </div>
+                            <button onclick="${action}" class="bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold px-3 py-1.5 rounded transition-colors">Select</button>
+                        `;
+                        container.appendChild(div);
+                    });
+                }
             }
             switchView('results');
         }
