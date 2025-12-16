@@ -1,0 +1,716 @@
+/**
+ * FRAGRANCE SOMMELIER v85
+ * Client Logic - Restored v74 UI + v85 Data & Algorithms
+ */
+
+const APP_ID = "scentApp_v85_restore"; // UPDATED STORAGE KEY
+const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
+
+let state = {
+    context: { season: 'fall', weather: 'sunny', situation: 'office', suspense: false },
+    data: { fragrances: [], decants: [], combos: [], history: [] },
+    ui: { collectionMode: 'bottles' }
+};
+
+const KEYWORDS = {
+    winter: ["oud", "vanilla", "tobacco", "leather", "chocolate", "coffee", "rum", "cinnamon", "spice", "amber", "chestnut", "smoke", "incense"],
+    summer: ["lime", "lemon", "bergamot", "citrus", "sea", "salt", "aquatic", "marine", "coconut", "mint", "ginger", "fresh"],
+    fall: ["iris", "sandalwood", "fig", "tea", "cardamom", "cedar", "vetiver"],
+    date: ["rose", "jasmine", "musk", "patchouli", "saffron", "sweet", "boozy", "gourmand"],
+    office: ["soap", "clean", "white musk", "lavender", "neroli", "cotton"]
+};
+
+let tempSmartObj = null; 
+let currentNoteId = null; 
+let editingHistoryIndex = null; 
+let toastTimeout = null;
+
+// --- V85 DATASET (FROM MASTER DOC) ---
+
+const CUSTOM_DB = [
+    { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "creed_aventus", name: "Aventus", brand: "Creed", inspiration: "Original", tags: ["fresh", "smoky", "fruity", "king", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 4, intimate: 3 }, sprayInstructions: "6-7 sprays (3 on neck, 4 on shirt).", description: "Smoky pineapple and birch. The ultimate confidence booster.", wearCount: 2, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "victory_man", name: "Victory Man", brand: "XXIV", inspiration: "Unknown/Fresh", tags: ["fresh", "citrus", "cedar", "gym"], weatherAffinity: { winter_sunny: -1, winter_rainy: -2, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 0 }, situationRatings: { office: 4, gym: 5, casual: 4, date_night: 1, intimate: 1 }, sprayInstructions: "8 sprays (Heavy on shirt/gym clothes).", description: "Bergamot and Cedarwood bomb. Clean, sharp, and energizing.", wearCount: 0, userNotes: "", userRating: "C", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "paco_1_million", name: "1 Million", brand: "Paco Rabanne", inspiration: "Original", tags: ["sweet", "spicy", "loud", "club"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 1 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 4, intimate: 2 }, sprayInstructions: "4-5 sprays (Chest and Neck).", description: "Sweet, spicy bubblegum. Designed for loud parties.", wearCount: 0, userNotes: "", userRating: "C", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "blomb_27", name: "No. 27", brand: "BLOMB", inspiration: "Original", tags: ["woody", "tobacco", "coconut", "unique"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 0, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 3 }, sprayInstructions: "6 sprays (Shirt Front/Back).", description: "Unique woody-tobacco with a coconut twist.", wearCount: 1, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "phantom_noir", name: "Phantom Noir", brand: "Montagne", inspiration: "Black Phantom?", tags: ["coffee", "boozy", "chocolate", "dark", "suspense"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "5-6 sprays (Jacket/Scarf heavy).", description: "Coffee, booze, and sugar. Dark and mysterious.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "brooklyn_jazz", name: "Brooklyn Jazz", brand: "Montagne", inspiration: "Maison Margiela Jazz Club", tags: ["boozy", "tobacco", "rum", "smooth"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -2, summer_rainy: 0, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Collar, Chest, Wrists).", description: "Boozy rum and tobacco. Captures the vibe of a dim jazz bar.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "maison_du_soir", name: "Maison du Soir", brand: "Montagne", inspiration: "By the Fireplace", tags: ["smoke", "vanilla", "chestnut", "cozy"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 5, date_night: 3, intimate: 5 }, sprayInstructions: "5 sprays (Sweater/Chest).", description: "Chestnut and vanilla smoke. The ultimate 'Cozy' scent.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "cubicle_men", name: "Cubicle for Men", brand: "Montagne", inspiration: "Fragrance One Office", tags: ["ambroxan", "fresh", "safe", "power"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 0, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 3, casual: 4, date_night: 2, intimate: 1 }, sprayInstructions: "8-10 sprays (Full coverage on shirt).", description: "Clean, soapy, and projecting. Perfect Office scent.", wearCount: 2, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "gentle_silver", name: "Gentle Silver", brand: "Montagne", inspiration: "Gentle Fluidity Silver", tags: ["gin", "juniper", "fresh", "crisp"], weatherAffinity: { winter_sunny: 1, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 4, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (Saturate shirt front).", description: "Crisp juniper. Smells like a cold Gin & Tonic.", wearCount: 5, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "vanille_absolute", name: "Vanille Absolute", brand: "Montagne", inspiration: "Nishane Ani?", tags: ["vanilla", "spicy", "ginger", "green"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "5-6 sprays (Neck + Clothes).", description: "Spicy ginger and rich vanilla.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 1, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Behind Ears + Collar).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 4, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "prada_paradigme", name: "Paradigme", brand: "Prada", inspiration: "Original", tags: ["fresh", "clean", "floral", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 1, spring: 2, fall: 2 }, situationRatings: { office: 5, gym: 1, casual: 5, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (High Heat/Volume)", description: "A modern paradigm of Prada's clean, soapy, and floral style.", wearCount: 1, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "fleurit_sainte_fumee", name: "Sainte Fumée", brand: "Fleurit Parfums", inspiration: "Original", tags: ["smoke", "incense", "dark", "intimate"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "4-5 sprays (Dense profile)", description: "Holy Smoke. Deep resins and incense for intimate winter nights.", wearCount: 0, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "hermes_terre_eau_intense", name: "Terre d'Hermès Eau Intense", brand: "Hermès", inspiration: "Original", tags: ["vetiver", "citrus", "classy", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 1, spring: 2, fall: 2 }, situationRatings: { office: 5, gym: 1, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "5-7 sprays (Standard)", description: "Sophisticated vetiver with a bright citrus opening. A masterpiece.", wearCount: 0, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' }
+];
+
+const INITIAL_DECANTS = [
+    { id: "custom_1765648274151", name: "Labdanum 18", brand: "Le Labo", tags: ["powdery", "animalic", "musk"], description: "Intimate and powdery skin scent.", rating: 'like' },
+    { id: "custom_1765726222017", name: "Fil d’Or No1", brand: "Laurent Mazzone", tags: ["boozy", "tobacco", "luxurious"], description: "Rich, boozy, golden tobacco.", rating: 'like' },
+    { id: "black_orchid_decant", name: "Black Orchid", brand: "Tom Ford", tags: ["dark", "floral", "chocolate", "suspense"], description: "Dark, dramatic, and floral chocolate.", rating: 'like' }
+];
+
+const COMBOS_DB = [
+    { id: "combo_executive", name: "The Executive Suite", parts: ["creed_aventus", "dossier_ambery_saffron"], tags: ["date_night", "power", "complex"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "Smoky birch meets airy saffron sweetness. A massive compliment magnet.", instructions: "Aventus (4x) on shirt chest. Saffron (3x) on neck skin.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 1, spring: 1, fall: 2, summer_sunny: -1 } },
+    { id: "combo_cherry_lounge", name: "Cherry Lounge", parts: ["lost_cherry", "brooklyn_jazz"], tags: ["boozy", "gourmand", "suspense"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco darkens the cherry almond profile. Very sexy.", instructions: "Brooklyn Jazz (4x) on clothes. Lost Cherry (3x) on pulse points.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, fall: 1, summer_sunny: -3 } },
+    { id: "combo_gin_juice", name: "Gin & Juice", parts: ["gentle_silver", "creed_aventus"], tags: ["fresh", "fruity", "energy"], situationRatings: { office: 4, gym: 4, casual: 5, date_night: 3, intimate: 2 }, description: "Juniper berry and pineapple. An explosion of freshness.", instructions: "4 sprays each on opposite shirt shoulders.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2, fall: 0, winter_sunny: -1 } },
+    { id: "combo_smoked_vanilla", name: "Smoked Vanilla", parts: ["maison_du_soir", "vanille_absolute"], tags: ["cozy", "winter", "gourmand"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Chestnut smoke mixed with spicy ginger vanilla. Ultimate cozy mode.", instructions: "Maison (3x) on shirt/sweater. Vanille (3x) on wrists/neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, fall: 2, summer_sunny: -4 } },
+    { id: "combo_island_noir", name: "Island Noir", parts: ["creed_aventus", "blomb_27"], tags: ["summer", "night", "unique"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Pineapple meets Coconut and Tobacco. A dark, smoky Piña Colada vibe.", instructions: "BLOMB (4x) on shirt. Aventus (3x) on neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 1, fall: 0 } },
+    { id: "combo_spiced_cherry", name: "Spiced Cherry", parts: ["lost_cherry", "vanille_absolute"], tags: ["gourmand", "winter", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Ginger and Green Vanilla cut the sweetness of the Cherry. Sophisticated gourmand.", instructions: "Vanille (3x) first, top with Lost Cherry (3x).", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, summer_sunny: -2 } },
+    { id: "combo_clean_cut", name: "The Clean Cut", parts: ["cubicle_men", "gentle_silver"], tags: ["office", "fresh", "clean"], situationRatings: { office: 5, gym: 5, casual: 3, date_night: 1, intimate: 1 }, description: "Ambroxan power meets Juniper freshness. The ultimate 'clean' scent profile.", instructions: "3 sprays of each on opposite shirt shoulders.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2, fall: 1, winter_sunny: 0 } },
+    { id: "combo_midnight_tea", name: "Midnight Tea", parts: ["eau_noir", "brooklyn_jazz"], tags: ["dark", "boozy", "suspense"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 5, intimate: 4 }, description: "Black tea and Fig mixed with Rum and Tobacco. Dark, moody, and intellectual.", instructions: "Brooklyn Jazz (4x) on clothes. Eau Noir (3x) behind ears.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, winter_sunny: 2, spring: 0, summer_sunny: -2 } },
+    { id: "combo_smoked_jazz", name: "Smoked Jazz", parts: ["fleurit_sainte_fumee", "brooklyn_jazz"], tags: ["boozy", "incense", "dark"], situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco meets holy incense. A speakeasy vibe.", instructions: "Jazz Club on neck (projection), Sainte Fumée on chest (base).", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, summer_sunny: -3 } },
+    { id: "combo_winter_hearth", name: "Winter Hearth", parts: ["fleurit_sainte_fumee", "maison_du_soir"], tags: ["cozy", "smoke", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 3, intimate: 5 }, description: "Chestnut fire and church incense. Maximum winter coziness.", instructions: "Maison on sweater, Sainte Fumée on skin.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 3, winter_rainy: 2, summer_sunny: -5 } },
+    { id: "combo_holy_clean", name: "Holy Clean", parts: ["fleurit_sainte_fumee", "gentle_silver"], tags: ["unique", "contrast", "casual"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 2 }, description: "Clean gin meets dark incense. An interesting, artistic contrast.", instructions: "Gentle Silver on shirt (clean), Sainte Fumée on wrists.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, spring: 2, winter_sunny: 1, summer_sunny: 0 } },
+    { id: "combo_sacred_vanilla", name: "Sacred Vanilla", parts: ["fleurit_sainte_fumee", "vanille_absolute"], tags: ["gourmand", "sensual", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Vanilla sweetness balanced by dark resins. Sensual and mysterious.", instructions: "Vanille as base, Sainte Fumée to cut sweetness.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, spring: 1 } },
+    { id: "combo_paradigm_shift", name: "Paradigm Shift", parts: ["prada_paradigme", "cubicle_men"], tags: ["office", "clean", "professional"], situationRatings: { office: 5, gym: 1, casual: 3, date_night: 2, intimate: 1 }, description: "The ultimate clean professional. Soapy floral meets ambroxan power.", instructions: "Cubicle on shirt (power), Paradigme on skin (refinement).", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, summer_sunny: 2, fall: 1, winter_sunny: 0 } },
+    { id: "combo_holy_saffron", name: "Holy Saffron", parts: ["fleurit_sainte_fumee", "dossier_ambery_saffron"], tags: ["date_night", "unique", "sweet"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Burnt sugar and airy saffron mixed with deep church incense.", instructions: "Sainte Fumée chest, Saffron neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, spring: 1 } },
+    { id: "combo_vanilla_smoke_2", name: "Vanilla Smoke", parts: ["maison_du_soir", "vanille_absolute"], tags: ["winter", "cozy", "sweet"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 3, intimate: 5 }, description: "Ultimate winter sweater combo. Vanilla, chestnut, and ginger.", instructions: "Layer both on sweater.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4 } },
+    { id: "combo_holy_gin", name: "Holy Gin", parts: ["gentle_silver", "fleurit_sainte_fumee"], tags: ["unique", "fresh", "dark"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Fresh Juniper vs Dark Incense. High contrast, very artistic.", instructions: "Sainte Fumée chest, Gentle Silver neck/wrists.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, spring: 1, winter_sunny: 1 } },
+    { id: "combo_vanilla_latte", name: "Vanilla Latte", parts: ["phantom_noir", "vanille_absolute"], tags: ["gourmand", "sweet", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 5, intimate: 5 }, description: "Coffee/Chocolate layered with Green Vanilla. Rich and delicious.", instructions: "Phantom chest, Vanille neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, summer_sunny: -3 } },
+    { id: "combo_london_fog", name: "London Fog", parts: ["eau_noir", "vanille_absolute"], tags: ["tea", "cozy", "relaxing"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Black Tea and Fig softened by Vanilla. Like a warm drink.", instructions: "Eau Noir behind ears, Vanille on collar.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, winter_rainy: 2, spring: 1 } },
+    { id: "combo_office_power", name: "Office Power", parts: ["victory_man", "cubicle_men"], tags: ["office", "fresh", "strong"], situationRatings: { office: 5, gym: 4, casual: 3, date_night: 1, intimate: 1 }, description: "Citrus/Cedar + Ambroxan. Maximum clean projection.", instructions: "Cubicle chest, Victory Man neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2, fall: 0 } },
+    { id: "combo_tropical_hearth", name: "Tropical Hearth", parts: ["creed_aventus", "maison_du_soir"], tags: ["smoky", "fruity", "unique"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 4, intimate: 4 }, description: "Smoky Pineapple meets Chestnut Fire. Complex smoke layers.", instructions: "Maison chest, Aventus neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, winter_sunny: 1, summer_sunny: -1 } },
+    { id: "combo_ceo", name: "The CEO", parts: ["hermes_terre_eau_intense", "cubicle_men"], tags: ["office", "boss", "professional"], situationRatings: { office: 5, casual: 3, date_night: 2, gym: 2, intimate: 1 }, description: "Pure authority. Vetiver and Ambroxan.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, fall: 2 } },
+    { id: "combo_gin_earth", name: "Gin & Earth", parts: ["hermes_terre_eau_intense", "gentle_silver"], tags: ["fresh", "earthy", "unique"], situationRatings: { casual: 5, office: 3, date_night: 3, gym: 2, intimate: 2 }, description: "Earthy vetiver lifted by sparkling juniper.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, summer_sunny: 2 } },
+    { id: "combo_earth_king", name: "The Earth King", parts: ["hermes_terre_eau_intense", "creed_aventus"], tags: ["masculine", "earthy", "fruity"], situationRatings: { casual: 5, office: 5, date_night: 4, gym: 2, intimate: 3 }, description: "The King Aventus meets earthy Hermes.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, fall: 2 } },
+    { id: "combo_midnight_cacao", name: "Midnight Cacao", parts: ["phantom_noir", "fleurit_sainte_fumee"], tags: ["gourmand", "dark", "date_night"], situationRatings: { date_night: 5, intimate: 5, casual: 3, office: 0, gym: 0 }, description: "Dark chocolate and holy smoke.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2 } },
+    { id: "combo_iron_man", name: "Iron Man", parts: ["prada_paradigme", "victory_man"], tags: ["gym", "clean", "metallic"], situationRatings: { gym: 5, office: 4, casual: 3, date_night: 2, intimate: 1 }, description: "Metallic fresh and clean.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2 } },
+    { id: "combo_dark_architect", name: "The Dark Architect", parts: ["black_orchid_decant", "hermes_terre_eau_intense"], tags: ["unique", "dark", "earthy"], situationRatings: { date_night: 5, intimate: 4, casual: 3, office: 1, gym: 0 }, description: "Architecture in a bottle. Dark florals and earth.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2 } }
+];
+
+const INITIAL_HISTORY = [
+    { date: "2025-11-29T13:35:00", id: "cubicle_men", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-11-30T13:45:00", id: "gentle_silver", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-01T12:39:00", id: "combo_clean_cut", type: "combo", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-03T20:21:00", id: "eau_noir", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Casual" }, feedbackRecorded: true },
+    { date: "2025-12-04T12:48:00", id: "eau_noir", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-05T12:44:00", id: "eau_noir", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-06T13:29:00", id: "combo_gin_juice", type: "combo", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-07T13:30:00", id: "blomb_27", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-08T12:41:00", id: "gentle_silver", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-10T16:55:00", id: "gentle_silver", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Casual" }, feedbackRecorded: true },
+    { date: "2025-12-11T12:40:00", id: "prada_paradigme", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-12T12:43:00", id: "eau_noir", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-13T13:15:00", id: "custom_1765648274151", type: "decant", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-14T13:20:00", id: "custom_1765726222017", type: "decant", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-15T14:22:00", id: "creed_aventus", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Office" }, feedbackRecorded: true }
+];
+
+// --- INITIALIZATION ---
+
+window.addEventListener('DOMContentLoaded', () => {
+     loadData(); 
+     initUI(); 
+     setTimeout(() => { if (window.lucide) lucide.createIcons(); }, 100);
+     document.querySelectorAll('[id$="-modal"]').forEach(el => el.classList.add('hidden'));
+});
+
+// Icon refresh loop
+setInterval(() => { if (window.lucide) lucide.createIcons(); }, 1000);
+
+// --- CORE FUNCTIONS ---
+
+function loadData() {
+    const raw = localStorage.getItem(APP_ID);
+    if (raw) {
+        try {
+            let savedData = JSON.parse(raw);
+            if(!savedData.decants) savedData.decants = [];
+            if(!savedData.history) savedData.history = [];
+            
+            // Merge Saved User Data (Ratings/Wears) with System DB (Logic/Tags)
+            state.data.fragrances = CUSTOM_DB.map(sysF => {
+                const savedF = (savedData.fragrances || []).find(f => f.id === sysF.id);
+                if (savedF) {
+                    return { 
+                        ...sysF, 
+                        wearCount: savedF.wearCount !== undefined ? savedF.wearCount : (sysF.wearCount || 0),
+                        userNotes: savedF.userNotes !== undefined ? savedF.userNotes : (sysF.userNotes || ""),
+                        userRating: savedF.userRating !== undefined ? savedF.userRating : (sysF.userRating || 0),
+                        pairingOnly: savedF.pairingOnly !== undefined ? savedF.pairingOnly : (sysF.pairingOnly || false),
+                        paused: savedF.paused !== undefined ? savedF.paused : (sysF.paused || false),
+                        reviewStatus: savedF.reviewStatus || 'approved' 
+                    };
+                }
+                return sysF;
+            });
+            
+            // Retain custom bottles created via Smart Add
+            (savedData.fragrances || []).forEach(f => {
+                 if (!CUSTOM_DB.find(cdb => cdb.id === f.id)) state.data.fragrances.push(f);
+            });
+
+            state.data.combos = COMBOS_DB.map(sysC => {
+                const savedC = (savedData.combos || []).find(c => c.id === sysC.id);
+                if (savedC) {
+                    return { 
+                        ...sysC, 
+                        wearCount: savedC.wearCount || 0, 
+                        userNotes: savedC.userNotes || "", 
+                        userRating: savedC.userRating || 0 
+                    };
+                }
+                return sysC;
+            });
+            
+            // Merge Decants
+            const savedDecantIds = new Set(savedData.decants.map(d => d.id));
+            const initialDecantsToAdd = INITIAL_DECANTS.filter(d => !savedDecantIds.has(d.id));
+            state.data.decants = [...savedData.decants, ...initialDecantsToAdd];
+            
+            state.data.history = savedData.history.filter(h => h && h.id && h.date);
+
+        } catch(e) {
+            console.error("Data Corrupted", e);
+            setDefaultData();
+        }
+    } else {
+        setDefaultData();
+    }
+}
+
+function setDefaultData() {
+    state.data = { 
+        fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), 
+        decants: JSON.parse(JSON.stringify(INITIAL_DECANTS)), 
+        combos: JSON.parse(JSON.stringify(COMBOS_DB)), 
+        history: JSON.parse(JSON.stringify(INITIAL_HISTORY))
+    };
+    saveData();
+}
+
+function saveData() {
+    localStorage.setItem(APP_ID, JSON.stringify(state.data));
+}
+
+// --- UI LOGIC ---
+
+function initUI() {
+    switchView('selector');
+    updateContextUI();
+}
+
+function switchView(viewName) {
+    ['view-selector', 'view-results', 'view-collection', 'view-history'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+    });
+    const target = document.getElementById(viewName === 'selector' ? 'view-selector' : 'view-' + viewName);
+    if(target) target.classList.remove('hidden');
+
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-teal-500'));
+    const navMap = { 'selector': 0, 'results': 0, 'collection': 1, 'history': 2 };
+    const idx = navMap[viewName];
+    const navBtns = document.querySelectorAll('nav button');
+    if(navBtns[idx]) navBtns[idx].classList.add('text-teal-500');
+
+    if (viewName === 'collection') showCollection(); 
+    if (viewName === 'history') renderHistory();
+    
+    document.getElementById('main-content').scrollTop = 0;
+    if (window.lucide) lucide.createIcons();
+}
+
+function setContext(type, value) { 
+    state.context[type] = value; 
+    updateContextUI(); 
+    const sus = document.getElementById('suspense-section');
+    if (state.context.situation === 'date_night' || state.context.situation === 'intimate') sus.classList.remove('hidden');
+    else { sus.classList.add('hidden'); state.context.suspense = false; document.getElementById('suspense-toggle').checked = false; }
+}
+
+function updateContextUI() {
+     document.querySelectorAll('.ctx-btn').forEach(btn => {
+        const group = btn.dataset.group; const val = btn.dataset.val;
+        if (state.context[group] === val) { 
+            btn.classList.add('btn-active'); btn.classList.remove('glass-panel'); 
+            const icon = btn.querySelector('svg'); if(icon) { icon.classList.remove('text-teal-300', 'text-yellow-400', 'text-blue-400'); icon.classList.add('text-white'); }
+        } else { 
+            btn.classList.remove('btn-active'); btn.classList.add('glass-panel'); 
+            const icon = btn.querySelector('svg'); 
+            if(icon) { icon.classList.remove('text-white'); 
+                if(group === 'situation') icon.classList.add('text-teal-300'); 
+                if(val === 'sunny') icon.classList.add('text-yellow-400'); 
+                if(val === 'rainy') icon.classList.add('text-blue-400'); 
+            }
+        }
+    });
+}
+
+function toggleSuspense() { state.context.suspense = document.getElementById('suspense-toggle').checked; }
+
+// --- DEEP ROTATION ALGORITHM (v82) ---
+
+function calculateScore(item, isCombo) {
+    const ctx = state.context; 
+    let score = 0;
+    
+    // 1. Situation (High Weight x4)
+    const sitScore = item.situationRatings ? (item.situationRatings[ctx.situation] || 0) : 0; 
+    if (sitScore < 2) return -100; // Disqualify mismatch
+    score += sitScore * 4; 
+    
+    // 2. Weather (Medium Weight x2)
+    if (item.weatherAffinity) {
+        let weatherKey = `${ctx.season}_${ctx.weather}`;
+        if (item.weatherAffinity[weatherKey] !== undefined) {
+            score += item.weatherAffinity[weatherKey] * 2;
+        } else if (item.weatherAffinity[ctx.season] !== undefined) {
+             score += item.weatherAffinity[ctx.season] * 2;
+        }
+    }
+
+    if (!isCombo) {
+        if(item.pairingOnly || item.paused) return -999;
+        
+        // 3. Tier Bonus
+        if (item.userRating === 'S') score += 20;
+        else if (item.userRating === 'A') score += 12;
+        else if (item.userRating === 'B') score += 5;
+        
+        // 4. Freshness
+        if (item.wearCount === 0) score += 5; 
+        else score -= (item.wearCount * 2);
+    } else {
+        score += 8; // Combo Base Bonus
+    }
+    
+    // 5. Suspense
+    if (ctx.suspense && item.tags && item.tags.includes('suspense')) score += 10;
+    
+    // 6. Jitter
+    score += Math.random() * 4;
+    
+    return score;
+}
+
+function generateRecommendations() {
+    const container = document.getElementById('results-container'); container.innerHTML = '';
+    const scoredSingles = state.data.fragrances.map(f => ({ ...f, score: calculateScore(f, false), type: 'single' }));
+    const scoredCombos = state.data.combos.map(c => ({ ...c, score: calculateScore(c, true), type: 'combo' }));
+    const scoredDecants = state.data.decants.map(d => {
+        let score = 0;
+        if (d.rating === null) score = 15; else if (d.rating === 'like') score = 10; else score = -50;
+        return { ...d, score, type: 'decant' };
+    });
+
+    const results = [...scoredSingles, ...scoredCombos, ...scoredDecants].filter(f => f.score > -50).sort((a, b) => b.score - a.score);
+
+    if (results.length === 0) container.innerHTML = `<div class="p-6 text-center text-gray-400">No suitable fragrances found.</div>`;
+    else {
+        results.slice(0, 3).forEach((item, idx) => {
+            if(idx===0) container.appendChild(createTierHeader("🏆 The Signature"));
+            if(idx===1) container.appendChild(createTierHeader("🥈 Alternative"));
+            if(idx===2) container.appendChild(createTierHeader("🃏 Wildcard"));
+            if(item.type === 'single') container.appendChild(createFragranceCard(item, idx===0));
+            else if(item.type === 'combo') container.appendChild(createComboCard(item, idx===0));
+            else if(item.type === 'decant') {
+                const div = document.createElement('div');
+                div.className = "glass-panel p-4 rounded-xl border border-dashed border-teal-500/50 mb-2";
+                div.innerHTML = `<div class="flex justify-between items-start"><div><h3 class="font-bold text-white">${item.name}</h3><span class="text-[10px] bg-teal-500 px-2 rounded text-white">DECANT</span></div></div><button onclick="logDecantWear('${item.id}')" class="mt-2 w-full bg-white/10 py-2 rounded text-xs font-bold text-white hover:bg-white/20">Log Wear</button>`;
+                container.appendChild(div);
+            }
+        });
+        
+        // Rotation Options
+        const rotation = results.slice(3, 8);
+        if(rotation.length > 0) {
+             const rotHeader = document.createElement('div'); rotHeader.className = 'tier-header mt-8'; rotHeader.innerText = "Rotation Options"; container.appendChild(rotHeader);
+             rotation.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-gray-800/50 p-4 rounded-xl flex justify-between items-center border border-gray-800 mb-2";
+                div.innerHTML = `<div><div class="font-medium text-white">${item.name}</div><div class="text-xs text-gray-500">${item.brand || "Combo"}</div></div><button onclick="logAnyWear('${item.id}', '${item.type}')" class="p-2 bg-gray-700 rounded-full hover:bg-teal-600 transition-colors"><i data-lucide="plus" class="w-4 h-4 text-white"></i></button>`;
+                container.appendChild(div);
+             });
+        }
+    }
+    switchView('results');
+}
+
+function logAnyWear(id, type) {
+    if (type === 'single') logWear(id);
+    else if (type === 'combo') logComboWear(id);
+    else if (type === 'decant') logDecantWear(id);
+}
+
+function createTierHeader(text) { const div = document.createElement('div'); div.className = 'tier-header'; div.innerText = text; return div; }
+
+function createFragranceCard(f, isTop) {
+     const div = document.createElement('div');
+     const bgClass = isTop ? 'bg-gradient-to-br from-charcoal-700 to-teal-900/20 border-teal-500/50' : 'glass-panel border-white/5';
+     const wearColor = f.wearCount > 4 ? 'text-red-400' : (f.wearCount === 0 ? 'text-green-400' : 'text-gray-400');
+     div.className = `${bgClass} p-5 rounded-2xl border relative transition-all mb-3`;
+     div.innerHTML = `<div class="flex justify-between items-start mb-2"><div><span class="text-[10px] font-bold tracking-widest text-teal-400 uppercase">${f.brand}</span><h3 class="text-xl font-bold text-white leading-tight">${f.name}</h3><p class="text-xs text-teal-300 italic mt-0.5">${f.inspiration || ''}</p></div><button onclick="openNote('${f.id}')" class="text-gray-400 hover:text-white"><i data-lucide="sticky-note" class="w-4 h-4"></i></button></div><div class="bg-black/20 p-3 rounded-lg my-3 border border-white/5"><p class="text-sm text-gray-200 leading-relaxed">"${f.description}"</p></div><div class="flex items-center gap-2 mb-4"><i data-lucide="spray-can" class="w-4 h-4 text-gray-400"></i><span class="text-xs text-gray-400 font-mono">${f.sprayInstructions}</span></div><div class="flex justify-between items-center pt-3 border-t border-white/5"><span class="text-xs font-mono ${wearColor}">Wears: ${f.wearCount}</span><button onclick="logWear('${f.id}')" class="bg-white/10 hover:bg-white/20 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Wear <i data-lucide="plus" class="w-4 h-4"></i></button></div>`;
+     return div;
+}
+
+function createComboCard(c, isTop) {
+    const div = document.createElement('div');
+    const bgClass = isTop ? 'bg-gradient-to-br from-purple-900/30 to-teal-900/30 border-teal-500/50' : 'combo-gradient border-teal-500/20';
+    const partNames = c.parts.map(pid => { const f = state.data.fragrances.find(x => x.id === pid); return f ? f.name : pid; }).join(' + ');
+    div.className = `${bgClass} p-5 rounded-2xl border relative transition-all mb-3`;
+    div.innerHTML = `<div class="flex justify-between items-start mb-2"><div><span class="text-[10px] font-bold tracking-widest text-teal-300 uppercase">LAYER COMBO</span><h3 class="text-xl font-bold text-white leading-tight">${c.name}</h3><p class="text-xs text-gray-300 mt-1">${partNames}</p></div><div class="flex flex-col items-end gap-1"><button onclick="openNote('${c.id}')" class="text-gray-400 hover:text-white"><i data-lucide="sticky-note" class="w-4 h-4 ${c.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button></div></div><div class="bg-black/20 p-3 rounded-lg my-3 border border-white/5"><p class="text-sm text-gray-200 leading-relaxed">"${c.description}"</p><div class="mt-2 pt-2 border-t border-white/10 flex items-start gap-2"><i data-lucide="layers" class="w-4 h-4 text-teal-300 mt-1"></i><p class="text-xs text-teal-100 font-mono">${c.instructions}</p></div></div><div class="flex justify-between items-center pt-3 border-t border-white/5"><span class="text-xs font-mono text-gray-400">Combo Wears: ${c.wearCount}</span><button onclick="logComboWear('${c.id}')" class="bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">Log Pair <i data-lucide="plus" class="w-4 h-4"></i></button></div>`;
+    return div;
+}
+
+// --- LOGGING ---
+function logWear(id) {
+     const idx = state.data.fragrances.findIndex(f => f.id === id);
+     if (idx > -1) { 
+         state.data.fragrances[idx].wearCount++; 
+         state.data.history.push({ id, type:'single', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: true });
+         saveData(); 
+         showToast('Wear Logged'); 
+         setTimeout(() => switchView('selector'), 500); 
+    }
+}
+
+function logComboWear(id) {
+     const comboIdx = state.data.combos.findIndex(c => c.id === id);
+     if (comboIdx > -1) {
+         const combo = state.data.combos[comboIdx]; combo.wearCount++;
+         combo.parts.forEach(pid => { const fIdx = state.data.fragrances.findIndex(f => f.id === pid); if(fIdx > -1) state.data.fragrances[fIdx].wearCount++; });
+         state.data.history.push({ id, type:'combo', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false });
+         saveData(); 
+         showToast('Pair Logged'); 
+         setTimeout(() => switchView('history'), 500); 
+    }
+}
+
+function logDecantWear(id) {
+    let decant = state.data.decants.find(d => d.id === id);
+    if (!decant && typeof id === 'number') decant = state.data.decants[id];
+    if (!decant) return;
+    state.data.history.push({ id: decant.id, type: 'decant', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false });
+    saveData();
+    showToast("Logged Decant");
+    switchView('history');
+}
+
+// --- INTERACTION ---
+
+function handleFeedback(logIndex, action) {
+     const log = state.data.history[logIndex];
+     log.feedbackRecorded = true;
+     
+     if (action === 'dislike') {
+         if (log.type === 'decant') {
+             if(confirm("Remove this decant from collection?")) {
+                state.data.decants = state.data.decants.filter(d => d.id !== log.id);
+                showToast("Decant Removed");
+             }
+         } else if (log.type === 'combo') {
+             showToast("Combo Disliked");
+         }
+     } else if (action === 'like') {
+         if (log.type === 'decant') {
+             const d = state.data.decants.find(x => x.id === log.id);
+             if(d) d.rating = 'like';
+             showToast("Marked as Favorite");
+         } else {
+            showToast("Saved to Favorites");
+         }
+     } else {
+         showToast("Will ask again");
+     }
+     saveData();
+     renderHistory();
+}
+
+function renderHistory() {
+    const list = document.getElementById('history-list'); 
+    list.innerHTML = '';
+    const sortedHistory = [...state.data.history].sort((a,b) => new Date(b.date) - new Date(a.date));
+    if(sortedHistory.length === 0) { list.innerHTML = `<div class="text-center text-gray-500 mt-10">No wear history yet.</div>`; return; }
+    sortedHistory.forEach((log, index) => {
+        const realIndex = state.data.history.indexOf(log);
+        let name = "Unknown"; let brand = ""; 
+        if (log.type === 'single') { const f = state.data.fragrances.find(x => x.id === log.id); if(f) { name = f.name; brand = f.brand; } } 
+        else if (log.type === 'combo') { const c = state.data.combos.find(x => x.id === log.id); if(c) { name = c.name; brand = "Combo"; } }
+        else if (log.type === 'decant') { const d = state.data.decants.find(x => x.id === log.id); if(d) { name = d.name; brand = "Decant"; } else { name = "Deleted Decant"; } }
+        const dateObj = new Date(log.date); 
+        const dateStr = dateObj.toLocaleDateString(); 
+        const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        let buttonsHtml = '';
+        if (!log.feedbackRecorded && (log.type === 'combo' || log.type === 'decant')) {
+            buttonsHtml = `<div class="mt-3 flex gap-2 pt-2 border-t border-white/5"><button onclick="handleFeedback(${realIndex}, 'like')" class="flex-1 py-1.5 bg-green-500/20 text-green-300 rounded text-xs hover:bg-green-500/40 font-bold flex items-center justify-center gap-1"><i data-lucide="thumbs-up" class="w-3 h-3"></i> Like</button><button onclick="handleFeedback(${realIndex}, 'try_more')" class="flex-1 py-1.5 bg-blue-500/20 text-blue-300 rounded text-xs hover:bg-blue-500/40 font-bold flex items-center justify-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Retry</button><button onclick="handleFeedback(${realIndex}, 'dislike')" class="flex-1 py-1.5 bg-red-500/20 text-red-300 rounded text-xs hover:bg-red-500/40 font-bold flex items-center justify-center gap-1"><i data-lucide="thumbs-down" class="w-3 h-3"></i> Dislike</button></div>`;
+        }
+        const div = document.createElement('div'); 
+        div.className = "glass-panel p-4 rounded-xl border border-white/5 mb-3";
+        div.innerHTML = `<div class="flex justify-between items-center"><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] text-gray-400 font-mono">${dateStr} • ${timeStr}</span><span class="text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300 uppercase">${log.context ? log.context.situation : 'Log'}</span></div><h4 class="font-bold text-white text-sm">${name}</h4><p class="text-[10px] text-teal-400 uppercase tracking-wider">${brand}</p></div><button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors relative z-10"><i data-lucide="edit-2" class="w-4 h-4"></i></button></div>${buttonsHtml}`;
+        list.appendChild(div);
+    });
+    if (window.lucide) lucide.createIcons();
+}
+
+function setCollectionMode(mode) {
+     state.ui.collectionMode = mode;
+     document.getElementById('tab-bottles').className = mode === 'bottles' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
+     document.getElementById('tab-decants').className = mode === 'decants' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
+     document.getElementById('tab-combos').className = mode === 'combos' ? 'flex-1 py-2 text-xs font-bold rounded-lg transition-all bg-white/10 text-white' : 'flex-1 py-2 text-xs font-bold rounded-lg text-gray-500 transition-all hover:text-white';
+     showCollection();
+}
+
+function showCollection() {
+     const list = document.getElementById('collection-list');
+     list.innerHTML = '';
+     if(state.ui.collectionMode === 'bottles') {
+        state.data.fragrances.forEach(f => {
+            const div = document.createElement('div');
+            div.className = `glass-panel p-4 rounded-xl border border-white/5 ${f.paused ? 'opacity-50' : ''}`;
+            let tiersHtml = '';
+            TIERS.forEach(tier => {
+                const isActive = f.userRating === tier;
+                const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`;
+                tiersHtml += `<button onclick="setRating('${f.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`;
+            });
+            const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300';
+            const pauseClass = f.paused ? 'text-yellow-400' : 'text-gray-600 hover:text-white';
+            const pauseIcon = f.paused ? 'play-circle' : 'pause-circle';
+            div.innerHTML = `<div class="flex justify-between items-start mb-3"><div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3></div><div class="flex items-center gap-3"><button onclick="togglePairingOnly('${f.id}')" class="${pairingClass} transition-colors" title="Toggle Pairing Only"><i data-lucide="layers" class="w-4 h-4"></i></button><button onclick="openNote('${f.id}')" class="text-gray-400"><i data-lucide="sticky-note" class="w-4 h-4 ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button><button onclick="togglePause('${f.id}')" class="${pauseClass} transition-colors"><i data-lucide="${pauseIcon}" class="w-4 h-4"></i></button><button onclick="deleteFragrance('${f.id}')" class="text-gray-600 hover:text-red-500" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div><div class="flex justify-between items-center mb-2"><div class="flex gap-1">${tiersHtml}</div></div><div class="flex justify-between items-center pt-2 border-t border-white/5"><p class="text-[10px] text-gray-400 font-mono">Wears: ${f.wearCount}</p><button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 flex items-center gap-1"><i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset</button></div>`;
+            list.appendChild(div);
+        });
+     } else if (state.ui.collectionMode === 'decants') {
+        if(state.data.decants.length === 0) list.innerHTML = `<div class="text-center text-gray-500 p-4">No decants yet. Use Smart Add to add one.</div>`;
+        state.data.decants.forEach((d, idx) => {
+            const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5`;
+            div.innerHTML = `<div class="flex justify-between items-start mb-2"><div><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">${d.brand}</span><h3 class="font-bold text-sm text-white">${d.name}</h3></div><button onclick="deleteDecant(${idx})" class="text-gray-600 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div><div class="mt-2"><button onclick="logDecantWear('${d.id}')" class="w-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold py-2 rounded-lg flex items-center justify-center gap-2 transition-colors">Log Wear <i data-lucide="plus" class="w-3 h-3"></i></button></div>`;
+            list.appendChild(div);
+        });
+    } else if (state.ui.collectionMode === 'combos') {
+        if(state.data.combos.length === 0) list.innerHTML = `<div class="text-center text-gray-500 p-4">No combos found.</div>`;
+        state.data.combos.forEach((c) => {
+            const div = document.createElement('div'); div.className = `combo-gradient p-4 rounded-xl border border-teal-500/20`;
+            const partNames = c.parts.map(pid => { const f = state.data.fragrances.find(x => x.id === pid); return f ? f.name : pid; }).join(' + ');
+            let tiersHtml = '';
+            TIERS.forEach(tier => {
+                const isActive = c.userRating === tier;
+                const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`;
+                tiersHtml += `<button onclick="setRating('${c.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`;
+            });
+            div.innerHTML = `<div class="flex justify-between items-start mb-2"><div><span class="text-[10px] text-teal-300 font-bold uppercase tracking-wider">COMBO RECIPE</span><h3 class="font-bold text-sm text-white">${c.name}</h3><p class="text-[10px] text-gray-300 mt-0.5">${partNames}</p></div><div class="flex items-center gap-2"><button onclick="openNote('${c.id}')" class="text-gray-400"><i data-lucide="sticky-note" class="w-4 h-4 ${c.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button></div></div><div class="flex justify-between items-center mb-2"><div class="flex gap-1">${tiersHtml}</div></div><div class="bg-black/30 p-2 rounded-lg mb-2"><p class="text-[10px] text-teal-100 font-mono">${c.instructions}</p></div><div class="flex justify-between items-center pt-1 border-t border-white/5"><p class="text-[10px] text-gray-400 font-mono">Wears: ${c.wearCount}</p><button onclick="logComboWear('${c.id}')" class="text-xs bg-teal-600 hover:bg-teal-500 text-white px-3 py-1 rounded font-bold">Log</button></div>`;
+            list.appendChild(div);
+        });
+    }
+    if (window.lucide) lucide.createIcons();
+}
+
+function setRating(id, tier) {
+    let f = state.data.fragrances.find(i => i.id === id); 
+    if(f) { 
+        f.userRating = tier; 
+        saveData(); 
+        showCollection(); 
+        return; 
+    }
+    let c = state.data.combos.find(i => i.id === id); 
+    if(c) { 
+        c.userRating = tier; 
+        saveData(); 
+        showCollection(); 
+    }
+}
+
+function togglePairingOnly(id) { const f = state.data.fragrances.find(i => i.id === id); if(f) { f.pairingOnly = !f.pairingOnly; saveData(); showCollection(); showToast(f.pairingOnly ? "Set to Pairing Only" : "Set to Solo + Pairing"); } }
+function togglePause(id) { const f = state.data.fragrances.find(i => i.id === id); if (f) { f.paused = !f.paused; saveData(); showCollection(); showToast(f.paused ? "Fragrance Paused" : "Fragrance Resumed"); } }
+function deleteFragrance(id) { if(confirm("Permanently delete this fragrance from your collection?")) { state.data.fragrances = state.data.fragrances.filter(f => f.id !== id); saveData(); showCollection(); showToast("Fragrance Deleted"); } }
+function resetWear(id) { const idx = state.data.fragrances.findIndex(f => f.id === id); if (idx > -1) { state.data.fragrances[idx].wearCount = 0; saveData(); showCollection(); } }
+function deleteDecant(idx) { if(confirm('Remove this decant?')) { state.data.decants.splice(idx, 1); saveData(); showCollection(); } }
+
+function copyStats() {
+    let report = "--- FRAGRANCE SOMMELIER STATS ---\n\n";
+    report += "== BOTTLES ==\n";
+    state.data.fragrances.sort((a,b) => b.wearCount - a.wearCount).forEach(f => { report += `${f.name} [${f.userRating || '-'}]: ${f.wearCount}\n`; });
+    report += "\n== COMBOS ==\n";
+    state.data.combos.sort((a,b) => b.wearCount - a.wearCount).forEach(c => { if(c.wearCount > 0) report += `${c.name} [${c.userRating || '-'}]: ${c.wearCount}\n`; });
+    report += `\n== TOTAL LOGS: ${state.data.history.length} ==`;
+    const area = document.getElementById('backup-area');
+    area.value = report; area.select(); document.execCommand('copy'); showToast('Stats Copied');
+}
+
+function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); }
+function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); }
+
+function analyzeText() { 
+    const text = document.getElementById('sa-text').value.toLowerCase();
+    const name = document.getElementById('sa-name').value;
+    const brand = document.getElementById('sa-brand').value;
+    if(!text) return alert("Paste text first");
+    
+    let tags = []; 
+    let affinity = { winter_sunny: 0, winter_rainy: 0, summer_sunny: 0, summer_rainy: 0, spring: 0, fall: 0 }; 
+    let ratings = { office: 2, gym: 1, casual: 3, date_night: 2, intimate: 2 };
+    
+    if (KEYWORDS.winter.some(k => text.includes(k))) { tags.push('winter', 'cozy'); affinity.winter_sunny += 2; affinity.winter_rainy += 2; affinity.summer_sunny -= 3; ratings.date_night += 2; ratings.intimate += 2; ratings.gym = 0; }
+    if (KEYWORDS.summer.some(k => text.includes(k))) { tags.push('fresh', 'citrus'); affinity.summer_sunny += 2; affinity.summer_rainy += 1; affinity.winter_sunny -= 1; ratings.gym += 3; ratings.office += 2; ratings.date_night -= 1; }
+    if (KEYWORDS.fall.some(k => text.includes(k))) { tags.push('woody', 'spicy'); affinity.fall += 2; affinity.spring += 1; ratings.casual += 2; ratings.office += 1; }
+    if (KEYWORDS.office.some(k => text.includes(k))) { tags.push('clean', 'safe'); ratings.office += 3; ratings.gym += 1; }
+    
+    if(text.includes('dark') || text.includes('mysterious') || text.includes('incense')) { tags.push('suspense'); ratings.date_night += 1; }
+    
+    let comboSuggestion = "None detected"; if(tags.includes('fresh')) comboSuggestion = "Try layering with Aventus/Gentle Silver for depth."; if(tags.includes('winter')) comboSuggestion = "Try layering with Vanille Absolute for sweetness.";
+    
+    const resultsDiv = document.getElementById('sa-results'); 
+    resultsDiv.classList.remove('hidden'); 
+    document.getElementById('sa-tags').innerHTML = tags.map(t => `<span class="bg-teal-900 text-teal-300 text-[10px] px-2 py-1 rounded-full">${t}</span>`).join(''); 
+    document.getElementById('sa-combo').innerText = comboSuggestion;
+    
+    tempSmartObj = { 
+        id: 'custom_' + Date.now(), 
+        name: name, 
+        brand: brand, 
+        inspiration: "Imported", 
+        tags: tags, 
+        weatherAffinity: affinity, 
+        situationRatings: ratings, 
+        sprayInstructions: "4-5 sprays (Clothes/Neck)", 
+        description: "Smart-Added: " + text.substring(0, 50) + "...", 
+        wearCount: 0, 
+        userNotes: comboSuggestion, 
+        userRating: 0, 
+        pairingOnly: false,
+        paused: false,
+        reviewStatus: 'approved'
+    };
+}
+
+function saveSmartAdd() { 
+    if(!tempSmartObj) return alert("Please click 'Analyze' first."); 
+    
+    tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; 
+    tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; 
+    
+    const isDecant = document.getElementById('sa-is-decant').checked;
+    
+    if(isDecant) {
+        state.data.decants.push({ 
+            id: tempSmartObj.id, 
+            name: tempSmartObj.name, 
+            brand: tempSmartObj.brand, 
+            tags: tempSmartObj.tags, 
+            description: tempSmartObj.description, 
+            rating: null 
+        });
+        showToast('Decant Added');
+    } else {
+        state.data.fragrances.push(tempSmartObj); 
+        showToast('Bottle Added');
+    }
+    saveData(); 
+    closeSmartAdd(); 
+    showCollection(); 
+}
+
+// --- MODALS & UTILS ---
+
+function openNote(id) { 
+    currentNoteId = id; 
+    let item = state.data.fragrances.find(f => f.id === id); 
+    if (!item) item = state.data.combos.find(c => c.id === id); 
+    document.getElementById('note-input').value = item.userNotes || ""; 
+    document.getElementById('notes-modal').classList.remove('hidden'); 
+}
+
+function closeNotesModal() { document.getElementById('notes-modal').classList.add('hidden'); }
+
+function saveNote() {
+    if(!currentNoteId) return;
+    const val = document.getElementById('note-input').value;
+    
+    let f = state.data.fragrances.find(i => i.id === currentNoteId);
+    if(f) { 
+        f.userNotes = val; 
+        saveData(); 
+        showCollection(); 
+        // Also update results if open to reflect new notes icon
+        const resContainer = document.getElementById('results-container');
+        if(!resContainer.classList.contains('hidden')) generateRecommendations();
+        closeNotesModal(); 
+        return; 
+    }
+    
+    let c = state.data.combos.find(i => i.id === currentNoteId);
+    if(c) { 
+        c.userNotes = val; 
+        saveData(); 
+        showCollection(); 
+        closeNotesModal(); 
+    }
+}
+
+function openAddLogModal() {
+    const select = document.getElementById('add-log-fragrance'); select.innerHTML = '';
+    const fragGroup = document.createElement('optgroup'); fragGroup.label = "Fragrances";
+    state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; fragGroup.appendChild(opt); }); select.appendChild(fragGroup);
+    const comboGroup = document.createElement('optgroup'); comboGroup.label = "Combos";
+    state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; comboGroup.appendChild(opt); }); select.appendChild(comboGroup);
+    if (state.data.decants.length > 0) {
+        const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants";
+        state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; decantGroup.appendChild(opt); });
+        select.appendChild(decantGroup);
+    }
+    const now = new Date(); const isoString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); document.getElementById('add-log-date').value = isoString;
+    document.getElementById('add-log-modal').classList.remove('hidden');
+}
+function closeAddLogModal() { document.getElementById('add-log-modal').classList.add('hidden'); }
+function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
+function copyData() { const area = document.getElementById('backup-area'); area.value = JSON.stringify(state.data); area.select(); document.execCommand('copy'); alert('JSON Backup Copied!'); }
+function resetView() { switchView('selector'); }
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
+    toast.querySelector('span').innerText = msg;
+    toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
+    toastTimeout = setTimeout(() => { toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible'); }, 2000);
+}
+
+function openHistoryEdit(index) {
+     editingHistoryIndex = index;
+     const log = state.data.history[index];
+     const modal = document.getElementById('history-edit-modal');
+     const dateInput = document.getElementById('hist-edit-date');
+     const select = document.getElementById('hist-edit-fragrance');
+     const d = new Date(log.date); const isoString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); dateInput.value = isoString;
+     select.innerHTML = '';
+     const optGroupFrag = document.createElement('optgroup'); optGroupFrag.label = "Fragrances";
+     state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; if(f.id === log.id) opt.selected = true; optGroupFrag.appendChild(opt); }); select.appendChild(optGroupFrag);
+     const optGroupCombo = document.createElement('optgroup'); optGroupCombo.label = "Combos";
+     state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; if(c.id === log.id) opt.selected = true; optGroupCombo.appendChild(opt); }); select.appendChild(optGroupCombo);
+     if (state.data.decants.length > 0) {
+        const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants";
+        state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; if(d.id === log.id) opt.selected = true; decantGroup.appendChild(opt); }); select.appendChild(decantGroup);
+     }
+     modal.classList.remove('hidden');
+}
+function closeHistoryEdit() { document.getElementById('history-edit-modal').classList.add('hidden'); editingHistoryIndex = null; }
+function saveHistoryEdit() {
+    if (editingHistoryIndex === null) return;
+    const log = state.data.history[editingHistoryIndex]; const newDate = document.getElementById('hist-edit-date').value; const newId = document.getElementById('hist-edit-fragrance').value; const oldId = log.id;
+    log.date = new Date(newDate).toISOString();
+    if (newId !== oldId) { 
+        changeWearCount(oldId, -1); changeWearCount(newId, 1); log.id = newId; 
+        const isCombo = state.data.combos.some(c => c.id === newId); const isDecant = state.data.decants.some(d => d.id === newId);
+        if (isCombo) log.type = 'combo'; else if (isDecant) log.type = 'decant'; else log.type = 'single';
+    }
+    saveData(); closeHistoryEdit(); renderHistory(); showCollection(); showToast('Log Updated');
+}
+function deleteHistoryEntry() { if (editingHistoryIndex === null) return; if(!confirm("Delete this log entry?")) return; const log = state.data.history[editingHistoryIndex]; changeWearCount(log.id, -1); state.data.history.splice(editingHistoryIndex, 1); saveData(); closeHistoryEdit(); renderHistory(); showCollection(); showToast('Entry Deleted'); }
+function changeWearCount(id, delta) {
+    const fIdx = state.data.fragrances.findIndex(f => f.id === id); if (fIdx > -1) { state.data.fragrances[fIdx].wearCount += delta; if(state.data.fragrances[fIdx].wearCount < 0) state.data.fragrances[fIdx].wearCount = 0; return; }
+    const cIdx = state.data.combos.findIndex(c => c.id === id); if (cIdx > -1) { const combo = state.data.combos[cIdx]; combo.wearCount += delta; if(combo.wearCount < 0) combo.wearCount = 0; combo.parts.forEach(pid => { const partIdx = state.data.fragrances.findIndex(f => f.id === pid); if(partIdx > -1) { state.data.fragrances[partIdx].wearCount += delta; if(state.data.fragrances[partIdx].wearCount < 0) state.data.fragrances[partIdx].wearCount = 0; } }); }
+}
+
+function saveMissedLog() {
+     const dateVal = document.getElementById('add-log-date').value;
+     const idVal = document.getElementById('add-log-fragrance').value;
+     const situationVal = document.getElementById('add-log-situation').value;
+     if(!dateVal || !idVal) return alert("Date and Fragrance required");
+     const isCombo = state.data.combos.some(c => c.id === idVal); const isDecant = state.data.decants.some(d => d.id === idVal);
+     let type = 'single'; if (isCombo) type = 'combo'; else if (isDecant) type = 'decant';
+     changeWearCount(idVal, 1);
+     state.data.history.push({ id: idVal, type: type, date: new Date(dateVal).toISOString(), context: { situation: situationVal, season: state.context.season, weather: state.context.weather, suspense: false }, feedbackRecorded: false });
+     saveData(); closeAddLogModal(); renderHistory(); showCollection(); showToast('Log Added');
+}

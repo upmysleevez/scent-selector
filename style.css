@@ -1,0 +1,74 @@
+/* Base Styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+}
+
+/* Safe Areas */
+.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Utility */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Glassmorphism */
+.glass-panel {
+    background: rgba(38, 40, 40, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-active {
+    background-color: #208D8D;
+    color: white;
+    border-color: #208D8D;
+}
+
+/* Tier Badge Styles */
+.tier-btn { font-family: monospace; transition: all 0.2s; }
+.tier-s { color: #fbbf24; border-color: #fbbf24; }
+.tier-a { color: #f87171; border-color: #f87171; }
+.tier-b { color: #60a5fa; border-color: #60a5fa; }
+.tier-c { color: #34d399; border-color: #34d399; }
+.tier-d { color: #9ca3af; border-color: #9ca3af; }
+.tier-active { 
+    background-color: #208D8D; 
+    color: white !important; 
+    border-color: #208D8D !important; 
+    font-weight: bold; 
+    transform: scale(1.1); 
+}
+
+/* Custom Form Inputs */
+.input-glass {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+/* Combo Card Gradient */
+.combo-gradient {
+    background: linear-gradient(135deg, rgba(38,40,40,0.9) 0%, rgba(32,141,141,0.2) 100%);
+}
+
+.tier-header {
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; 
+    font-size: 0.75rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.05em; 
+    font-weight: 700; 
+    margin-top: 1.5rem; 
+    margin-bottom: 0.75rem; 
+    color: #9ca3af;
+}
+.tier-header::after { 
+    content: ''; 
+    flex: 1; 
+    height: 1px; 
+    background: rgba(255,255,255,0.1); 
+}
