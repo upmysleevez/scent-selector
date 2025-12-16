@@ -321,7 +321,15 @@
                     state.data.fragrances = CUSTOM_DB.map(sysF => {
                         const savedF = (savedData.fragrances || []).find(f => f.id === sysF.id);
                         if (savedF) {
-                            return { ...sysF, wearCount: savedF.wearCount || 0, userNotes: savedF.userNotes || "", userRating: savedF.userRating || 0, pairingOnly: savedF.pairingOnly || false, paused: savedF.paused || false, reviewStatus: savedF.reviewStatus || 'approved' };
+                            return { 
+                                ...sysF, 
+                                wearCount: savedF.wearCount !== undefined ? savedF.wearCount : (sysF.wearCount || 0),
+                                userNotes: savedF.userNotes !== undefined ? savedF.userNotes : (sysF.userNotes || ""),
+                                userRating: savedF.userRating !== undefined ? savedF.userRating : (sysF.userRating || 0),
+                                pairingOnly: savedF.pairingOnly !== undefined ? savedF.pairingOnly : (sysF.pairingOnly || false),
+                                paused: savedF.paused !== undefined ? savedF.paused : (sysF.paused || false),
+                                reviewStatus: savedF.reviewStatus || 'approved' 
+                            };
                         }
                         return sysF;
                     });
@@ -694,6 +702,7 @@
                     list.appendChild(div);
                 });
             }
+            if (window.lucide) lucide.createIcons();
         }
         
         function copyStats() {
@@ -792,84 +801,29 @@
         }
         function openNote(id) { currentNoteId = id; let item = state.data.fragrances.find(f => f.id === id); if (!item) item = state.data.combos.find(c => c.id === id); document.getElementById('note-input').value = item.userNotes || ""; document.getElementById('notes-modal').classList.remove('hidden'); }
         function closeNotesModal() { document.getElementById('notes-modal').classList.add('hidden'); }
-        function saveNote() {}
+        
+        function saveNote() {
+            if(!currentNoteId) return;
+            const val = document.getElementById('note-input').value;
+            
+            let f = state.data.fragrances.find(i => i.id === currentNoteId);
+            if(f) { 
+                f.userNotes = val; 
+                saveData(); 
+                showCollection(); 
+                const resContainer = document.getElementById('results-container');
+                if(!resContainer.classList.contains('hidden')) generateRecommendations();
+                closeNotesModal(); 
+                return; 
+            }
+            
+            let c = state.data.combos.find(i => i.id === currentNoteId);
+            if(c) { 
+                c.userNotes = val; 
+                saveData(); 
+                showCollection(); 
+                closeNotesModal(); 
+            }
+        }
         
         function openAddLogModal() {
-            const select = document.getElementById('add-log-fragrance'); select.innerHTML = '';
-            const fragGroup = document.createElement('optgroup'); fragGroup.label = "Fragrances";
-            state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; fragGroup.appendChild(opt); }); select.appendChild(fragGroup);
-            const comboGroup = document.createElement('optgroup'); comboGroup.label = "Combos";
-            state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; comboGroup.appendChild(opt); }); select.appendChild(comboGroup);
-            if (state.data.decants.length > 0) {
-                const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants";
-                state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; decantGroup.appendChild(opt); });
-                select.appendChild(decantGroup);
-            }
-            const now = new Date(); const isoString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); document.getElementById('add-log-date').value = isoString;
-            document.getElementById('add-log-modal').classList.remove('hidden');
-        }
-        function closeAddLogModal() { document.getElementById('add-log-modal').classList.add('hidden'); }
-        function toggleSettings() { document.getElementById('settings-modal').classList.toggle('hidden'); }
-        function copyData() { const area = document.getElementById('backup-area'); area.value = JSON.stringify(state.data); area.select(); document.execCommand('copy'); alert('JSON Backup Copied!'); }
-        function resetView() { switchView('selector'); }
-        
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
-            toast.querySelector('span').innerText = msg;
-            toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
-            toastTimeout = setTimeout(() => { toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible'); }, 2000);
-        }
-
-        // --- HISTORY EDIT ---
-        function openHistoryEdit(index) {
-             editingHistoryIndex = index;
-             const log = state.data.history[index];
-             const modal = document.getElementById('history-edit-modal');
-             const dateInput = document.getElementById('hist-edit-date');
-             const select = document.getElementById('hist-edit-fragrance');
-             const d = new Date(log.date); const isoString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); dateInput.value = isoString;
-             select.innerHTML = '';
-             const optGroupFrag = document.createElement('optgroup'); optGroupFrag.label = "Fragrances";
-             state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; if(f.id === log.id) opt.selected = true; optGroupFrag.appendChild(opt); }); select.appendChild(optGroupFrag);
-             const optGroupCombo = document.createElement('optgroup'); optGroupCombo.label = "Combos";
-             state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; if(c.id === log.id) opt.selected = true; optGroupCombo.appendChild(opt); }); select.appendChild(optGroupCombo);
-             if (state.data.decants.length > 0) {
-                const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants";
-                state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; if(d.id === log.id) opt.selected = true; decantGroup.appendChild(opt); }); select.appendChild(decantGroup);
-             }
-             modal.classList.remove('hidden');
-        }
-        function closeHistoryEdit() { document.getElementById('history-edit-modal').classList.add('hidden'); editingHistoryIndex = null; }
-        function saveHistoryEdit() {
-            if (editingHistoryIndex === null) return;
-            const log = state.data.history[editingHistoryIndex]; const newDate = document.getElementById('hist-edit-date').value; const newId = document.getElementById('hist-edit-fragrance').value; const oldId = log.id;
-            log.date = new Date(newDate).toISOString();
-            if (newId !== oldId) { 
-                changeWearCount(oldId, -1); changeWearCount(newId, 1); log.id = newId; 
-                const isCombo = state.data.combos.some(c => c.id === newId); const isDecant = state.data.decants.some(d => d.id === newId);
-                if (isCombo) log.type = 'combo'; else if (isDecant) log.type = 'decant'; else log.type = 'single';
-            }
-            saveData(); closeHistoryEdit(); renderHistory(); showCollection(); showToast('Log Updated');
-        }
-        function deleteHistoryEntry() { if (editingHistoryIndex === null) return; if(!confirm("Delete this log entry?")) return; const log = state.data.history[editingHistoryIndex]; changeWearCount(log.id, -1); state.data.history.splice(editingHistoryIndex, 1); saveData(); closeHistoryEdit(); renderHistory(); showCollection(); showToast('Entry Deleted'); }
-        function changeWearCount(id, delta) {
-            const fIdx = state.data.fragrances.findIndex(f => f.id === id); if (fIdx > -1) { state.data.fragrances[fIdx].wearCount += delta; if(state.data.fragrances[fIdx].wearCount < 0) state.data.fragrances[fIdx].wearCount = 0; return; }
-            const cIdx = state.data.combos.findIndex(c => c.id === id); if (cIdx > -1) { const combo = state.data.combos[cIdx]; combo.wearCount += delta; if(combo.wearCount < 0) combo.wearCount = 0; combo.parts.forEach(pid => { const partIdx = state.data.fragrances.findIndex(f => f.id === pid); if(partIdx > -1) { state.data.fragrances[partIdx].wearCount += delta; if(state.data.fragrances[partIdx].wearCount < 0) state.data.fragrances[partIdx].wearCount = 0; } }); }
-        }
-        
-        function saveMissedLog() {
-             const dateVal = document.getElementById('add-log-date').value;
-             const idVal = document.getElementById('add-log-fragrance').value;
-             const situationVal = document.getElementById('add-log-situation').value;
-             if(!dateVal || !idVal) return alert("Date and Fragrance required");
-             const isCombo = state.data.combos.some(c => c.id === idVal); const isDecant = state.data.decants.some(d => d.id === idVal);
-             let type = 'single'; if (isCombo) type = 'combo'; else if (isDecant) type = 'decant';
-             changeWearCount(idVal, 1);
-             state.data.history.push({ id: idVal, type: type, date: new Date(dateVal).toISOString(), context: { situation: situationVal, season: state.context.season, weather: state.context.weather, suspense: false }, feedbackRecorded: false });
-             saveData(); closeAddLogModal(); renderHistory(); showCollection(); showToast('Log Added');
-        }
-
-    </script>
-</body>
-</html>
