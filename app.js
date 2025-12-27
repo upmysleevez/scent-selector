@@ -1,9 +1,9 @@
 /**
- * FRAGRANCE SOMMELIER v87
- * Logic: Snow, Specific Temp, Updated Stats
+ * FRAGRANCE SOMMELIER v89
+ * Logic: Plan Tab, Refresh Button, Snow, Specific Temp
  */
 
-const APP_ID = "scentApp_v87_arctic"; // UPDATED STORAGE KEY
+const APP_ID = "scentApp_v89_plan"; // UPDATED STORAGE KEY
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
 let state = {
@@ -11,6 +11,15 @@ let state = {
     data: { fragrances: [], decants: [], combos: [], history: [] },
     ui: { collectionMode: 'bottles' }
 };
+
+const ACQUISITION_ROADMAP = [
+    { phase: "PHASE 1: THE DEEP FREEZE", date: "Jan 25 - 30, 2026", target: "Emanuel New York", brand: "The Elemental (Extrait)", role: "The Grail Leather", reason: "Honey/Oud notes prevent leather from cracking in <20°F wind chill.", source: "Emanuel NYC", icon: "snowflake" },
+    { phase: "PHASE 2: THE OFFICE KING", date: "Mid-Feb 2026", target: "Pasha de Cartier", brand: "Cartier (Parfum)", role: "Manager Aura", reason: "Creamy Sandalwood/Fir Balsam. Replaces decant for authority.", source: "Jomashop / Macy's", icon: "briefcase" },
+    { phase: "PHASE 3: THE SUMMER BEAST", date: "Late April 2026", target: "Hacienda", brand: "Montagne", role: "10-Hour Citrus", reason: "Oakmoss base allows pineapple to stick to skin in high heat.", source: "Montagne", icon: "sun" },
+    { phase: "PHASE 4: THE HUMIDITY KILLER", date: "Late May 2026", target: "Torino 2021", brand: "Montagne", role: "The Ice Bath", reason: "Mint & Basil provide physical cooling effect in 90%+ humidity.", source: "Montagne", icon: "droplets" },
+    { phase: "PHASE 5: THE MOLECULAR BRIDGE", date: "Early Sept 2026", target: "Ambre Musc", brand: "Montagne", role: "The Ghost Layer", reason: "Cetalox projects a warm, clean aura. Perfect for 'False Fall'.", source: "Montagne", icon: "wind" },
+    { phase: "PHASE 6: THE GOTHIC STATEMENT", date: "Late Oct 2026", target: "Scandinavian Crime", brand: "LM Parfums", role: "The Villain", reason: "Dark Pepper, Incense, Woods. Replaces Sainte Fumée.", source: "Emanuel NYC", icon: "ghost" }
+];
 
 const KEYWORDS = {
     winter: ["oud", "vanilla", "tobacco", "leather", "chocolate", "coffee", "rum", "cinnamon", "spice", "amber", "chestnut", "smoke", "incense"],
@@ -25,7 +34,7 @@ let currentNoteId = null;
 let editingHistoryIndex = null; 
 let toastTimeout = null;
 
-// --- V87 DATASET (Synced from User Log) ---
+// --- V89 DATASET ---
 
 const CUSTOM_DB = [
     { id: "montagne_eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 4, winter_rainy: 5, summer_sunny: 2, summer_rainy: 3, spring: 4, fall: 5 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "10 Sprays: 4 Chest, 6 Sleeves (Sleeve Trick).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 9, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
@@ -100,8 +109,6 @@ const INITIAL_HISTORY = [
     { date: "2025-12-27T13:52:00", id: "fleurit_sainte_fumee", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: false }
 ];
 
-// --- INITIALIZATION ---
-
 window.addEventListener('DOMContentLoaded', () => {
      loadData(); 
      initUI(); 
@@ -109,10 +116,7 @@ window.addEventListener('DOMContentLoaded', () => {
      document.querySelectorAll('[id$="-modal"]').forEach(el => el.classList.add('hidden'));
 });
 
-// Icon refresh loop
 setInterval(() => { if (window.lucide) lucide.createIcons(); }, 1000);
-
-// --- CORE FUNCTIONS ---
 
 function loadData() {
     const raw = localStorage.getItem(APP_ID);
@@ -121,90 +125,48 @@ function loadData() {
             let savedData = JSON.parse(raw);
             if(!savedData.decants) savedData.decants = [];
             if(!savedData.history) savedData.history = [];
-            
-            // Merge Saved User Data (Ratings/Wears) with System DB (Logic/Tags)
             state.data.fragrances = CUSTOM_DB.map(sysF => {
                 const savedF = (savedData.fragrances || []).find(f => f.id === sysF.id);
                 if (savedF) {
-                    return { 
-                        ...sysF, 
-                        wearCount: savedF.wearCount !== undefined ? savedF.wearCount : (sysF.wearCount || 0),
-                        userNotes: savedF.userNotes !== undefined ? savedF.userNotes : (sysF.userNotes || ""),
-                        userRating: savedF.userRating !== undefined ? savedF.userRating : (sysF.userRating || 0),
-                        pairingOnly: savedF.pairingOnly !== undefined ? savedF.pairingOnly : (sysF.pairingOnly || false),
-                        paused: savedF.paused !== undefined ? savedF.paused : (sysF.paused || false),
-                        reviewStatus: savedF.reviewStatus || 'approved' 
-                    };
+                    return { ...sysF, wearCount: savedF.wearCount !== undefined ? savedF.wearCount : (sysF.wearCount || 0), userNotes: savedF.userNotes !== undefined ? savedF.userNotes : (sysF.userNotes || ""), userRating: savedF.userRating !== undefined ? savedF.userRating : (sysF.userRating || 0), pairingOnly: savedF.pairingOnly !== undefined ? savedF.pairingOnly : (sysF.pairingOnly || false), paused: savedF.paused !== undefined ? savedF.paused : (sysF.paused || false), reviewStatus: savedF.reviewStatus || 'approved' };
                 }
                 return sysF;
             });
-            
-            // Retain custom bottles
-            (savedData.fragrances || []).forEach(f => {
-                 if (!CUSTOM_DB.find(cdb => cdb.id === f.id)) state.data.fragrances.push(f);
-            });
-
+            (savedData.fragrances || []).forEach(f => { if (!CUSTOM_DB.find(cdb => cdb.id === f.id)) state.data.fragrances.push(f); });
             state.data.combos = COMBOS_DB.map(sysC => {
                 const savedC = (savedData.combos || []).find(c => c.id === sysC.id);
-                if (savedC) {
-                    return { ...sysC, wearCount: savedC.wearCount || 0, userNotes: savedC.userNotes || "", userRating: savedC.userRating || 0 };
-                }
+                if (savedC) { return { ...sysC, wearCount: savedC.wearCount || 0, userNotes: savedC.userNotes || "", userRating: savedC.userRating || 0 }; }
                 return sysC;
             });
-            
-            // Merge Decants
             const savedDecantIds = new Set(savedData.decants.map(d => d.id));
             const initialDecantsToAdd = INITIAL_DECANTS.filter(d => !savedDecantIds.has(d.id));
             state.data.decants = [...savedData.decants, ...initialDecantsToAdd];
-            
             state.data.history = savedData.history.filter(h => h && h.id && h.date);
-
-        } catch(e) {
-            console.error("Data Corrupted", e);
-            setDefaultData();
-        }
-    } else {
-        setDefaultData();
-    }
+        } catch(e) { console.error("Data Corrupted", e); setDefaultData(); }
+    } else { setDefaultData(); }
 }
 
 function setDefaultData() {
-    state.data = { 
-        fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), 
-        decants: JSON.parse(JSON.stringify(INITIAL_DECANTS)), 
-        combos: JSON.parse(JSON.stringify(COMBOS_DB)), 
-        history: JSON.parse(JSON.stringify(INITIAL_HISTORY))
-    };
+    state.data = { fragrances: JSON.parse(JSON.stringify(CUSTOM_DB)), decants: JSON.parse(JSON.stringify(INITIAL_DECANTS)), combos: JSON.parse(JSON.stringify(COMBOS_DB)), history: JSON.parse(JSON.stringify(INITIAL_HISTORY)) };
     saveData();
 }
 
-function saveData() {
-    localStorage.setItem(APP_ID, JSON.stringify(state.data));
-}
+function saveData() { localStorage.setItem(APP_ID, JSON.stringify(state.data)); }
 
-// --- UI LOGIC ---
-
-function initUI() {
-    switchView('selector');
-    updateContextUI();
-}
+function initUI() { switchView('selector'); updateContextUI(); }
 
 function switchView(viewName) {
-    ['view-selector', 'view-results', 'view-collection', 'view-history'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
-    });
+    ['view-selector', 'view-results', 'view-collection', 'view-history', 'view-schedule'].forEach(id => { document.getElementById(id).classList.add('hidden'); });
     const target = document.getElementById(viewName === 'selector' ? 'view-selector' : 'view-' + viewName);
     if(target) target.classList.remove('hidden');
-
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('text-teal-500'));
-    const navMap = { 'selector': 0, 'results': 0, 'collection': 1, 'history': 2 };
+    const navMap = { 'selector': 0, 'results': 0, 'collection': 1, 'schedule': 2, 'history': 3 };
     const idx = navMap[viewName];
     const navBtns = document.querySelectorAll('nav button');
     if(navBtns[idx]) navBtns[idx].classList.add('text-teal-500');
-
     if (viewName === 'collection') showCollection(); 
     if (viewName === 'history') renderHistory();
-    
+    if (viewName === 'schedule') renderSchedule();
     document.getElementById('main-content').scrollTop = 0;
     if (window.lucide) lucide.createIcons();
 }
@@ -220,7 +182,6 @@ function setContext(type, value) {
 function updateTemp(val) {
     state.context.temperature = parseInt(val);
     document.getElementById('temp-display').innerText = val + "°F";
-    // Color Logic
     const disp = document.getElementById('temp-display');
     if(val < 32) disp.className = "text-blue-300 font-bold text-lg";
     else if(val < 60) disp.className = "text-teal-300 font-bold text-lg";
@@ -249,70 +210,47 @@ function updateContextUI() {
 
 function toggleSuspense() { state.context.suspense = document.getElementById('suspense-toggle').checked; }
 
-// --- DEEP ROTATION ALGORITHM (v87) ---
+function refreshResults() {
+    const btn = document.querySelector('button[onclick="refreshResults()"] i');
+    if(btn) btn.classList.add('animate-spin');
+    setTimeout(() => { generateRecommendations(); if(btn) btn.classList.remove('animate-spin'); }, 300);
+}
 
 function calculateScore(item, isCombo) {
     const ctx = state.context; 
     let score = 0;
-    
-    // 1. Situation (High Weight x4)
     const sitScore = item.situationRatings ? (item.situationRatings[ctx.situation] || 0) : 0; 
-    if (sitScore < 2) return -100; // Disqualify mismatch
+    if (sitScore < 2) return -100;
     score += sitScore * 4; 
-    
-    // 2. Weather Algorithm (Snow/Rain/Sun)
     if (item.weatherAffinity) {
         let weatherKey = `${ctx.season}_${ctx.weather}`;
-        
-        // Handle SNOW Logic
         if (ctx.weather === 'snow') {
-            // Snow uses Winter_Rainy baseline but heavily boosts 'Cozy/Dark'
             const rainyScore = item.weatherAffinity[`${ctx.season}_rainy`] || item.weatherAffinity['winter_rainy'] || 0;
             score += rainyScore * 2.5; 
             if(item.tags && (item.tags.includes('cozy') || item.tags.includes('incense') || item.tags.includes('smoke'))) score += 5;
-            if(item.tags && item.tags.includes('fresh')) score -= 5; // Penalty for freshies in snow
+            if(item.tags && item.tags.includes('fresh')) score -= 5;
         } else {
-            // Standard Logic
-            if (item.weatherAffinity[weatherKey] !== undefined) {
-                score += item.weatherAffinity[weatherKey] * 2;
-            } else if (item.weatherAffinity[ctx.season] !== undefined) {
-                 score += item.weatherAffinity[ctx.season] * 2;
-            }
+            if (item.weatherAffinity[weatherKey] !== undefined) { score += item.weatherAffinity[weatherKey] * 2; } 
+            else if (item.weatherAffinity[ctx.season] !== undefined) { score += item.weatherAffinity[ctx.season] * 2; }
         }
     }
-
-    // 3. Temperature Logic (v87)
     if (ctx.temperature < 40) {
-        // FREEZING: Boost Heavy, Penalize Fresh
         if (item.tags.includes('vanilla') || item.tags.includes('tobacco') || item.tags.includes('incense')) score += 5;
         if (item.tags.includes('citrus') || item.tags.includes('aquatic')) score -= 5;
     } else if (ctx.temperature > 75) {
-        // HOT: Boost Fresh, Penalize Heavy
         if (item.tags.includes('citrus') || item.tags.includes('fresh') || item.tags.includes('gin')) score += 5;
         if (item.tags.includes('tobacco') || item.tags.includes('gourmand')) score -= 8;
     }
-
     if (!isCombo) {
         if(item.pairingOnly || item.paused) return -999;
-        
-        // 4. Tier Bonus
         if (item.userRating === 'S') score += 20;
         else if (item.userRating === 'A') score += 12;
         else if (item.userRating === 'B') score += 5;
-        
-        // 5. Freshness
         if (item.wearCount === 0) score += 5; 
         else score -= (item.wearCount * 2);
-    } else {
-        score += 8; // Combo Base Bonus
-    }
-    
-    // 6. Suspense
+    } else { score += 8; }
     if (ctx.suspense && item.tags && item.tags.includes('suspense')) score += 10;
-    
-    // 7. Jitter
     score += Math.random() * 4;
-    
     return score;
 }
 
@@ -325,7 +263,6 @@ function generateRecommendations() {
         if (d.rating === null) score = 15; else if (d.rating === 'like') score = 10; else score = -50;
         return { ...d, score, type: 'decant' };
     });
-
     const results = [...scoredSingles, ...scoredCombos, ...scoredDecants].filter(f => f.score > -50).sort((a, b) => b.score - a.score);
 
     if (results.length === 0) container.innerHTML = `<div class="p-6 text-center text-gray-400">No suitable fragrances found.</div>`;
@@ -343,8 +280,6 @@ function generateRecommendations() {
                 container.appendChild(div);
             }
         });
-        
-        // Rotation Options
         const rotation = results.slice(3, 8);
         if(rotation.length > 0) {
              const rotHeader = document.createElement('div'); rotHeader.className = 'tier-header mt-8'; rotHeader.innerText = "Rotation Options"; container.appendChild(rotHeader);
@@ -359,12 +294,40 @@ function generateRecommendations() {
     switchView('results');
 }
 
-function logAnyWear(id, type) {
-    if (type === 'single') logWear(id);
-    else if (type === 'combo') logComboWear(id);
-    else if (type === 'decant') logDecantWear(id);
+function renderSchedule() {
+    const list = document.getElementById('schedule-list'); list.innerHTML = '';
+    ACQUISITION_ROADMAP.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "glass-panel p-5 rounded-xl border-l-4 border-l-teal-500/50 relative overflow-hidden";
+        div.innerHTML = `
+            <div class="flex justify-between items-start mb-2 relative z-10">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-bold tracking-widest text-teal-300 uppercase">${item.phase}</span>
+                        <span class="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-400 font-mono">${item.date}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-white leading-tight">${item.target}</h3>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">${item.brand}</p>
+                </div>
+                <div class="bg-teal-900/30 p-2 rounded-full border border-teal-500/20"><i data-lucide="${item.icon}" class="w-5 h-5 text-teal-400"></i></div>
+            </div>
+            <div class="bg-black/20 p-3 rounded-lg border border-white/5 relative z-10">
+                <div class="flex items-start gap-2 mb-2">
+                    <span class="text-[10px] font-bold text-teal-200 uppercase bg-teal-900/40 px-1.5 rounded">ROLE</span>
+                    <span class="text-xs text-gray-200">${item.role}</span>
+                </div>
+                <p class="text-xs text-gray-400 italic leading-relaxed">"${item.reason}"</p>
+            </div>
+            <div class="mt-3 flex justify-between items-center relative z-10">
+                <span class="text-[10px] text-gray-500 font-mono">Source: ${item.source}</span>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+    if (window.lucide) lucide.createIcons();
 }
 
+function logAnyWear(id, type) { if (type === 'single') logWear(id); else if (type === 'combo') logComboWear(id); else if (type === 'decant') logDecantWear(id); }
 function createTierHeader(text) { const div = document.createElement('div'); div.className = 'tier-header'; div.innerText = text; return div; }
 
 function createFragranceCard(f, isTop) {
@@ -385,15 +348,12 @@ function createComboCard(c, isTop) {
     return div;
 }
 
-// --- LOGGING ---
 function logWear(id) {
      const idx = state.data.fragrances.findIndex(f => f.id === id);
      if (idx > -1) { 
          state.data.fragrances[idx].wearCount++; 
          state.data.history.push({ id, type:'single', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: true });
-         saveData(); 
-         showToast('Wear Logged'); 
-         setTimeout(() => switchView('selector'), 500); 
+         saveData(); showToast('Wear Logged'); setTimeout(() => switchView('selector'), 500); 
     }
 }
 
@@ -403,9 +363,7 @@ function logComboWear(id) {
          const combo = state.data.combos[comboIdx]; combo.wearCount++;
          combo.parts.forEach(pid => { const fIdx = state.data.fragrances.findIndex(f => f.id === pid); if(fIdx > -1) state.data.fragrances[fIdx].wearCount++; });
          state.data.history.push({ id, type:'combo', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false });
-         saveData(); 
-         showToast('Pair Logged'); 
-         setTimeout(() => switchView('history'), 500); 
+         saveData(); showToast('Pair Logged'); setTimeout(() => switchView('history'), 500); 
     }
 }
 
@@ -414,44 +372,23 @@ function logDecantWear(id) {
     if (!decant && typeof id === 'number') decant = state.data.decants[id];
     if (!decant) return;
     state.data.history.push({ id: decant.id, type: 'decant', date: new Date().toISOString(), context: { ...state.context }, feedbackRecorded: false });
-    saveData();
-    showToast("Logged Decant");
-    switchView('history');
+    saveData(); showToast("Logged Decant"); switchView('history');
 }
 
-// --- INTERACTION ---
-
 function handleFeedback(logIndex, action) {
-     const log = state.data.history[logIndex];
-     log.feedbackRecorded = true;
-     
+     const log = state.data.history[logIndex]; log.feedbackRecorded = true;
      if (action === 'dislike') {
-         if (log.type === 'decant') {
-             if(confirm("Remove this decant from collection?")) {
-                state.data.decants = state.data.decants.filter(d => d.id !== log.id);
-                showToast("Decant Removed");
-             }
-         } else if (log.type === 'combo') {
-             showToast("Combo Disliked");
-         }
+         if (log.type === 'decant') { if(confirm("Remove this decant from collection?")) { state.data.decants = state.data.decants.filter(d => d.id !== log.id); showToast("Decant Removed"); } } 
+         else if (log.type === 'combo') { showToast("Combo Disliked"); }
      } else if (action === 'like') {
-         if (log.type === 'decant') {
-             const d = state.data.decants.find(x => x.id === log.id);
-             if(d) d.rating = 'like';
-             showToast("Marked as Favorite");
-         } else {
-            showToast("Saved to Favorites");
-         }
-     } else {
-         showToast("Will ask again");
-     }
-     saveData();
-     renderHistory();
+         if (log.type === 'decant') { const d = state.data.decants.find(x => x.id === log.id); if(d) d.rating = 'like'; showToast("Marked as Favorite"); } 
+         else { showToast("Saved to Favorites"); }
+     } else { showToast("Will ask again"); }
+     saveData(); renderHistory();
 }
 
 function renderHistory() {
-    const list = document.getElementById('history-list'); 
-    list.innerHTML = '';
+    const list = document.getElementById('history-list'); list.innerHTML = '';
     const sortedHistory = [...state.data.history].sort((a,b) => new Date(b.date) - new Date(a.date));
     if(sortedHistory.length === 0) { list.innerHTML = `<div class="text-center text-gray-500 mt-10">No wear history yet.</div>`; return; }
     sortedHistory.forEach((log, index) => {
@@ -460,15 +397,12 @@ function renderHistory() {
         if (log.type === 'single') { const f = state.data.fragrances.find(x => x.id === log.id); if(f) { name = f.name; brand = f.brand; } } 
         else if (log.type === 'combo') { const c = state.data.combos.find(x => x.id === log.id); if(c) { name = c.name; brand = "Combo"; } }
         else if (log.type === 'decant') { const d = state.data.decants.find(x => x.id === log.id); if(d) { name = d.name; brand = "Decant"; } else { name = "Deleted Decant"; } }
-        const dateObj = new Date(log.date); 
-        const dateStr = dateObj.toLocaleDateString(); 
-        const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        const dateObj = new Date(log.date); const dateStr = dateObj.toLocaleDateString(); const timeStr = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         let buttonsHtml = '';
         if (!log.feedbackRecorded && (log.type === 'combo' || log.type === 'decant')) {
             buttonsHtml = `<div class="mt-3 flex gap-2 pt-2 border-t border-white/5"><button onclick="handleFeedback(${realIndex}, 'like')" class="flex-1 py-1.5 bg-green-500/20 text-green-300 rounded text-xs hover:bg-green-500/40 font-bold flex items-center justify-center gap-1"><i data-lucide="thumbs-up" class="w-3 h-3"></i> Like</button><button onclick="handleFeedback(${realIndex}, 'try_more')" class="flex-1 py-1.5 bg-blue-500/20 text-blue-300 rounded text-xs hover:bg-blue-500/40 font-bold flex items-center justify-center gap-1"><i data-lucide="refresh-cw" class="w-3 h-3"></i> Retry</button><button onclick="handleFeedback(${realIndex}, 'dislike')" class="flex-1 py-1.5 bg-red-500/20 text-red-300 rounded text-xs hover:bg-red-500/40 font-bold flex items-center justify-center gap-1"><i data-lucide="thumbs-down" class="w-3 h-3"></i> Dislike</button></div>`;
         }
-        const div = document.createElement('div'); 
-        div.className = "glass-panel p-4 rounded-xl border border-white/5 mb-3";
+        const div = document.createElement('div'); div.className = "glass-panel p-4 rounded-xl border border-white/5 mb-3";
         div.innerHTML = `<div class="flex justify-between items-center"><div><div class="flex items-center gap-2 mb-1"><span class="text-[10px] text-gray-400 font-mono">${dateStr} • ${timeStr}</span><span class="text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-gray-300 uppercase">${log.context ? log.context.situation : 'Log'}</span></div><h4 class="font-bold text-white text-sm">${name}</h4><p class="text-[10px] text-teal-400 uppercase tracking-wider">${brand}</p></div><button onclick="openHistoryEdit(${realIndex})" class="bg-white/5 hover:bg-white/10 p-2 rounded-lg text-gray-400 hover:text-white transition-colors relative z-10"><i data-lucide="edit-2" class="w-4 h-4"></i></button></div>${buttonsHtml}`;
         list.appendChild(div);
     });
@@ -484,21 +418,13 @@ function setCollectionMode(mode) {
 }
 
 function showCollection() {
-     const list = document.getElementById('collection-list');
-     list.innerHTML = '';
+     const list = document.getElementById('collection-list'); list.innerHTML = '';
      if(state.ui.collectionMode === 'bottles') {
         state.data.fragrances.forEach(f => {
-            const div = document.createElement('div');
-            div.className = `glass-panel p-4 rounded-xl border border-white/5 ${f.paused ? 'opacity-50' : ''}`;
+            const div = document.createElement('div'); div.className = `glass-panel p-4 rounded-xl border border-white/5 ${f.paused ? 'opacity-50' : ''}`;
             let tiersHtml = '';
-            TIERS.forEach(tier => {
-                const isActive = f.userRating === tier;
-                const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`;
-                tiersHtml += `<button onclick="setRating('${f.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`;
-            });
-            const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300';
-            const pauseClass = f.paused ? 'text-yellow-400' : 'text-gray-600 hover:text-white';
-            const pauseIcon = f.paused ? 'play-circle' : 'pause-circle';
+            TIERS.forEach(tier => { const isActive = f.userRating === tier; const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`; tiersHtml += `<button onclick="setRating('${f.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`; });
+            const pairingClass = f.pairingOnly ? 'text-teal-400' : 'text-gray-600 hover:text-teal-300'; const pauseClass = f.paused ? 'text-yellow-400' : 'text-gray-600 hover:text-white'; const pauseIcon = f.paused ? 'play-circle' : 'pause-circle';
             div.innerHTML = `<div class="flex justify-between items-start mb-3"><div><span class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">${f.brand}</span><h3 class="font-bold text-sm text-white">${f.name}</h3></div><div class="flex items-center gap-3"><button onclick="togglePairingOnly('${f.id}')" class="${pairingClass} transition-colors" title="Toggle Pairing Only"><i data-lucide="layers" class="w-4 h-4"></i></button><button onclick="openNote('${f.id}')" class="text-gray-400"><i data-lucide="sticky-note" class="w-4 h-4 ${f.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button><button onclick="togglePause('${f.id}')" class="${pauseClass} transition-colors"><i data-lucide="${pauseIcon}" class="w-4 h-4"></i></button><button onclick="deleteFragrance('${f.id}')" class="text-gray-600 hover:text-red-500" title="Delete"><i data-lucide="trash-2" class="w-4 h-4"></i></button></div></div><div class="flex justify-between items-center mb-2"><div class="flex gap-1">${tiersHtml}</div></div><div class="flex justify-between items-center pt-2 border-t border-white/5"><p class="text-[10px] text-gray-400 font-mono">Wears: ${f.wearCount}</p><button onclick="resetWear('${f.id}')" class="text-xs text-gray-500 hover:text-red-400 flex items-center gap-1"><i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset</button></div>`;
             list.appendChild(div);
         });
@@ -514,12 +440,7 @@ function showCollection() {
         state.data.combos.forEach((c) => {
             const div = document.createElement('div'); div.className = `combo-gradient p-4 rounded-xl border border-teal-500/20`;
             const partNames = c.parts.map(pid => { const f = state.data.fragrances.find(x => x.id === pid); return f ? f.name : pid; }).join(' + ');
-            let tiersHtml = '';
-            TIERS.forEach(tier => {
-                const isActive = c.userRating === tier;
-                const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`;
-                tiersHtml += `<button onclick="setRating('${c.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`;
-            });
+            let tiersHtml = ''; TIERS.forEach(tier => { const isActive = c.userRating === tier; const activeClass = isActive ? 'tier-active' : `tier-${tier.toLowerCase()} border border-white/10 hover:bg-white/5`; tiersHtml += `<button onclick="setRating('${c.id}', '${tier}')" class="w-6 h-6 text-[10px] rounded ${activeClass} tier-btn flex items-center justify-center">${tier}</button>`; });
             div.innerHTML = `<div class="flex justify-between items-start mb-2"><div><span class="text-[10px] text-teal-300 font-bold uppercase tracking-wider">COMBO RECIPE</span><h3 class="font-bold text-sm text-white">${c.name}</h3><p class="text-[10px] text-gray-300 mt-0.5">${partNames}</p></div><div class="flex items-center gap-2"><button onclick="openNote('${c.id}')" class="text-gray-400"><i data-lucide="sticky-note" class="w-4 h-4 ${c.userNotes ? 'text-yellow-400 fill-current' : ''}"></i></button></div></div><div class="flex justify-between items-center mb-2"><div class="flex gap-1">${tiersHtml}</div></div><div class="bg-black/30 p-2 rounded-lg mb-2"><p class="text-[10px] text-teal-100 font-mono">${c.instructions}</p></div><div class="flex justify-between items-center pt-1 border-t border-white/5"><p class="text-[10px] text-gray-400 font-mono">Wears: ${c.wearCount}</p><button onclick="logComboWear('${c.id}')" class="text-xs bg-teal-600 hover:bg-teal-500 text-white px-3 py-1 rounded font-bold">Log</button></div>`;
             list.appendChild(div);
         });
@@ -528,19 +449,8 @@ function showCollection() {
 }
 
 function setRating(id, tier) {
-    let f = state.data.fragrances.find(i => i.id === id); 
-    if(f) { 
-        f.userRating = tier; 
-        saveData(); 
-        showCollection(); 
-        return; 
-    }
-    let c = state.data.combos.find(i => i.id === id); 
-    if(c) { 
-        c.userRating = tier; 
-        saveData(); 
-        showCollection(); 
-    }
+    let f = state.data.fragrances.find(i => i.id === id); if(f) { f.userRating = tier; saveData(); showCollection(); return; }
+    let c = state.data.combos.find(i => i.id === id); if(c) { c.userRating = tier; saveData(); showCollection(); }
 }
 
 function togglePairingOnly(id) { const f = state.data.fragrances.find(i => i.id === id); if(f) { f.pairingOnly = !f.pairingOnly; saveData(); showCollection(); showToast(f.pairingOnly ? "Set to Pairing Only" : "Set to Solo + Pairing"); } }
@@ -556,131 +466,49 @@ function copyStats() {
     report += "\n== COMBOS ==\n";
     state.data.combos.sort((a,b) => b.wearCount - a.wearCount).forEach(c => { if(c.wearCount > 0) report += `${c.name} [${c.userRating || '-'}]: ${c.wearCount}\n`; });
     report += `\n== TOTAL LOGS: ${state.data.history.length} ==`;
-    const area = document.getElementById('backup-area');
-    area.value = report; area.select(); document.execCommand('copy'); showToast('Stats Copied');
+    const area = document.getElementById('backup-area'); area.value = report; area.select(); document.execCommand('copy'); showToast('Stats Copied');
 }
 
 function openSmartAdd() { document.getElementById('smart-add-modal').classList.remove('hidden'); }
 function closeSmartAdd() { document.getElementById('smart-add-modal').classList.add('hidden'); }
 
 function analyzeText() { 
-    const text = document.getElementById('sa-text').value.toLowerCase();
-    const name = document.getElementById('sa-name').value;
-    const brand = document.getElementById('sa-brand').value;
-    if(!text) return alert("Paste text first");
-    
-    let tags = []; 
-    let affinity = { winter_sunny: 0, winter_rainy: 0, summer_sunny: 0, summer_rainy: 0, spring: 0, fall: 0 }; 
-    let ratings = { office: 2, gym: 1, casual: 3, date_night: 2, intimate: 2 };
-    
+    const text = document.getElementById('sa-text').value.toLowerCase(); const name = document.getElementById('sa-name').value; const brand = document.getElementById('sa-brand').value; if(!text) return alert("Paste text first");
+    let tags = []; let affinity = { winter_sunny: 0, winter_rainy: 0, summer_sunny: 0, summer_rainy: 0, spring: 0, fall: 0 }; let ratings = { office: 2, gym: 1, casual: 3, date_night: 2, intimate: 2 };
     if (KEYWORDS.winter.some(k => text.includes(k))) { tags.push('winter', 'cozy'); affinity.winter_sunny += 2; affinity.winter_rainy += 2; affinity.summer_sunny -= 3; ratings.date_night += 2; ratings.intimate += 2; ratings.gym = 0; }
     if (KEYWORDS.summer.some(k => text.includes(k))) { tags.push('fresh', 'citrus'); affinity.summer_sunny += 2; affinity.summer_rainy += 1; affinity.winter_sunny -= 1; ratings.gym += 3; ratings.office += 2; ratings.date_night -= 1; }
     if (KEYWORDS.fall.some(k => text.includes(k))) { tags.push('woody', 'spicy'); affinity.fall += 2; affinity.spring += 1; ratings.casual += 2; ratings.office += 1; }
     if (KEYWORDS.office.some(k => text.includes(k))) { tags.push('clean', 'safe'); ratings.office += 3; ratings.gym += 1; }
-    
     if(text.includes('dark') || text.includes('mysterious') || text.includes('incense')) { tags.push('suspense'); ratings.date_night += 1; }
-    
     let comboSuggestion = "None detected"; if(tags.includes('fresh')) comboSuggestion = "Try layering with Aventus/Gentle Silver for depth."; if(tags.includes('winter')) comboSuggestion = "Try layering with Vanille Absolute for sweetness.";
-    
-    const resultsDiv = document.getElementById('sa-results'); 
-    resultsDiv.classList.remove('hidden'); 
+    const resultsDiv = document.getElementById('sa-results'); resultsDiv.classList.remove('hidden'); 
     document.getElementById('sa-tags').innerHTML = tags.map(t => `<span class="bg-teal-900 text-teal-300 text-[10px] px-2 py-1 rounded-full">${t}</span>`).join(''); 
     document.getElementById('sa-combo').innerText = comboSuggestion;
-    
-    tempSmartObj = { 
-        id: 'custom_' + Date.now(), 
-        name: name, 
-        brand: brand, 
-        inspiration: "Imported", 
-        tags: tags, 
-        weatherAffinity: affinity, 
-        situationRatings: ratings, 
-        sprayInstructions: "4-5 sprays (Clothes/Neck)", 
-        description: "Smart-Added: " + text.substring(0, 50) + "...", 
-        wearCount: 0, 
-        userNotes: comboSuggestion, 
-        userRating: 0, 
-        pairingOnly: false,
-        paused: false,
-        reviewStatus: 'approved'
-    };
+    tempSmartObj = { id: 'custom_' + Date.now(), name: name, brand: brand, inspiration: "Imported", tags: tags, weatherAffinity: affinity, situationRatings: ratings, sprayInstructions: "4-5 sprays (Clothes/Neck)", description: "Smart-Added: " + text.substring(0, 50) + "...", wearCount: 0, userNotes: comboSuggestion, userRating: 0, pairingOnly: false, paused: false, reviewStatus: 'approved' };
 }
 
 function saveSmartAdd() { 
     if(!tempSmartObj) return alert("Please click 'Analyze' first."); 
-    
-    tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; 
-    tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; 
-    
+    tempSmartObj.name = document.getElementById('sa-name').value || "New Fragrance"; tempSmartObj.brand = document.getElementById('sa-brand').value || "Unknown House"; 
     const isDecant = document.getElementById('sa-is-decant').checked;
-    
-    if(isDecant) {
-        state.data.decants.push({ 
-            id: tempSmartObj.id, 
-            name: tempSmartObj.name, 
-            brand: tempSmartObj.brand, 
-            tags: tempSmartObj.tags, 
-            description: tempSmartObj.description, 
-            rating: null 
-        });
-        showToast('Decant Added');
-    } else {
-        state.data.fragrances.push(tempSmartObj); 
-        showToast('Bottle Added');
-    }
-    saveData(); 
-    closeSmartAdd(); 
-    showCollection(); 
+    if(isDecant) { state.data.decants.push({ id: tempSmartObj.id, name: tempSmartObj.name, brand: tempSmartObj.brand, tags: tempSmartObj.tags, description: tempSmartObj.description, rating: null }); showToast('Decant Added'); } 
+    else { state.data.fragrances.push(tempSmartObj); showToast('Bottle Added'); }
+    saveData(); closeSmartAdd(); showCollection(); 
 }
 
-// --- MODALS & UTILS ---
-
-function openNote(id) { 
-    currentNoteId = id; 
-    let item = state.data.fragrances.find(f => f.id === id); 
-    if (!item) item = state.data.combos.find(c => c.id === id); 
-    document.getElementById('note-input').value = item.userNotes || ""; 
-    document.getElementById('notes-modal').classList.remove('hidden'); 
-}
-
+function openNote(id) { currentNoteId = id; let item = state.data.fragrances.find(f => f.id === id); if (!item) item = state.data.combos.find(c => c.id === id); document.getElementById('note-input').value = item.userNotes || ""; document.getElementById('notes-modal').classList.remove('hidden'); }
 function closeNotesModal() { document.getElementById('notes-modal').classList.add('hidden'); }
-
 function saveNote() {
-    if(!currentNoteId) return;
-    const val = document.getElementById('note-input').value;
-    
-    let f = state.data.fragrances.find(i => i.id === currentNoteId);
-    if(f) { 
-        f.userNotes = val; 
-        saveData(); 
-        showCollection(); 
-        // Also update results if open to reflect new notes icon
-        const resContainer = document.getElementById('results-container');
-        if(!resContainer.classList.contains('hidden')) generateRecommendations();
-        closeNotesModal(); 
-        return; 
-    }
-    
-    let c = state.data.combos.find(i => i.id === currentNoteId);
-    if(c) { 
-        c.userNotes = val; 
-        saveData(); 
-        showCollection(); 
-        closeNotesModal(); 
-    }
+    if(!currentNoteId) return; const val = document.getElementById('note-input').value;
+    let f = state.data.fragrances.find(i => i.id === currentNoteId); if(f) { f.userNotes = val; saveData(); showCollection(); const resContainer = document.getElementById('results-container'); if(!resContainer.classList.contains('hidden')) generateRecommendations(); closeNotesModal(); return; }
+    let c = state.data.combos.find(i => i.id === currentNoteId); if(c) { c.userNotes = val; saveData(); showCollection(); closeNotesModal(); }
 }
 
 function openAddLogModal() {
     const select = document.getElementById('add-log-fragrance'); select.innerHTML = '';
-    const fragGroup = document.createElement('optgroup'); fragGroup.label = "Fragrances";
-    state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; fragGroup.appendChild(opt); }); select.appendChild(fragGroup);
-    const comboGroup = document.createElement('optgroup'); comboGroup.label = "Combos";
-    state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; comboGroup.appendChild(opt); }); select.appendChild(comboGroup);
-    if (state.data.decants.length > 0) {
-        const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants";
-        state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; decantGroup.appendChild(opt); });
-        select.appendChild(decantGroup);
-    }
+    const fragGroup = document.createElement('optgroup'); fragGroup.label = "Fragrances"; state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; fragGroup.appendChild(opt); }); select.appendChild(fragGroup);
+    const comboGroup = document.createElement('optgroup'); comboGroup.label = "Combos"; state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; comboGroup.appendChild(opt); }); select.appendChild(comboGroup);
+    if (state.data.decants.length > 0) { const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants"; state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; decantGroup.appendChild(opt); }); select.appendChild(decantGroup); }
     const now = new Date(); const isoString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); document.getElementById('add-log-date').value = isoString;
     document.getElementById('add-log-modal').classList.remove('hidden');
 }
@@ -690,29 +518,18 @@ function copyData() { const area = document.getElementById('backup-area'); area.
 function resetView() { switchView('selector'); }
 
 function showToast(msg) {
-    const toast = document.getElementById('toast');
-    if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
-    toast.querySelector('span').innerText = msg;
-    toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
+    const toast = document.getElementById('toast'); if (toastTimeout) { clearTimeout(toastTimeout); toastTimeout = null; }
+    toast.querySelector('span').innerText = msg; toast.classList.remove('translate-y-[-150%]', 'opacity-0', 'invisible');
     toastTimeout = setTimeout(() => { toast.classList.add('translate-y-[-150%]', 'opacity-0', 'invisible'); }, 2000);
 }
 
 function openHistoryEdit(index) {
-     editingHistoryIndex = index;
-     const log = state.data.history[index];
-     const modal = document.getElementById('history-edit-modal');
-     const dateInput = document.getElementById('hist-edit-date');
-     const select = document.getElementById('hist-edit-fragrance');
+     editingHistoryIndex = index; const log = state.data.history[index]; const modal = document.getElementById('history-edit-modal'); const dateInput = document.getElementById('hist-edit-date'); const select = document.getElementById('hist-edit-fragrance');
      const d = new Date(log.date); const isoString = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16); dateInput.value = isoString;
      select.innerHTML = '';
-     const optGroupFrag = document.createElement('optgroup'); optGroupFrag.label = "Fragrances";
-     state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; if(f.id === log.id) opt.selected = true; optGroupFrag.appendChild(opt); }); select.appendChild(optGroupFrag);
-     const optGroupCombo = document.createElement('optgroup'); optGroupCombo.label = "Combos";
-     state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; if(c.id === log.id) opt.selected = true; optGroupCombo.appendChild(opt); }); select.appendChild(optGroupCombo);
-     if (state.data.decants.length > 0) {
-        const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants";
-        state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; if(d.id === log.id) opt.selected = true; decantGroup.appendChild(opt); }); select.appendChild(decantGroup);
-     }
+     const optGroupFrag = document.createElement('optgroup'); optGroupFrag.label = "Fragrances"; state.data.fragrances.forEach(f => { const opt = document.createElement('option'); opt.value = f.id; opt.text = f.name; if(f.id === log.id) opt.selected = true; optGroupFrag.appendChild(opt); }); select.appendChild(optGroupFrag);
+     const optGroupCombo = document.createElement('optgroup'); optGroupCombo.label = "Combos"; state.data.combos.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.text = c.name + " (Combo)"; if(c.id === log.id) opt.selected = true; optGroupCombo.appendChild(opt); }); select.appendChild(optGroupCombo);
+     if (state.data.decants.length > 0) { const decantGroup = document.createElement('optgroup'); decantGroup.label = "Decants"; state.data.decants.forEach(d => { const opt = document.createElement('option'); opt.value = d.id; opt.text = d.name + " (Decant)"; if(d.id === log.id) opt.selected = true; decantGroup.appendChild(opt); }); select.appendChild(decantGroup); }
      modal.classList.remove('hidden');
 }
 function closeHistoryEdit() { document.getElementById('history-edit-modal').classList.add('hidden'); editingHistoryIndex = null; }
@@ -734,9 +551,7 @@ function changeWearCount(id, delta) {
 }
 
 function saveMissedLog() {
-     const dateVal = document.getElementById('add-log-date').value;
-     const idVal = document.getElementById('add-log-fragrance').value;
-     const situationVal = document.getElementById('add-log-situation').value;
+     const dateVal = document.getElementById('add-log-date').value; const idVal = document.getElementById('add-log-fragrance').value; const situationVal = document.getElementById('add-log-situation').value;
      if(!dateVal || !idVal) return alert("Date and Fragrance required");
      const isCombo = state.data.combos.some(c => c.id === idVal); const isDecant = state.data.decants.some(d => d.id === idVal);
      let type = 'single'; if (isCombo) type = 'combo'; else if (isDecant) type = 'decant';
