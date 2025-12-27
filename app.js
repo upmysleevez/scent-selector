@@ -1,13 +1,13 @@
 /**
- * FRAGRANCE SOMMELIER v85
- * Client Logic - Restored v74 UI + v85 Data & Algorithms
+ * FRAGRANCE SOMMELIER v87
+ * Logic: Snow, Specific Temp, Updated Stats
  */
 
-const APP_ID = "scentApp_v85_restore"; // UPDATED STORAGE KEY
+const APP_ID = "scentApp_v87_arctic"; // UPDATED STORAGE KEY
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
 let state = {
-    context: { season: 'fall', weather: 'sunny', situation: 'office', suspense: false },
+    context: { season: 'winter', weather: 'sunny', temperature: 50, situation: 'office', suspense: false },
     data: { fragrances: [], decants: [], combos: [], history: [] },
     ui: { collectionMode: 'bottles' }
 };
@@ -25,25 +25,26 @@ let currentNoteId = null;
 let editingHistoryIndex = null; 
 let toastTimeout = null;
 
-// --- V85 DATASET (FROM MASTER DOC) ---
+// --- V87 DATASET (Synced from User Log) ---
 
 const CUSTOM_DB = [
+    { id: "montagne_eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 4, winter_rainy: 5, summer_sunny: 2, summer_rainy: 3, spring: 4, fall: 5 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "10 Sprays: 4 Chest, 6 Sleeves (Sleeve Trick).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 9, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "montagne_gentle_silver", name: "Gentle Silver", brand: "Montagne", inspiration: "Gentle Fluidity Silver", tags: ["gin", "juniper", "fresh", "crisp", "snow_king"], weatherAffinity: { winter_sunny: 2, winter_rainy: 3, summer_sunny: 5, summer_rainy: 5, spring: 5, fall: 4 }, situationRatings: { office: 5, gym: 4, casual: 5, date_night: 3, intimate: 2 }, sprayInstructions: "12 Sprays: 6 Skin, 6 Shoulders. (Impossible to overspray).", description: "Crisp juniper. Smells like a cold Gin & Tonic.", wearCount: 5, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "creed_aventus", name: "Aventus", brand: "Creed", inspiration: "Original", tags: ["fresh", "smoky", "fruity", "king", "office"], weatherAffinity: { winter_sunny: 3, winter_rainy: 2, summer_sunny: 5, summer_rainy: 4, spring: 5, fall: 5 }, situationRatings: { office: 5, gym: 3, casual: 5, date_night: 4, intimate: 3 }, sprayInstructions: "6-8 Sprays.", description: "Smoky pineapple and birch. The ultimate confidence booster.", wearCount: 2, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "montagne_cubicle", name: "Cubicle for Men", brand: "Montagne", inspiration: "Fragrance One Office", tags: ["ambroxan", "fresh", "safe", "power"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: 5, summer_rainy: 5, spring: 4, fall: 3 }, situationRatings: { office: 5, gym: 5, casual: 4, date_night: 1, intimate: 0 }, sprayInstructions: "3 Sprays MAX: Skin Only. (Biohazard).", description: "Clean, soapy, and projecting. Perfect Office scent.", wearCount: 2, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "blomb_27", name: "No. 27", brand: "BLOMB", inspiration: "Original", tags: ["woody", "tobacco", "coconut", "unique"], weatherAffinity: { winter_sunny: 4, winter_rainy: 3, summer_sunny: 3, summer_rainy: 4, spring: 5, fall: 5 }, situationRatings: { office: 3, gym: 1, casual: 5, date_night: 2, intimate: 2 }, sprayInstructions: "8 Sprays: 3 Back Neck, 5 Back Shirt (Rear Guard).", description: "Unique woody-tobacco with a coconut twist.", wearCount: 1, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "montagne_brooklyn_jazz", name: "Brooklyn Jazz", brand: "Montagne", inspiration: "Maison Margiela Jazz Club", tags: ["boozy", "tobacco", "rum", "smooth"], weatherAffinity: { winter_sunny: 5, winter_rainy: 4, summer_sunny: -2, summer_rainy: -1, spring: 3, fall: 5 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "10 Sprays: 4 Chest, 6 Coat/Scarf (Wool Binder).", description: "Boozy rum and tobacco. Captures the vibe of a dim jazz bar.", wearCount: 1, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "montagne_maison_du_soir", name: "Maison du Soir", brand: "Montagne", inspiration: "By the Fireplace", tags: ["smoke", "vanilla", "chestnut", "cozy"], weatherAffinity: { winter_sunny: 5, winter_rainy: 5, summer_sunny: -5, summer_rainy: -2, spring: 2, fall: 5 }, situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 5 }, sprayInstructions: "12 Sprays: 2 Neck, 10 Undershirt (The Wick Method).", description: "Chestnut and vanilla smoke. The ultimate 'Cozy' scent.", wearCount: 1, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "montagne_vanille_absolute", name: "Vanille Absolute", brand: "Montagne", inspiration: "Nishane Ani?", tags: ["vanilla", "spicy", "ginger", "green"], weatherAffinity: { winter_sunny: 5, winter_rainy: 5, summer_sunny: -5, summer_rainy: -5, spring: 1, fall: 5 }, situationRatings: { office: 2, gym: 0, casual: 3, date_night: 5, intimate: 4 }, sprayInstructions: "4 Sprays: 3 Chest, 1 Back Neck. (Do not spray collar).", description: "Spicy ginger and rich vanilla.", wearCount: 1, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "prada_paradigme", name: "Paradigme", brand: "Prada", inspiration: "Original", tags: ["fresh", "clean", "floral", "office"], weatherAffinity: { winter_sunny: 3, winter_rainy: 2, summer_sunny: 5, summer_rainy: 4, spring: 5, fall: 4 }, situationRatings: { office: 5, gym: 3, casual: 5, date_night: 2, intimate: 2 }, sprayInstructions: "10 Sprays: 4 Torso, 6 Shirt Front (The Soap).", description: "A modern paradigm of Prada's clean, soapy, and floral style.", wearCount: 1, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "fleurit_sainte_fumee", name: "Sainte Fumée", brand: "Fleurit Parfums", inspiration: "Original", tags: ["smoke", "incense", "dark", "intimate", "snow_beast"], weatherAffinity: { winter_sunny: 5, winter_rainy: 5, summer_sunny: -2, summer_rainy: -2, spring: 3, fall: 5 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 5 }, sprayInstructions: "5 Sprays: 2 Chest, 3 Shoulders. (Resin Limit).", description: "Holy Smoke. Deep resins and incense for intimate winter nights.", wearCount: 1, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "hermes_terre_intense", name: "Terre d'Hermès Eau Intense", brand: "Hermès", inspiration: "Original", tags: ["vetiver", "citrus", "classy", "office"], weatherAffinity: { winter_sunny: 3, winter_rainy: 4, summer_sunny: 4, summer_rainy: 5, spring: 5, fall: 5 }, situationRatings: { office: 5, gym: 2, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "8 Sprays: 4 Chest, 4 Collar.", description: "Sophisticated vetiver with a bright citrus opening. A masterpiece.", wearCount: 1, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
     { id: "dossier_ambery_saffron", name: "Ambery Saffron", brand: "Dossier", inspiration: "BR 540", tags: ["sweet", "saffron", "unisex", "date_night"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "4-5 sprays (Shoulders, Neck, Back of Neck).", description: "A sweet, airy amber-saffron cloud.", wearCount: 0, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
     { id: "lost_cherry", name: "Lost Cherry", brand: "Tom Ford", inspiration: "Original", tags: ["gourmand", "cherry", "almond", "boozy", "suspense"], weatherAffinity: { winter_sunny: 1, winter_rainy: 2, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "6-8 sprays (All over clothes + Hair).", description: "Decadent cherry-almond liqueur.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "creed_aventus", name: "Aventus", brand: "Creed", inspiration: "Original", tags: ["fresh", "smoky", "fruity", "king", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 4, intimate: 3 }, sprayInstructions: "6-7 sprays (3 on neck, 4 on shirt).", description: "Smoky pineapple and birch. The ultimate confidence booster.", wearCount: 2, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "victory_man", name: "Victory Man", brand: "XXIV", inspiration: "Unknown/Fresh", tags: ["fresh", "citrus", "cedar", "gym"], weatherAffinity: { winter_sunny: -1, winter_rainy: -2, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 0 }, situationRatings: { office: 4, gym: 5, casual: 4, date_night: 1, intimate: 1 }, sprayInstructions: "8 sprays (Heavy on shirt/gym clothes).", description: "Bergamot and Cedarwood bomb. Clean, sharp, and energizing.", wearCount: 0, userNotes: "", userRating: "C", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "victory_man", name: "Victory Man", brand: "XXIV", inspiration: "Unknown/Fresh", tags: ["fresh", "citrus", "cedar", "gym"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: 5, summer_rainy: 3, spring: 4, fall: 3 }, situationRatings: { office: 4, gym: 5, casual: 5, date_night: 2, intimate: 2 }, sprayInstructions: "10 Sprays: 4 Chest, 6 Sweater.", description: "Bergamot and Cedarwood bomb. Clean, sharp, and energizing.", wearCount: 0, userNotes: "", userRating: "C", pairingOnly: false, paused: false, reviewStatus: 'approved' },
     { id: "paco_1_million", name: "1 Million", brand: "Paco Rabanne", inspiration: "Original", tags: ["sweet", "spicy", "loud", "club"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -3, summer_rainy: -2, spring: 0, fall: 1 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 4, intimate: 2 }, sprayInstructions: "4-5 sprays (Chest and Neck).", description: "Sweet, spicy bubblegum. Designed for loud parties.", wearCount: 0, userNotes: "", userRating: "C", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "blomb_27", name: "No. 27", brand: "BLOMB", inspiration: "Original", tags: ["woody", "tobacco", "coconut", "unique"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 0, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 3 }, sprayInstructions: "6 sprays (Shirt Front/Back).", description: "Unique woody-tobacco with a coconut twist.", wearCount: 1, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "phantom_noir", name: "Phantom Noir", brand: "Montagne", inspiration: "Black Phantom?", tags: ["coffee", "boozy", "chocolate", "dark", "suspense"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "5-6 sprays (Jacket/Scarf heavy).", description: "Coffee, booze, and sugar. Dark and mysterious.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "brooklyn_jazz", name: "Brooklyn Jazz", brand: "Montagne", inspiration: "Maison Margiela Jazz Club", tags: ["boozy", "tobacco", "rum", "smooth"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -2, summer_rainy: 0, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Collar, Chest, Wrists).", description: "Boozy rum and tobacco. Captures the vibe of a dim jazz bar.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "maison_du_soir", name: "Maison du Soir", brand: "Montagne", inspiration: "By the Fireplace", tags: ["smoke", "vanilla", "chestnut", "cozy"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: -1, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 5, date_night: 3, intimate: 5 }, sprayInstructions: "5 sprays (Sweater/Chest).", description: "Chestnut and vanilla smoke. The ultimate 'Cozy' scent.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "cubicle_men", name: "Cubicle for Men", brand: "Montagne", inspiration: "Fragrance One Office", tags: ["ambroxan", "fresh", "safe", "power"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 0, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 3, casual: 4, date_night: 2, intimate: 1 }, sprayInstructions: "8-10 sprays (Full coverage on shirt).", description: "Clean, soapy, and projecting. Perfect Office scent.", wearCount: 2, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "gentle_silver", name: "Gentle Silver", brand: "Montagne", inspiration: "Gentle Fluidity Silver", tags: ["gin", "juniper", "fresh", "crisp"], weatherAffinity: { winter_sunny: 1, winter_rainy: -1, summer_sunny: 2, summer_rainy: 1, spring: 2, fall: 1 }, situationRatings: { office: 5, gym: 4, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (Saturate shirt front).", description: "Crisp juniper. Smells like a cold Gin & Tonic.", wearCount: 5, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "vanille_absolute", name: "Vanille Absolute", brand: "Montagne", inspiration: "Nishane Ani?", tags: ["vanilla", "spicy", "ginger", "green"], weatherAffinity: { winter_sunny: 2, winter_rainy: 1, summer_sunny: -2, summer_rainy: -1, spring: 0, fall: 2 }, situationRatings: { office: 2, gym: 0, casual: 4, date_night: 5, intimate: 4 }, sprayInstructions: "5-6 sprays (Neck + Clothes).", description: "Spicy ginger and rich vanilla.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 1, winter_rainy: 1, summer_sunny: -1, summer_rainy: 1, spring: 1, fall: 2 }, situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "6-7 sprays (Behind Ears + Collar).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 4, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "prada_paradigme", name: "Paradigme", brand: "Prada", inspiration: "Original", tags: ["fresh", "clean", "floral", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 1, spring: 2, fall: 2 }, situationRatings: { office: 5, gym: 1, casual: 5, date_night: 3, intimate: 2 }, sprayInstructions: "8-10 sprays (High Heat/Volume)", description: "A modern paradigm of Prada's clean, soapy, and floral style.", wearCount: 1, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "fleurit_sainte_fumee", name: "Sainte Fumée", brand: "Fleurit Parfums", inspiration: "Original", tags: ["smoke", "incense", "dark", "intimate"], weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4, summer_rainy: -2, spring: 0, fall: 2 }, situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, sprayInstructions: "4-5 sprays (Dense profile)", description: "Holy Smoke. Deep resins and incense for intimate winter nights.", wearCount: 0, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
-    { id: "hermes_terre_eau_intense", name: "Terre d'Hermès Eau Intense", brand: "Hermès", inspiration: "Original", tags: ["vetiver", "citrus", "classy", "office"], weatherAffinity: { winter_sunny: 0, winter_rainy: -1, summer_sunny: 1, summer_rainy: 1, spring: 2, fall: 2 }, situationRatings: { office: 5, gym: 1, casual: 4, date_night: 3, intimate: 2 }, sprayInstructions: "5-7 sprays (Standard)", description: "Sophisticated vetiver with a bright citrus opening. A masterpiece.", wearCount: 0, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' }
+    { id: "montagne_phantom_noir", name: "Phantom Noir", brand: "Montagne", inspiration: "Black Phantom?", tags: ["coffee", "boozy", "chocolate", "dark", "suspense"], weatherAffinity: { winter_sunny: 5, winter_rainy: 5, summer_sunny: -5, summer_rainy: -3, spring: 1, fall: 5 }, situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, sprayInstructions: "7 Sprays: 5 Stomach, 2 Wrists (Low Center).", description: "Coffee, booze, and sugar. Dark and mysterious.", wearCount: 0, userNotes: "", userRating: "A", pairingOnly: false, paused: false, reviewStatus: 'approved' },
+    { id: "montagne_la_nuit_2011", name: "La Nuit 2011", brand: "Montagne", inspiration: "La Nuit de L'Homme", tags: ["cardamom", "romantic", "soft"], weatherAffinity: { winter_sunny: 4, winter_rainy: 3, summer_sunny: 1, summer_rainy: 2, spring: 4, fall: 5 }, situationRatings: { office: 4, gym: 2, casual: 4, date_night: 5, intimate: 5 }, sprayInstructions: "12 Sprays: 6 Torso, 6 Scarf (Cardamom Shield).", description: "The original 2011 Cardamom Bomb. Pure romance.", wearCount: 0, userNotes: "", userRating: "B", pairingOnly: false, paused: false, reviewStatus: 'approved' }
 ];
 
 const INITIAL_DECANTS = [
@@ -53,50 +54,50 @@ const INITIAL_DECANTS = [
 ];
 
 const COMBOS_DB = [
-    { id: "combo_executive", name: "The Executive Suite", parts: ["creed_aventus", "dossier_ambery_saffron"], tags: ["date_night", "power", "complex"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "Smoky birch meets airy saffron sweetness. A massive compliment magnet.", instructions: "Aventus (4x) on shirt chest. Saffron (3x) on neck skin.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 1, spring: 1, fall: 2, summer_sunny: -1 } },
-    { id: "combo_cherry_lounge", name: "Cherry Lounge", parts: ["lost_cherry", "brooklyn_jazz"], tags: ["boozy", "gourmand", "suspense"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco darkens the cherry almond profile. Very sexy.", instructions: "Brooklyn Jazz (4x) on clothes. Lost Cherry (3x) on pulse points.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, fall: 1, summer_sunny: -3 } },
-    { id: "combo_gin_juice", name: "Gin & Juice", parts: ["gentle_silver", "creed_aventus"], tags: ["fresh", "fruity", "energy"], situationRatings: { office: 4, gym: 4, casual: 5, date_night: 3, intimate: 2 }, description: "Juniper berry and pineapple. An explosion of freshness.", instructions: "4 sprays each on opposite shirt shoulders.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2, fall: 0, winter_sunny: -1 } },
-    { id: "combo_smoked_vanilla", name: "Smoked Vanilla", parts: ["maison_du_soir", "vanille_absolute"], tags: ["cozy", "winter", "gourmand"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Chestnut smoke mixed with spicy ginger vanilla. Ultimate cozy mode.", instructions: "Maison (3x) on shirt/sweater. Vanille (3x) on wrists/neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, fall: 2, summer_sunny: -4 } },
-    { id: "combo_island_noir", name: "Island Noir", parts: ["creed_aventus", "blomb_27"], tags: ["summer", "night", "unique"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Pineapple meets Coconut and Tobacco. A dark, smoky Piña Colada vibe.", instructions: "BLOMB (4x) on shirt. Aventus (3x) on neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 1, fall: 0 } },
-    { id: "combo_spiced_cherry", name: "Spiced Cherry", parts: ["lost_cherry", "vanille_absolute"], tags: ["gourmand", "winter", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Ginger and Green Vanilla cut the sweetness of the Cherry. Sophisticated gourmand.", instructions: "Vanille (3x) first, top with Lost Cherry (3x).", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, summer_sunny: -2 } },
-    { id: "combo_clean_cut", name: "The Clean Cut", parts: ["cubicle_men", "gentle_silver"], tags: ["office", "fresh", "clean"], situationRatings: { office: 5, gym: 5, casual: 3, date_night: 1, intimate: 1 }, description: "Ambroxan power meets Juniper freshness. The ultimate 'clean' scent profile.", instructions: "3 sprays of each on opposite shirt shoulders.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2, fall: 1, winter_sunny: 0 } },
-    { id: "combo_midnight_tea", name: "Midnight Tea", parts: ["eau_noir", "brooklyn_jazz"], tags: ["dark", "boozy", "suspense"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 5, intimate: 4 }, description: "Black tea and Fig mixed with Rum and Tobacco. Dark, moody, and intellectual.", instructions: "Brooklyn Jazz (4x) on clothes. Eau Noir (3x) behind ears.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, winter_sunny: 2, spring: 0, summer_sunny: -2 } },
-    { id: "combo_smoked_jazz", name: "Smoked Jazz", parts: ["fleurit_sainte_fumee", "brooklyn_jazz"], tags: ["boozy", "incense", "dark"], situationRatings: { office: 0, gym: 0, casual: 2, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco meets holy incense. A speakeasy vibe.", instructions: "Jazz Club on neck (projection), Sainte Fumée on chest (base).", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, summer_sunny: -3 } },
-    { id: "combo_winter_hearth", name: "Winter Hearth", parts: ["fleurit_sainte_fumee", "maison_du_soir"], tags: ["cozy", "smoke", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 3, intimate: 5 }, description: "Chestnut fire and church incense. Maximum winter coziness.", instructions: "Maison on sweater, Sainte Fumée on skin.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 3, winter_rainy: 2, summer_sunny: -5 } },
-    { id: "combo_holy_clean", name: "Holy Clean", parts: ["fleurit_sainte_fumee", "gentle_silver"], tags: ["unique", "contrast", "casual"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 2 }, description: "Clean gin meets dark incense. An interesting, artistic contrast.", instructions: "Gentle Silver on shirt (clean), Sainte Fumée on wrists.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, spring: 2, winter_sunny: 1, summer_sunny: 0 } },
-    { id: "combo_sacred_vanilla", name: "Sacred Vanilla", parts: ["fleurit_sainte_fumee", "vanille_absolute"], tags: ["gourmand", "sensual", "date_night"], situationRatings: { office: 1, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Vanilla sweetness balanced by dark resins. Sensual and mysterious.", instructions: "Vanille as base, Sainte Fumée to cut sweetness.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, spring: 1 } },
-    { id: "combo_paradigm_shift", name: "Paradigm Shift", parts: ["prada_paradigme", "cubicle_men"], tags: ["office", "clean", "professional"], situationRatings: { office: 5, gym: 1, casual: 3, date_night: 2, intimate: 1 }, description: "The ultimate clean professional. Soapy floral meets ambroxan power.", instructions: "Cubicle on shirt (power), Paradigme on skin (refinement).", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, summer_sunny: 2, fall: 1, winter_sunny: 0 } },
-    { id: "combo_holy_saffron", name: "Holy Saffron", parts: ["fleurit_sainte_fumee", "dossier_ambery_saffron"], tags: ["date_night", "unique", "sweet"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Burnt sugar and airy saffron mixed with deep church incense.", instructions: "Sainte Fumée chest, Saffron neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, spring: 1 } },
-    { id: "combo_vanilla_smoke_2", name: "Vanilla Smoke", parts: ["maison_du_soir", "vanille_absolute"], tags: ["winter", "cozy", "sweet"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 3, intimate: 5 }, description: "Ultimate winter sweater combo. Vanilla, chestnut, and ginger.", instructions: "Layer both on sweater.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, summer_sunny: -4 } },
-    { id: "combo_holy_gin", name: "Holy Gin", parts: ["gentle_silver", "fleurit_sainte_fumee"], tags: ["unique", "fresh", "dark"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Fresh Juniper vs Dark Incense. High contrast, very artistic.", instructions: "Sainte Fumée chest, Gentle Silver neck/wrists.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, spring: 1, winter_sunny: 1 } },
-    { id: "combo_vanilla_latte", name: "Vanilla Latte", parts: ["phantom_noir", "vanille_absolute"], tags: ["gourmand", "sweet", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 5, intimate: 5 }, description: "Coffee/Chocolate layered with Green Vanilla. Rich and delicious.", instructions: "Phantom chest, Vanille neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, summer_sunny: -3 } },
-    { id: "combo_london_fog", name: "London Fog", parts: ["eau_noir", "vanille_absolute"], tags: ["tea", "cozy", "relaxing"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Black Tea and Fig softened by Vanilla. Like a warm drink.", instructions: "Eau Noir behind ears, Vanille on collar.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, winter_rainy: 2, spring: 1 } },
-    { id: "combo_office_power", name: "Office Power", parts: ["victory_man", "cubicle_men"], tags: ["office", "fresh", "strong"], situationRatings: { office: 5, gym: 4, casual: 3, date_night: 1, intimate: 1 }, description: "Citrus/Cedar + Ambroxan. Maximum clean projection.", instructions: "Cubicle chest, Victory Man neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2, fall: 0 } },
-    { id: "combo_tropical_hearth", name: "Tropical Hearth", parts: ["creed_aventus", "maison_du_soir"], tags: ["smoky", "fruity", "unique"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 4, intimate: 4 }, description: "Smoky Pineapple meets Chestnut Fire. Complex smoke layers.", instructions: "Maison chest, Aventus neck.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, winter_sunny: 1, summer_sunny: -1 } },
-    { id: "combo_ceo", name: "The CEO", parts: ["hermes_terre_eau_intense", "cubicle_men"], tags: ["office", "boss", "professional"], situationRatings: { office: 5, casual: 3, date_night: 2, gym: 2, intimate: 1 }, description: "Pure authority. Vetiver and Ambroxan.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, fall: 2 } },
-    { id: "combo_gin_earth", name: "Gin & Earth", parts: ["hermes_terre_eau_intense", "gentle_silver"], tags: ["fresh", "earthy", "unique"], situationRatings: { casual: 5, office: 3, date_night: 3, gym: 2, intimate: 2 }, description: "Earthy vetiver lifted by sparkling juniper.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, summer_sunny: 2 } },
-    { id: "combo_earth_king", name: "The Earth King", parts: ["hermes_terre_eau_intense", "creed_aventus"], tags: ["masculine", "earthy", "fruity"], situationRatings: { casual: 5, office: 5, date_night: 4, gym: 2, intimate: 3 }, description: "The King Aventus meets earthy Hermes.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, fall: 2 } },
-    { id: "combo_midnight_cacao", name: "Midnight Cacao", parts: ["phantom_noir", "fleurit_sainte_fumee"], tags: ["gourmand", "dark", "date_night"], situationRatings: { date_night: 5, intimate: 5, casual: 3, office: 0, gym: 0 }, description: "Dark chocolate and holy smoke.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2 } },
-    { id: "combo_iron_man", name: "Iron Man", parts: ["prada_paradigme", "victory_man"], tags: ["gym", "clean", "metallic"], situationRatings: { gym: 5, office: 4, casual: 3, date_night: 2, intimate: 1 }, description: "Metallic fresh and clean.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2 } },
-    { id: "combo_dark_architect", name: "The Dark Architect", parts: ["black_orchid_decant", "hermes_terre_eau_intense"], tags: ["unique", "dark", "earthy"], situationRatings: { date_night: 5, intimate: 4, casual: 3, office: 1, gym: 0 }, description: "Architecture in a bottle. Dark florals and earth.", instructions: "Standard layering.", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2 } }
+    { id: "c_executive", name: "The Executive Suite", parts: ["creed_aventus", "dossier_ambery_saffron"], protocol: "4x Aventus (Base) + 2x Saffron (Top)", tags: ["power", "office", "date_night"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "Smoky birch meets airy saffron sweetness.", instructions: "4x Aventus (Base) + 2x Saffron (Top)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 1, spring: 1, fall: 2, summer_sunny: -1 } },
+    { id: "c_cleancut", name: "The Clean Cut", parts: ["montagne_cubicle", "montagne_gentle_silver"], protocol: "3x Cubicle (Skin) + 3x Silver (Clothes)", tags: ["fresh", "sterile", "office"], situationRatings: { office: 5, gym: 5, casual: 3, date_night: 1, intimate: 1 }, description: "Ambroxan power meets Juniper freshness.", instructions: "3x Cubicle (Skin) + 3x Silver (Clothes)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2, fall: 1, winter_sunny: 0 } },
+    { id: "c_shift", name: "Paradigm Shift", parts: ["prada_paradigme", "montagne_cubicle"], protocol: "4x Cubicle (Base) + 4x Paradigme (Shirt)", tags: ["clean", "long_lasting", "office"], situationRatings: { office: 5, gym: 1, casual: 3, date_night: 2, intimate: 1 }, description: "Soapy floral meets ambroxan power.", instructions: "4x Cubicle (Base) + 4x Paradigme (Shirt)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, summer_sunny: 2, fall: 1, winter_sunny: 0 } },
+    { id: "c_ceo", name: "The CEO", parts: ["hermes_terre_intense", "montagne_cubicle"], protocol: "3x Cubicle (Base) + 3x Hermes (Top)", tags: ["authority", "vetiver", "office"], situationRatings: { office: 5, casual: 3, date_night: 2, gym: 2, intimate: 1 }, description: "Pure authority. Vetiver and Ambroxan.", instructions: "3x Cubicle (Base) + 3x Hermes (Top)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, fall: 2 } },
+    { id: "c_gin_earth", name: "Gin & Earth", parts: ["hermes_terre_intense", "montagne_gentle_silver"], protocol: "4x Silver (Clothes) + 2x Hermes (Skin)", tags: ["metallic", "earthy", "casual"], situationRatings: { casual: 5, office: 3, date_night: 3, gym: 2, intimate: 2 }, description: "Earthy vetiver lifted by sparkling juniper.", instructions: "4x Silver (Clothes) + 2x Hermes (Skin)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { spring: 2, summer_sunny: 2 } },
+    { id: "c_fluid_gold", name: "The Fluid Gold", parts: ["montagne_vanille_absolute", "montagne_gentle_silver"], protocol: "1x Vanille (Chest) + 6x Silver (Chest)", tags: ["mfk_hack", "luxury", "date_night"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 5, intimate: 4 }, description: "The sharp Juniper cuts the heavy Vanilla. MFK Gold vibe.", instructions: "1x Vanille (Chest) + 6x Silver (Chest)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, fall: 2 } },
+    { id: "c_cherry_lounge", name: "Cherry Lounge", parts: ["lost_cherry", "montagne_brooklyn_jazz"], protocol: "3x Jazz (Coat) + 3x Cherry (Scarf)", tags: ["boozy", "tobacco", "intimate"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Boozy rum and tobacco darkens the cherry almond.", instructions: "3x Jazz (Coat) + 3x Cherry (Scarf)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, fall: 1 } },
+    { id: "c_smoked_vanilla", name: "Smoked Vanilla", parts: ["montagne_maison_du_soir", "montagne_vanille_absolute"], protocol: "3x Maison (Undershirt) + 2x Vanille (Skin)", tags: ["cozy", "fire", "intimate"], situationRatings: { office: 1, gym: 0, casual: 5, date_night: 4, intimate: 5 }, description: "Chestnut smoke mixed with spicy ginger vanilla.", instructions: "3x Maison (Undershirt) + 2x Vanille (Skin)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2, fall: 2, summer_sunny: -4 } },
+    { id: "c_midnight_cacao", name: "Midnight Cacao", parts: ["montagne_phantom_noir", "fleurit_sainte_fumee"], protocol: "3x Phantom (Base) + 2x Fumée (Top)", tags: ["gothic", "gourmand", "date_night"], situationRatings: { date_night: 5, intimate: 5, casual: 3, office: 0, gym: 0 }, description: "Dark chocolate and holy smoke.", instructions: "3x Phantom (Base) + 2x Fumée (Top)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, winter_rainy: 2 } },
+    { id: "c_holy_saffron", name: "Holy Saffron", parts: ["fleurit_sainte_fumee", "dossier_ambery_saffron"], protocol: "3x Fumée (Shoulders) + 3x Saffron (Neck)", tags: ["incense", "sweet", "date_night"], situationRatings: { office: 0, gym: 0, casual: 3, date_night: 5, intimate: 5 }, description: "Burnt sugar and airy saffron mixed with deep church incense.", instructions: "3x Fumée (Shoulders) + 3x Saffron (Neck)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2, spring: 1 } },
+    { id: "c_dark_arch", name: "The Dark Architect", parts: ["black_orchid_decant", "hermes_terre_intense"], protocol: "3x Hermes (Chest) + 2x Orchid (Neck)", tags: ["contrast", "mystery", "date_night"], situationRatings: { date_night: 5, intimate: 4, casual: 3, office: 1, gym: 0 }, description: "Architecture in a bottle. Dark florals and earth.", instructions: "3x Hermes (Chest) + 2x Orchid (Neck)", wearCount: 1, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 2, fall: 2 } },
+    { id: "c_gin_juice", name: "Gin & Juice", parts: ["montagne_gentle_silver", "creed_aventus"], protocol: "4x Silver (Clothes) + 2x Aventus (Skin)", tags: ["fresh", "gym", "casual"], situationRatings: { office: 4, gym: 4, casual: 5, date_night: 3, intimate: 2 }, description: "Juniper berry and pineapple. An explosion of freshness.", instructions: "4x Silver (Clothes) + 2x Aventus (Skin)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 2, fall: 0, winter_sunny: -1 } },
+    { id: "c_holy_clean", name: "Holy Clean", parts: ["fleurit_sainte_fumee", "montagne_gentle_silver"], protocol: "4x Silver (Base) + 2x Fumée (Top)", tags: ["cold_incense", "unique", "casual"], situationRatings: { office: 3, gym: 0, casual: 5, date_night: 3, intimate: 2 }, description: "Clean gin meets dark incense. An interesting, artistic contrast.", instructions: "4x Silver (Base) + 2x Fumée (Top)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, spring: 2, winter_sunny: 1, summer_sunny: 0 } },
+    { id: "c_island_noir", name: "Island Noir", parts: ["creed_aventus", "blomb_27"], protocol: "3x Blomb (Back) + 3x Aventus (Front)", tags: ["wood", "pineapple", "casual"], situationRatings: { office: 2, gym: 0, casual: 5, date_night: 4, intimate: 3 }, description: "Pineapple meets Coconut and Tobacco. A dark, smoky Piña Colada.", instructions: "3x Blomb (Back) + 3x Aventus (Front)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { summer_sunny: 2, spring: 1, fall: 0 } },
+    { id: "c_midnight_tea", name: "Midnight Tea", parts: ["montagne_eau_noir", "montagne_brooklyn_jazz"], protocol: "3x Jazz (Coat) + 2x Eau Noir (Skin)", tags: ["tea", "tobacco", "casual"], situationRatings: { office: 1, gym: 0, casual: 4, date_night: 5, intimate: 4 }, description: "Black tea and Fig mixed with Rum and Tobacco.", instructions: "3x Jazz (Coat) + 2x Eau Noir (Skin)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { fall: 2, winter_sunny: 2, spring: 0, summer_sunny: -2 } },
+    { id: "c_winter_hearth", name: "Winter Hearth", parts: ["fleurit_sainte_fumee", "montagne_maison_du_soir"], protocol: "3x Maison (Undershirt) + 2x Fumée (Skin)", tags: ["smoke_bomb", "winter"], situationRatings: { office: 0, gym: 0, casual: 4, date_night: 3, intimate: 5 }, description: "Chestnut fire and church incense. Maximum winter coziness.", instructions: "3x Maison (Undershirt) + 2x Fumée (Skin)", wearCount: 0, userNotes: "", userRating: 0, weatherAffinity: { winter_sunny: 3, winter_rainy: 2, summer_sunny: -5 } }
 ];
 
 const INITIAL_HISTORY = [
-    { date: "2025-11-29T13:35:00", id: "cubicle_men", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-11-30T13:45:00", id: "gentle_silver", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-12-01T12:39:00", id: "combo_clean_cut", type: "combo", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-12-03T20:21:00", id: "eau_noir", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Casual" }, feedbackRecorded: true },
-    { date: "2025-12-04T12:48:00", id: "eau_noir", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-12-05T12:44:00", id: "eau_noir", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-12-06T13:29:00", id: "combo_gin_juice", type: "combo", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-11-29T13:35:00", id: "montagne_cubicle", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-11-30T13:45:00", id: "montagne_gentle_silver", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-01T12:39:00", id: "c_cleancut", type: "combo", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-03T20:21:00", id: "montagne_eau_noir", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Casual" }, feedbackRecorded: true },
+    { date: "2025-12-04T12:48:00", id: "montagne_eau_noir", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-05T12:44:00", id: "montagne_eau_noir", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-06T13:29:00", id: "c_gin_juice", type: "combo", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
     { date: "2025-12-07T13:30:00", id: "blomb_27", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-12-08T12:41:00", id: "gentle_silver", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-12-10T16:55:00", id: "gentle_silver", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Casual" }, feedbackRecorded: true },
+    { date: "2025-12-08T12:41:00", id: "montagne_gentle_silver", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-10T16:55:00", id: "montagne_gentle_silver", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Casual" }, feedbackRecorded: true },
     { date: "2025-12-11T12:40:00", id: "prada_paradigme", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-12-12T12:43:00", id: "eau_noir", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-12T12:43:00", id: "montagne_eau_noir", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
     { date: "2025-12-13T13:15:00", id: "custom_1765648274151", type: "decant", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
     { date: "2025-12-14T13:20:00", id: "custom_1765726222017", type: "decant", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
-    { date: "2025-12-15T14:22:00", id: "creed_aventus", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Office" }, feedbackRecorded: true }
+    { date: "2025-12-15T14:22:00", id: "creed_aventus", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-16T12:40:00", id: "c_dark_arch", type: "combo", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-19T12:31:00", id: "montagne_maison_du_soir", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-20T13:32:00", id: "montagne_brooklyn_jazz", type: "single", context: { season: "Winter", weather: "Rainy", situation: "Office" }, feedbackRecorded: true },
+    { date: "2025-12-21T13:28:00", id: "montagne_vanille_absolute", type: "single", context: { season: "Winter", weather: "Sunny", situation: "Office" }, feedbackRecorded: false },
+    { date: "2025-12-22T12:41:00", id: "montagne_eau_noir", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: false },
+    { date: "2025-12-23T12:41:00", id: "montagne_eau_noir", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: false },
+    { date: "2025-12-24T15:48:00", id: "montagne_eau_noir", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Casual" }, feedbackRecorded: false },
+    { date: "2025-12-25T15:48:00", id: "montagne_eau_noir", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Casual" }, feedbackRecorded: false },
+    { date: "2025-12-26T13:52:00", id: "montagne_eau_noir", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: false },
+    { date: "2025-12-27T13:52:00", id: "fleurit_sainte_fumee", type: "single", context: { season: "Fall", weather: "Sunny", situation: "Office" }, feedbackRecorded: false }
 ];
 
 // --- INITIALIZATION ---
@@ -138,7 +139,7 @@ function loadData() {
                 return sysF;
             });
             
-            // Retain custom bottles created via Smart Add
+            // Retain custom bottles
             (savedData.fragrances || []).forEach(f => {
                  if (!CUSTOM_DB.find(cdb => cdb.id === f.id)) state.data.fragrances.push(f);
             });
@@ -146,12 +147,7 @@ function loadData() {
             state.data.combos = COMBOS_DB.map(sysC => {
                 const savedC = (savedData.combos || []).find(c => c.id === sysC.id);
                 if (savedC) {
-                    return { 
-                        ...sysC, 
-                        wearCount: savedC.wearCount || 0, 
-                        userNotes: savedC.userNotes || "", 
-                        userRating: savedC.userRating || 0 
-                    };
+                    return { ...sysC, wearCount: savedC.wearCount || 0, userNotes: savedC.userNotes || "", userRating: savedC.userRating || 0 };
                 }
                 return sysC;
             });
@@ -221,12 +217,23 @@ function setContext(type, value) {
     else { sus.classList.add('hidden'); state.context.suspense = false; document.getElementById('suspense-toggle').checked = false; }
 }
 
+function updateTemp(val) {
+    state.context.temperature = parseInt(val);
+    document.getElementById('temp-display').innerText = val + "°F";
+    // Color Logic
+    const disp = document.getElementById('temp-display');
+    if(val < 32) disp.className = "text-blue-300 font-bold text-lg";
+    else if(val < 60) disp.className = "text-teal-300 font-bold text-lg";
+    else if(val > 80) disp.className = "text-red-400 font-bold text-lg";
+    else disp.className = "text-yellow-300 font-bold text-lg";
+}
+
 function updateContextUI() {
      document.querySelectorAll('.ctx-btn').forEach(btn => {
         const group = btn.dataset.group; const val = btn.dataset.val;
         if (state.context[group] === val) { 
             btn.classList.add('btn-active'); btn.classList.remove('glass-panel'); 
-            const icon = btn.querySelector('svg'); if(icon) { icon.classList.remove('text-teal-300', 'text-yellow-400', 'text-blue-400'); icon.classList.add('text-white'); }
+            const icon = btn.querySelector('svg'); if(icon) { icon.classList.remove('text-teal-300', 'text-yellow-400', 'text-blue-400', 'text-white'); icon.classList.add('text-white'); }
         } else { 
             btn.classList.remove('btn-active'); btn.classList.add('glass-panel'); 
             const icon = btn.querySelector('svg'); 
@@ -234,6 +241,7 @@ function updateContextUI() {
                 if(group === 'situation') icon.classList.add('text-teal-300'); 
                 if(val === 'sunny') icon.classList.add('text-yellow-400'); 
                 if(val === 'rainy') icon.classList.add('text-blue-400'); 
+                if(val === 'snow') icon.classList.add('text-white'); 
             }
         }
     });
@@ -241,7 +249,7 @@ function updateContextUI() {
 
 function toggleSuspense() { state.context.suspense = document.getElementById('suspense-toggle').checked; }
 
-// --- DEEP ROTATION ALGORITHM (v82) ---
+// --- DEEP ROTATION ALGORITHM (v87) ---
 
 function calculateScore(item, isCombo) {
     const ctx = state.context; 
@@ -252,35 +260,57 @@ function calculateScore(item, isCombo) {
     if (sitScore < 2) return -100; // Disqualify mismatch
     score += sitScore * 4; 
     
-    // 2. Weather (Medium Weight x2)
+    // 2. Weather Algorithm (Snow/Rain/Sun)
     if (item.weatherAffinity) {
         let weatherKey = `${ctx.season}_${ctx.weather}`;
-        if (item.weatherAffinity[weatherKey] !== undefined) {
-            score += item.weatherAffinity[weatherKey] * 2;
-        } else if (item.weatherAffinity[ctx.season] !== undefined) {
-             score += item.weatherAffinity[ctx.season] * 2;
+        
+        // Handle SNOW Logic
+        if (ctx.weather === 'snow') {
+            // Snow uses Winter_Rainy baseline but heavily boosts 'Cozy/Dark'
+            const rainyScore = item.weatherAffinity[`${ctx.season}_rainy`] || item.weatherAffinity['winter_rainy'] || 0;
+            score += rainyScore * 2.5; 
+            if(item.tags && (item.tags.includes('cozy') || item.tags.includes('incense') || item.tags.includes('smoke'))) score += 5;
+            if(item.tags && item.tags.includes('fresh')) score -= 5; // Penalty for freshies in snow
+        } else {
+            // Standard Logic
+            if (item.weatherAffinity[weatherKey] !== undefined) {
+                score += item.weatherAffinity[weatherKey] * 2;
+            } else if (item.weatherAffinity[ctx.season] !== undefined) {
+                 score += item.weatherAffinity[ctx.season] * 2;
+            }
         }
+    }
+
+    // 3. Temperature Logic (v87)
+    if (ctx.temperature < 40) {
+        // FREEZING: Boost Heavy, Penalize Fresh
+        if (item.tags.includes('vanilla') || item.tags.includes('tobacco') || item.tags.includes('incense')) score += 5;
+        if (item.tags.includes('citrus') || item.tags.includes('aquatic')) score -= 5;
+    } else if (ctx.temperature > 75) {
+        // HOT: Boost Fresh, Penalize Heavy
+        if (item.tags.includes('citrus') || item.tags.includes('fresh') || item.tags.includes('gin')) score += 5;
+        if (item.tags.includes('tobacco') || item.tags.includes('gourmand')) score -= 8;
     }
 
     if (!isCombo) {
         if(item.pairingOnly || item.paused) return -999;
         
-        // 3. Tier Bonus
+        // 4. Tier Bonus
         if (item.userRating === 'S') score += 20;
         else if (item.userRating === 'A') score += 12;
         else if (item.userRating === 'B') score += 5;
         
-        // 4. Freshness
+        // 5. Freshness
         if (item.wearCount === 0) score += 5; 
         else score -= (item.wearCount * 2);
     } else {
         score += 8; // Combo Base Bonus
     }
     
-    // 5. Suspense
+    // 6. Suspense
     if (ctx.suspense && item.tags && item.tags.includes('suspense')) score += 10;
     
-    // 6. Jitter
+    // 7. Jitter
     score += Math.random() * 4;
     
     return score;
