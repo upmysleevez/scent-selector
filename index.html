@@ -7,13 +7,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ScentSelector">
     <meta name="theme-color" content="#1F2121">
-    <title>Fragrance Sommelier v85</title>
+    <title>Fragrance Sommelier v87</title>
     
-    <!-- External Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Custom Tailwind Configuration -->
     <script>
         tailwind.config = {
             theme: {
@@ -28,12 +26,10 @@
         }
     </script>
 
-    <!-- App Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="h-screen w-screen flex flex-col overflow-hidden text-gray-100 selection:bg-teal-500 selection:text-white bg-[#1F2121]">
 
-    <!-- HEADER -->
     <header class="fixed top-0 w-full z-50 bg-charcoal-700 border-b border-white/5 shadow-lg px-6 py-4 safe-top">
         <div class="flex justify-between items-center">
             <div>
@@ -46,11 +42,9 @@
         </div>
     </header>
 
-    <!-- MAIN CONTENT AREA -->
     <div id="app-container" class="flex-1 flex flex-col relative h-full">
         <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-36 pb-48" id="main-content">
             
-            <!-- VIEW 1: SELECTOR -->
             <div id="view-selector" class="space-y-6 max-w-md mx-auto fade-enter-active">
                 <section>
                     <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Situation</label>
@@ -63,10 +57,20 @@
                     </div>
                 </section>
                 <section>
-                    <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 mb-2 block">Weather</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="setContext('weather', 'sunny')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="sunny"><i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i><span class="text-sm">Sunny</span></button>
-                        <button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-4 rounded-xl flex items-center justify-center gap-3 active:scale-95 transition-all" data-group="weather" data-val="rainy"><i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i><span class="text-sm">Rainy/Cold</span></button>
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 block">Weather Conditions</label>
+                        <div class="text-right"><span id="temp-display" class="text-teal-300 font-bold text-lg">50°F</span></div>
+                    </div>
+                    
+                    <div class="glass-panel p-3 rounded-xl mb-3 flex items-center gap-3">
+                        <i data-lucide="thermometer" class="w-4 h-4 text-gray-400"></i>
+                        <input type="range" id="temp-slider" min="0" max="100" value="50" class="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateTemp(this.value)">
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="setContext('weather', 'sunny')" class="ctx-btn glass-panel p-3 rounded-xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-all" data-group="weather" data-val="sunny"><i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i><span class="text-xs">Sunny</span></button>
+                        <button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-3 rounded-xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-all" data-group="weather" data-val="rainy"><i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i><span class="text-xs">Rain</span></button>
+                        <button onclick="setContext('weather', 'snow')" class="ctx-btn glass-panel p-3 rounded-xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-all" data-group="weather" data-val="snow"><i data-lucide="snowflake" class="w-5 h-5 text-white"></i><span class="text-xs">Snow</span></button>
                     </div>
                 </section>
                 <section>
@@ -101,13 +105,11 @@
                 </div>
             </div>
 
-            <!-- VIEW 2: RESULTS -->
             <div id="view-results" class="hidden space-y-4 max-w-md mx-auto">
                 <button onclick="resetView()" class="mb-4 text-xs font-bold text-gray-400 hover:text-white flex items-center gap-1"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Filter</button>
                 <div id="results-container" class="space-y-2"></div>
             </div>
 
-            <!-- VIEW 3: COLLECTION -->
             <div id="view-collection" class="hidden space-y-4 max-w-md mx-auto relative">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">My Collection</h2>
@@ -121,7 +123,6 @@
                 <div id="collection-list" class="space-y-3"></div>
             </div>
 
-            <!-- VIEW 4: HISTORY -->
             <div id="view-history" class="hidden space-y-4 max-w-md mx-auto relative">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Wear Log</h2>
@@ -131,7 +132,6 @@
             </div>
         </main>
         
-        <!-- FOOTER NAV -->
         <nav class="fixed bottom-0 w-full bg-charcoal-900 border-t border-white/5 flex justify-around items-center px-4 pt-4 z-50 safe-bottom pb-6 shadow-2xl opacity-100">
             <button onclick="switchView('selector')" class="nav-btn flex flex-col items-center gap-1.5 text-teal-500 active:scale-95 transition-transform"><i data-lucide="search" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Select</span></button>
             <button onclick="switchView('collection')" class="nav-btn flex flex-col items-center gap-1.5 text-gray-500 hover:text-teal-300 active:scale-95 transition-transform"><i data-lucide="library" class="w-8 h-8"></i><span class="text-xs font-bold tracking-wide">Collect</span></button>
@@ -139,7 +139,6 @@
         </nav>
     </div>
 
-    <!-- MODALS & TOASTS -->
     <div id="history-edit-modal" class="fixed inset-0 z-[65] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10"><h3 class="text-xl font-bold mb-4">Edit Log</h3><div class="space-y-4"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Date & Time</label><input type="datetime-local" id="hist-edit-date" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm"></div><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Fragrance</label><select id="hist-edit-fragrance" class="w-full input-glass p-3 rounded-lg focus:outline-none focus:border-teal-500 text-sm appearance-none bg-none"></select></div><div class="flex gap-2 pt-2"><button onclick="closeHistoryEdit()" class="flex-1 bg-white/10 hover:bg-white/20 py-3 rounded-xl font-bold text-sm">Cancel</button><button onclick="saveHistoryEdit()" class="flex-1 bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl font-bold text-sm shadow-lg">Update Log</button></div><button onclick="deleteHistoryEntry()" class="w-full text-red-400 text-xs font-bold py-2 mt-2 hover:text-red-300">Delete Entry</button></div></div></div>
 
     <div id="smart-add-modal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4"><div class="bg-charcoal-800 w-full max-w-sm rounded-2xl p-6 shadow-2xl border border-white/10 transform transition-all h-[80vh] flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-bold">Smart Add</h3><button onclick="closeSmartAdd()" class="p-2 bg-white/10 rounded-full"><i data-lucide="x" class="w-4 h-4"></i></button></div><div class="space-y-4 overflow-y-auto no-scrollbar flex-1"><div><label class="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Name & Brand</label><input type="text" id="sa-name" class="w-full input-glass p-3 rounded-lg mb-2" placeholder="Fragrance Name"><input type="text" id="sa-brand" class="w-full input-glass p-3 rounded-lg" placeholder="Brand / House"></div><div class="flex items-center gap-2 mt-2"><input type="checkbox" id="sa-is-decant" class="w-4 h-4 rounded border-gray-600 text-teal-500 focus:ring-teal-500"><label for="sa-is-decant" class="text-sm font-bold text-gray-300">Save as Decant/Sample</label></div><div class="bg-teal-900/20 p-4 rounded-xl border border-teal-500/20"><div class="flex items-center gap-2 mb-2"><i data-lucide="wand-2" class="w-4 h-4 text-teal-300"></i><label class="text-xs font-bold text-teal-300 uppercase tracking-wider">Paste Info Here</label></div><textarea id="sa-text" class="w-full bg-black/40 text-xs text-gray-300 p-3 rounded-lg border border-white/10 h-32 focus:outline-none focus:border-teal-500" placeholder="Paste notes/description..."></textarea><button onclick="analyzeText()" class="w-full mt-2 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold py-2 rounded-lg">Analyze & Auto-Fill</button></div><div id="sa-results" class="hidden space-y-3"><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Detected Tags</h4><div id="sa-tags" class="flex flex-wrap gap-1"></div></div><div class="p-3 bg-white/5 rounded-lg"><h4 class="text-xs font-bold text-gray-400 mb-1">Suggested Combo</h4><p id="sa-combo" class="text-xs text-teal-200 italic">None detected</p></div></div></div><button onclick="saveSmartAdd()" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 rounded-xl shadow-lg mt-4">Save to Collection</button></div></div>
@@ -152,7 +151,6 @@
 
     <div id="toast" class="fixed top-32 left-1/2 transform -translate-x-1/2 bg-teal-500 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 translate-y-[-150%] opacity-0 invisible transition-all duration-300 z-[70]"><i data-lucide="check-circle" class="w-5 h-5"></i><span class="font-bold text-sm">Saved</span></div>
 
-    <!-- Application Logic -->
     <script src="app.js"></script>
 </body>
 </html>
