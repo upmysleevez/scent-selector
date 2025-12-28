@@ -1,9 +1,9 @@
 /**
- * FRAGRANCE SOMMELIER v89
- * Logic: Plan Tab, Refresh Button, Snow, Specific Temp
+ * FRAGRANCE SOMMELIER v92
+ * Logic: Merged Scentbird/Boutique Schedule, Removed Redundancy
  */
 
-const APP_ID = "scentApp_v89_plan"; // UPDATED STORAGE KEY
+const APP_ID = "scentApp_v92_merged"; // UPDATED STORAGE KEY
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
 let state = {
@@ -13,12 +13,27 @@ let state = {
 };
 
 const ACQUISITION_ROADMAP = [
+    // JANUARY
     { phase: "PHASE 1: THE DEEP FREEZE", date: "Jan 25 - 30, 2026", target: "Emanuel New York", brand: "The Elemental (Extrait)", role: "The Grail Leather", reason: "Honey/Oud notes prevent leather from cracking in <20°F wind chill.", source: "Emanuel NYC", icon: "snowflake" },
+    { phase: "JAN SUBSCRIPTION", date: "Jan Arrival", target: "African Leather", brand: "Memo Paris", role: "The Winter King", reason: "Highest quality spicy leather. Replaces La Nuit 2011.", source: "Scentbird", icon: "crown" },
+    { phase: "JAN SUBSCRIPTION", date: "Jan Arrival", target: "Oddity", brand: "Rag & Bone", role: "Shop Floor Signature", reason: "Licorice & Pepper match the smell of hot ink/machinery.", source: "Scentbird", icon: "factory" },
+    
+    // FEBRUARY
     { phase: "PHASE 2: THE OFFICE KING", date: "Mid-Feb 2026", target: "Pasha de Cartier", brand: "Cartier (Parfum)", role: "Manager Aura", reason: "Creamy Sandalwood/Fir Balsam. Replaces decant for authority.", source: "Jomashop / Macy's", icon: "briefcase" },
-    { phase: "PHASE 3: THE SUMMER BEAST", date: "Late April 2026", target: "Hacienda", brand: "Montagne", role: "10-Hour Citrus", reason: "Oakmoss base allows pineapple to stick to skin in high heat.", source: "Montagne", icon: "sun" },
+    { phase: "FEB SUBSCRIPTION", date: "Feb Arrival", target: "Great Lord", brand: "Vilhelm Parfumerie", role: "Brooklyn Jazz Upgrade", reason: "Dark Plum/Leather. Diversifies palette from Tea scents.", source: "Scentbird", icon: "wine" },
+    { phase: "FEB SUBSCRIPTION", date: "Feb Arrival", target: "Cherry Punk", brand: "Room 1015", role: "Lost Cherry Killer", reason: "Edgy, punk-rock cherry leather. No layering required.", source: "Scentbird", icon: "zap" },
+
+    // MARCH
+    { phase: "MAR SUBSCRIPTION", date: "Mar Arrival", target: "Cedrat Boise", brand: "Mancera", role: "Spring Workhorse", reason: "10-Hour daily driver. Replaces the need for Hacienda.", source: "Scentbird", icon: "sun" },
+    { phase: "MAR SUBSCRIPTION", date: "Mar Arrival", target: "Espíritu Parfum", brand: "House of Bō", role: "The Green Element", reason: "Sage & Oakwood fill the Herbal gap for rising humidity.", source: "Scentbird", icon: "leaf" },
+
+    // SUMMER+
     { phase: "PHASE 4: THE HUMIDITY KILLER", date: "Late May 2026", target: "Torino 2021", brand: "Montagne", role: "The Ice Bath", reason: "Mint & Basil provide physical cooling effect in 90%+ humidity.", source: "Montagne", icon: "droplets" },
-    { phase: "PHASE 5: THE MOLECULAR BRIDGE", date: "Early Sept 2026", target: "Ambre Musc", brand: "Montagne", role: "The Ghost Layer", reason: "Cetalox projects a warm, clean aura. Perfect for 'False Fall'.", source: "Montagne", icon: "wind" },
-    { phase: "PHASE 6: THE GOTHIC STATEMENT", date: "Late Oct 2026", target: "Scandinavian Crime", brand: "LM Parfums", role: "The Villain", reason: "Dark Pepper, Incense, Woods. Replaces Sainte Fumée.", source: "Emanuel NYC", icon: "ghost" }
+    { phase: "PHASE 5: THE PRINT MASTER", date: "June 2026", target: "Galilean", brand: "Montagne", role: "Industrial Professional", reason: "Mineral/Suede/Ink notes match the print shop environment perfectly.", source: "Montagne", icon: "printer" },
+    { phase: "PHASE 6: THE SPORT-SPICE HYBRID", date: "Aug 15, 2026", target: "Torino 2022", brand: "Montagne", role: "Transition Ace", reason: "Eucalyptus freshness meets Saffron sweetness.", source: "Montagne", icon: "wind" },
+    { phase: "PHASE 7: THE MOLECULAR BRIDGE", date: "Early Sept 2026", target: "Ambre Musc", brand: "Montagne", role: "The Ghost Layer", reason: "Cetalox projects a warm, clean aura. Perfect for 'False Fall'.", source: "Montagne", icon: "ghost" },
+    { phase: "PHASE 8: THE GOTHIC STATEMENT", date: "Late Oct 2026", target: "Scandinavian Crime", brand: "LM Parfums", role: "The Villain", reason: "Dark Pepper, Incense, Woods. Replaces Sainte Fumée.", source: "Emanuel NYC", icon: "skull" },
+    { phase: "PHASE 9: THE SUEDE VANILLA", date: "Nov 2026", target: "Bobcat", brand: "Montagne", role: "Winter Upgrade", reason: "Incense and Suede Vanilla. Replaces Vanille Absolute.", source: "Montagne", icon: "flame" }
 ];
 
 const KEYWORDS = {
@@ -34,7 +49,7 @@ let currentNoteId = null;
 let editingHistoryIndex = null; 
 let toastTimeout = null;
 
-// --- V89 DATASET ---
+// --- V92 DATASET ---
 
 const CUSTOM_DB = [
     { id: "montagne_eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 4, winter_rainy: 5, summer_sunny: 2, summer_rainy: 3, spring: 4, fall: 5 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "10 Sprays: 4 Chest, 6 Sleeves (Sleeve Trick).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 9, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
@@ -558,4 +573,5 @@ function saveMissedLog() {
      changeWearCount(idVal, 1);
      state.data.history.push({ id: idVal, type: type, date: new Date(dateVal).toISOString(), context: { situation: situationVal, season: state.context.season, weather: state.context.weather, suspense: false }, feedbackRecorded: false });
      saveData(); closeAddLogModal(); renderHistory(); showCollection(); showToast('Log Added');
+}
 }
