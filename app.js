@@ -1,9 +1,9 @@
 /**
- * FRAGRANCE SOMMELIER v92
+ * FRAGRANCE SOMMELIER v92 (FIXED)
  * Logic: Merged Scentbird/Boutique Schedule, Removed Redundancy
  */
 
-const APP_ID = "scentApp_v92_merged"; // UPDATED STORAGE KEY
+const APP_ID = "scentApp_v92_merged";
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
 let state = {
@@ -573,5 +573,4 @@ function saveMissedLog() {
      changeWearCount(idVal, 1);
      state.data.history.push({ id: idVal, type: type, date: new Date(dateVal).toISOString(), context: { situation: situationVal, season: state.context.season, weather: state.context.weather, suspense: false }, feedbackRecorded: false });
      saveData(); closeAddLogModal(); renderHistory(); showCollection(); showToast('Log Added');
-}
 }
