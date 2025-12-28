@@ -1,9 +1,9 @@
 /**
- * FRAGRANCE SOMMELIER v92 (FIXED)
- * Logic: Merged Scentbird/Boutique Schedule, Removed Redundancy
+ * FRAGRANCE SOMMELIER v93
+ * Logic: Merged Schedule, Shuffle Button, Fixed Syntax
  */
 
-const APP_ID = "scentApp_v92_merged";
+const APP_ID = "scentApp_v93_stable"; 
 const TIERS = ['S', 'A', 'B', 'C', 'D', 'E', 'F'];
 
 let state = {
@@ -12,28 +12,22 @@ let state = {
     ui: { collectionMode: 'bottles' }
 };
 
+// --- DATA: ACQUISITION ROADMAP (v93) ---
 const ACQUISITION_ROADMAP = [
-    // JANUARY
-    { phase: "PHASE 1: THE DEEP FREEZE", date: "Jan 25 - 30, 2026", target: "Emanuel New York", brand: "The Elemental (Extrait)", role: "The Grail Leather", reason: "Honey/Oud notes prevent leather from cracking in <20°F wind chill.", source: "Emanuel NYC", icon: "snowflake" },
-    { phase: "JAN SUBSCRIPTION", date: "Jan Arrival", target: "African Leather", brand: "Memo Paris", role: "The Winter King", reason: "Highest quality spicy leather. Replaces La Nuit 2011.", source: "Scentbird", icon: "crown" },
-    { phase: "JAN SUBSCRIPTION", date: "Jan Arrival", target: "Oddity", brand: "Rag & Bone", role: "Shop Floor Signature", reason: "Licorice & Pepper match the smell of hot ink/machinery.", source: "Scentbird", icon: "factory" },
-    
-    // FEBRUARY
-    { phase: "PHASE 2: THE OFFICE KING", date: "Mid-Feb 2026", target: "Pasha de Cartier", brand: "Cartier (Parfum)", role: "Manager Aura", reason: "Creamy Sandalwood/Fir Balsam. Replaces decant for authority.", source: "Jomashop / Macy's", icon: "briefcase" },
-    { phase: "FEB SUBSCRIPTION", date: "Feb Arrival", target: "Great Lord", brand: "Vilhelm Parfumerie", role: "Brooklyn Jazz Upgrade", reason: "Dark Plum/Leather. Diversifies palette from Tea scents.", source: "Scentbird", icon: "wine" },
-    { phase: "FEB SUBSCRIPTION", date: "Feb Arrival", target: "Cherry Punk", brand: "Room 1015", role: "Lost Cherry Killer", reason: "Edgy, punk-rock cherry leather. No layering required.", source: "Scentbird", icon: "zap" },
-
-    // MARCH
-    { phase: "MAR SUBSCRIPTION", date: "Mar Arrival", target: "Cedrat Boise", brand: "Mancera", role: "Spring Workhorse", reason: "10-Hour daily driver. Replaces the need for Hacienda.", source: "Scentbird", icon: "sun" },
-    { phase: "MAR SUBSCRIPTION", date: "Mar Arrival", target: "Espíritu Parfum", brand: "House of Bō", role: "The Green Element", reason: "Sage & Oakwood fill the Herbal gap for rising humidity.", source: "Scentbird", icon: "leaf" },
-
-    // SUMMER+
-    { phase: "PHASE 4: THE HUMIDITY KILLER", date: "Late May 2026", target: "Torino 2021", brand: "Montagne", role: "The Ice Bath", reason: "Mint & Basil provide physical cooling effect in 90%+ humidity.", source: "Montagne", icon: "droplets" },
-    { phase: "PHASE 5: THE PRINT MASTER", date: "June 2026", target: "Galilean", brand: "Montagne", role: "Industrial Professional", reason: "Mineral/Suede/Ink notes match the print shop environment perfectly.", source: "Montagne", icon: "printer" },
-    { phase: "PHASE 6: THE SPORT-SPICE HYBRID", date: "Aug 15, 2026", target: "Torino 2022", brand: "Montagne", role: "Transition Ace", reason: "Eucalyptus freshness meets Saffron sweetness.", source: "Montagne", icon: "wind" },
-    { phase: "PHASE 7: THE MOLECULAR BRIDGE", date: "Early Sept 2026", target: "Ambre Musc", brand: "Montagne", role: "The Ghost Layer", reason: "Cetalox projects a warm, clean aura. Perfect for 'False Fall'.", source: "Montagne", icon: "ghost" },
-    { phase: "PHASE 8: THE GOTHIC STATEMENT", date: "Late Oct 2026", target: "Scandinavian Crime", brand: "LM Parfums", role: "The Villain", reason: "Dark Pepper, Incense, Woods. Replaces Sainte Fumée.", source: "Emanuel NYC", icon: "skull" },
-    { phase: "PHASE 9: THE SUEDE VANILLA", date: "Nov 2026", target: "Bobcat", brand: "Montagne", role: "Winter Upgrade", reason: "Incense and Suede Vanilla. Replaces Vanille Absolute.", source: "Montagne", icon: "flame" }
+    { phase: "PHASE 1", date: "Jan 2026", target: "Emanuel New York", brand: "The Elemental (Extrait)", role: "The Grail Leather", reason: "Honey/Oud notes prevent leather from cracking in <20°F wind chill.", source: "Emanuel NYC", icon: "snowflake" },
+    { phase: "JAN SUB", date: "Jan 2026", target: "African Leather", brand: "Memo Paris", role: "The Winter King", reason: "Highest quality spicy leather. Replaces La Nuit 2011.", source: "Scentbird", icon: "crown" },
+    { phase: "JAN SUB", date: "Jan 2026", target: "Oddity", brand: "Rag & Bone", role: "Shop Floor Signature", reason: "Licorice & Pepper match the smell of hot ink/machinery.", source: "Scentbird", icon: "factory" },
+    { phase: "PHASE 2", date: "Feb 2026", target: "Pasha de Cartier", brand: "Cartier (Parfum)", role: "Manager Aura", reason: "Creamy Sandalwood/Fir Balsam. Authority in a bottle.", source: "Jomashop", icon: "briefcase" },
+    { phase: "FEB SUB", date: "Feb 2026", target: "Great Lord", brand: "Vilhelm Parfumerie", role: "Brooklyn Jazz Upgrade", reason: "Dark Plum/Leather. Diversifies palette from Tea scents.", source: "Scentbird", icon: "wine" },
+    { phase: "FEB SUB", date: "Feb 2026", target: "Cherry Punk", brand: "Room 1015", role: "Lost Cherry Killer", reason: "Edgy, punk-rock cherry leather. No layering required.", source: "Scentbird", icon: "zap" },
+    { phase: "MAR SUB", date: "Mar 2026", target: "Cedrat Boise", brand: "Mancera", role: "Spring Workhorse", reason: "10-Hour daily driver. Replaces the need for Hacienda.", source: "Scentbird", icon: "sun" },
+    { phase: "MAR SUB", date: "Mar 2026", target: "Espíritu Parfum", brand: "House of Bō", role: "The Green Element", reason: "Sage & Oakwood fill the Herbal gap for rising humidity.", source: "Scentbird", icon: "leaf" },
+    { phase: "PHASE 4", date: "May 2026", target: "Torino 2021", brand: "Montagne", role: "The Ice Bath", reason: "Mint & Basil provide physical cooling effect in 90%+ humidity.", source: "Montagne", icon: "droplets" },
+    { phase: "PHASE 5", date: "June 2026", target: "Galilean", brand: "Montagne", role: "Industrial Professional", reason: "Mineral/Suede/Ink notes match the print shop environment perfectly.", source: "Montagne", icon: "printer" },
+    { phase: "PHASE 6", date: "Aug 2026", target: "Torino 2022", brand: "Montagne", role: "Transition Ace", reason: "Eucalyptus freshness meets Saffron sweetness.", source: "Montagne", icon: "wind" },
+    { phase: "PHASE 7", date: "Sept 2026", target: "Ambre Musc", brand: "Montagne", role: "The Ghost Layer", reason: "Cetalox projects a warm, clean aura. Perfect for 'False Fall'.", source: "Montagne", icon: "ghost" },
+    { phase: "PHASE 8", date: "Oct 2026", target: "Scandinavian Crime", brand: "LM Parfums", role: "The Villain", reason: "Dark Pepper, Incense, Woods. Replaces Sainte Fumée.", source: "Emanuel NYC", icon: "skull" },
+    { phase: "PHASE 9", date: "Nov 2026", target: "Bobcat", brand: "Montagne", role: "Winter Upgrade", reason: "Incense and Suede Vanilla. Replaces Vanille Absolute.", source: "Montagne", icon: "flame" }
 ];
 
 const KEYWORDS = {
@@ -49,7 +43,7 @@ let currentNoteId = null;
 let editingHistoryIndex = null; 
 let toastTimeout = null;
 
-// --- V92 DATASET ---
+// --- V93 DATASET (Restored) ---
 
 const CUSTOM_DB = [
     { id: "montagne_eau_noir", name: "Eau Noir", brand: "Montagne", inspiration: "The Noir 29", tags: ["tea", "fig", "hay", "suspense", "dark"], weatherAffinity: { winter_sunny: 4, winter_rainy: 5, summer_sunny: 2, summer_rainy: 3, spring: 4, fall: 5 }, situationRatings: { office: 5, gym: 2, casual: 5, date_night: 5, intimate: 4 }, sprayInstructions: "10 Sprays: 4 Chest, 6 Sleeves (Sleeve Trick).", description: "Black tea, fig, and tobacco. Mysterious and shifting.", wearCount: 9, userNotes: "", userRating: "S", pairingOnly: false, paused: false, reviewStatus: 'approved' },
@@ -133,6 +127,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
 setInterval(() => { if (window.lucide) lucide.createIcons(); }, 1000);
 
+// --- CORE FUNCTIONS ---
+
 function loadData() {
     const raw = localStorage.getItem(APP_ID);
     if (raw) {
@@ -143,7 +139,7 @@ function loadData() {
             state.data.fragrances = CUSTOM_DB.map(sysF => {
                 const savedF = (savedData.fragrances || []).find(f => f.id === sysF.id);
                 if (savedF) {
-                    return { ...sysF, wearCount: savedF.wearCount !== undefined ? savedF.wearCount : (sysF.wearCount || 0), userNotes: savedF.userNotes !== undefined ? savedF.userNotes : (sysF.userNotes || ""), userRating: savedF.userRating !== undefined ? savedF.userRating : (sysF.userRating || 0), pairingOnly: savedF.pairingOnly !== undefined ? savedF.pairingOnly : (sysF.pairingOnly || false), paused: savedF.paused !== undefined ? savedF.paused : (sysF.paused || false), reviewStatus: savedF.reviewStatus || 'approved' };
+                    return { ...sysF, wearCount: savedF.wearCount || 0, userNotes: savedF.userNotes || "", userRating: savedF.userRating || 0, pairingOnly: savedF.pairingOnly || false, paused: savedF.paused || false, reviewStatus: savedF.reviewStatus || 'approved' };
                 }
                 return sysF;
             });
@@ -225,10 +221,45 @@ function updateContextUI() {
 
 function toggleSuspense() { state.context.suspense = document.getElementById('suspense-toggle').checked; }
 
+// --- REFRESH / SHUFFLE LOGIC ---
 function refreshResults() {
     const btn = document.querySelector('button[onclick="refreshResults()"] i');
     if(btn) btn.classList.add('animate-spin');
     setTimeout(() => { generateRecommendations(); if(btn) btn.classList.remove('animate-spin'); }, 300);
+}
+
+// --- SCHEDULE LOGIC ---
+function renderSchedule() {
+    const list = document.getElementById('schedule-list'); list.innerHTML = '';
+    ACQUISITION_ROADMAP.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "glass-panel p-5 rounded-xl border-l-4 border-l-teal-500/50 relative overflow-hidden";
+        div.innerHTML = `
+            <div class="flex justify-between items-start mb-2 relative z-10">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-bold tracking-widest text-teal-300 uppercase">${item.phase}</span>
+                        <span class="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-400 font-mono">${item.date}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-white leading-tight">${item.target}</h3>
+                    <p class="text-xs text-gray-400 uppercase tracking-wide">${item.brand}</p>
+                </div>
+                <div class="bg-teal-900/30 p-2 rounded-full border border-teal-500/20"><i data-lucide="${item.icon}" class="w-5 h-5 text-teal-400"></i></div>
+            </div>
+            <div class="bg-black/20 p-3 rounded-lg border border-white/5 relative z-10">
+                <div class="flex items-start gap-2 mb-2">
+                    <span class="text-[10px] font-bold text-teal-200 uppercase bg-teal-900/40 px-1.5 rounded">ROLE</span>
+                    <span class="text-xs text-gray-200">${item.role}</span>
+                </div>
+                <p class="text-xs text-gray-400 italic leading-relaxed">"${item.reason}"</p>
+            </div>
+            <div class="mt-3 flex justify-between items-center relative z-10">
+                <span class="text-[10px] text-gray-500 font-mono">Source: ${item.source}</span>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+    if (window.lucide) lucide.createIcons();
 }
 
 function calculateScore(item, isCombo) {
@@ -307,39 +338,6 @@ function generateRecommendations() {
         }
     }
     switchView('results');
-}
-
-function renderSchedule() {
-    const list = document.getElementById('schedule-list'); list.innerHTML = '';
-    ACQUISITION_ROADMAP.forEach(item => {
-        const div = document.createElement('div');
-        div.className = "glass-panel p-5 rounded-xl border-l-4 border-l-teal-500/50 relative overflow-hidden";
-        div.innerHTML = `
-            <div class="flex justify-between items-start mb-2 relative z-10">
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="text-[10px] font-bold tracking-widest text-teal-300 uppercase">${item.phase}</span>
-                        <span class="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-gray-400 font-mono">${item.date}</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-white leading-tight">${item.target}</h3>
-                    <p class="text-xs text-gray-400 uppercase tracking-wide">${item.brand}</p>
-                </div>
-                <div class="bg-teal-900/30 p-2 rounded-full border border-teal-500/20"><i data-lucide="${item.icon}" class="w-5 h-5 text-teal-400"></i></div>
-            </div>
-            <div class="bg-black/20 p-3 rounded-lg border border-white/5 relative z-10">
-                <div class="flex items-start gap-2 mb-2">
-                    <span class="text-[10px] font-bold text-teal-200 uppercase bg-teal-900/40 px-1.5 rounded">ROLE</span>
-                    <span class="text-xs text-gray-200">${item.role}</span>
-                </div>
-                <p class="text-xs text-gray-400 italic leading-relaxed">"${item.reason}"</p>
-            </div>
-            <div class="mt-3 flex justify-between items-center relative z-10">
-                <span class="text-[10px] text-gray-500 font-mono">Source: ${item.source}</span>
-            </div>
-        `;
-        list.appendChild(div);
-    });
-    if (window.lucide) lucide.createIcons();
 }
 
 function logAnyWear(id, type) { if (type === 'single') logWear(id); else if (type === 'combo') logComboWear(id); else if (type === 'decant') logDecantWear(id); }
