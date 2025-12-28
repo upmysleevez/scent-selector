@@ -7,9 +7,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ScentSelector">
     <meta name="theme-color" content="#1F2121">
-    <title>Fragrance Sommelier v92</title>
+    <title>Fragrance Sommelier v93</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    
     <script>
         tailwind.config = {
             theme: {
@@ -23,9 +25,11 @@
             }
         }
     </script>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="h-screen w-screen flex flex-col overflow-hidden text-gray-100 selection:bg-teal-500 selection:text-white bg-[#1F2121]">
+
     <header class="fixed top-0 w-full z-50 bg-charcoal-700 border-b border-white/5 shadow-lg px-6 py-4 safe-top">
         <div class="flex justify-between items-center">
             <div>
@@ -37,6 +41,7 @@
             </button>
         </div>
     </header>
+
     <div id="app-container" class="flex-1 flex flex-col relative h-full">
         <main class="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar relative p-4 pt-36 pb-48" id="main-content">
             
@@ -56,10 +61,12 @@
                         <label class="text-xs font-medium text-gray-400 uppercase tracking-wider ml-1 block">Weather Conditions</label>
                         <div class="text-right"><span id="temp-display" class="text-teal-300 font-bold text-lg">50°F</span></div>
                     </div>
+                    
                     <div class="glass-panel p-3 rounded-xl mb-3 flex items-center gap-3">
                         <i data-lucide="thermometer" class="w-4 h-4 text-gray-400"></i>
                         <input type="range" id="temp-slider" min="0" max="100" value="50" class="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer accent-teal-500" oninput="updateTemp(this.value)">
                     </div>
+
                     <div class="grid grid-cols-3 gap-2">
                         <button onclick="setContext('weather', 'sunny')" class="ctx-btn glass-panel p-3 rounded-xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-all" data-group="weather" data-val="sunny"><i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i><span class="text-xs">Sunny</span></button>
                         <button onclick="setContext('weather', 'rainy')" class="ctx-btn glass-panel p-3 rounded-xl flex flex-col items-center justify-center gap-1 active:scale-95 transition-all" data-group="weather" data-val="rainy"><i data-lucide="cloud-rain" class="w-5 h-5 text-blue-400"></i><span class="text-xs">Rain</span></button>
